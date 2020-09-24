@@ -18,7 +18,7 @@ install_basic_package_files(${PROJECT_NAME}
 if (DEFINED CMAKE_INSTALL_DATADIR)
     set(config_install_dir "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}")
 
-    set(_IBPF_ARCH_INDEPENDENT OFF)
+    set(_IBPF_ARCH_INDEPENDENT FALSE)
     message(STATUS "install into ${config_install_dir}...")
     install(FILES
             ${CMAKE_CURRENT_SOURCE_DIR}/cmake/DoxypressCMake.cmake
