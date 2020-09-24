@@ -10,16 +10,14 @@ include(GNUInstallDirs)
 install_basic_package_files(${PROJECT_NAME}
         VERSION ${PROJECT_VERSION}
         COMPATIBILITY AnyNewerVersion
-        ARCH_INDEPENDENT
+        #ARCH_INDEPENDENT
         NO_EXPORT
         EXTRA_PATH_VARS_SUFFIX MODULE_DIR
         NO_CHECK_REQUIRED_COMPONENTS_MACRO)
 
 if (DEFINED CMAKE_INSTALL_DATADIR)
-    set(config_install_dir "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}")
+    set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-    set(_IBPF_ARCH_INDEPENDENT FALSE)
-    message(STATUS "install into ${config_install_dir}...")
     install(FILES
             ${CMAKE_CURRENT_SOURCE_DIR}/cmake/DoxypressCMake.cmake
             DESTINATION ${config_install_dir})
