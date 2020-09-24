@@ -9,3 +9,7 @@ branches:
   only:
     - master
     - DP-7
+script:
+  - cmake --version
+  - mkdir build && cd build
+  - cmake ..
