@@ -14,36 +14,60 @@
 ##############################################################################
 # @defgroup TargetPropertyAccess Simplified access to target properties
 # @brief Functions with prefix `TPA` manage state of a surrogate `INTERFACE`
-# target that is used as a scope for stateful part of the data being worked
-# with. It's possible to set, unset, or append to a target property using syntax
-# similar to that of `set(variable value)`.
+# target that is used as scope for stateful data. It's possible to set, unset,
+# or append to a target property using syntax similar to that of
+# `set(variable value)`. A call to `TPA_create_scope` with a previously unused
+# prefix creates a new scope; subsequent calls to `TPA` functions use this scope
+# implicitly until yet another scope is created. The actual prefix is held in
+# the variable `_doxypress_cmake_uuid` that should be defined in the outer
+# scope. If the variable is not defined, the scope will have a fixed name
+# "_properties".
 ##############################################################################
+
+include(${doxypress_dir}/DoxypressCommon.cmake)
 
 ##############################################################################
 # @ingroup TargetPropertyAccess
-# @brief Sets the given variable to the name of properties' CMake target.
-# @param[out] _out_var        property's new value
+# @brief Implements scope naming scheme. This function should not be used
+# anywhere except in `TPA_create_scope`.
+# @param[in]  _prefix         prefix of the scope name
+# @param[out] _out_var        output variable
+# @return scope name
 ##############################################################################
-function(TPA_scope_name _out_var)
-    set(${_out_var} "properties_properties" PARENT_SCOPE)
+function(TPA_scope_name _prefix _out_var)
+    set(${_out_var} "${_prefix}_properties" PARENT_SCOPE)
+endfunction()
+
+##############################################################################
+# @ingroup TargetPropertyAccess
+# @brief Creates a new scope with a given name prefix. If a scope with such
+# prefix already exists, simply returns the scope name. This function is meant
+# to be called by other `TPA` functions repeatedly to obtain the right scope
+# without additional checking.
+# @param[in]  _prefix         new scope's name prefix
+# @param[out] _out_var        output variable
+# @return scope's name, either a new one or one that existed beforehand
+##############################################################################
+function(TPA_create_scope _prefix _out_var)
+    TPA_scope_name(${_prefix} _scope_name)
+
+    if (NOT TARGET ${_scope_name})
+        add_library(${_scope_name} INTERFACE)
+        doxypress_log(DEBUG "Created INTERFACE target ${_scope_name}")
+    endif()
+    set(${_out_var} "${_scope_name}" PARENT_SCOPE)
 endfunction()
 
 ##############################################################################
 # @ingroup TargetPropertyAccess
 # @brief Sets the given property to a new value.
-# @param[in] _name         property to set
-# @param[in] _value        property's new value
+# @param[in] _property     a property to modify
+# @param[in] _value        _property's new value
 ##############################################################################
-function(TPA_set _name _value)
-    TPA_scope_name(_arguments_target)
-    if (NOT TARGET ${_arguments_target})
-        doxypress_log(DEBUG "Created target ${_arguments_target}")
-        add_library(${_arguments_target} INTERFACE)
-    endif ()
-    set_property(
-            TARGET ${_arguments_target}
-            PROPERTY INTERFACE_${_name}
-            ${_value})
+function(TPA_set _property _value)
+    TPA_create_scope(${_doxypress_cmake_uuid} _scope)
+    set_property(TARGET ${_scope} PROPERTY INTERFACE_${_property} "${_value}")
+    TPA_append(properties ${_property})
 endfunction()
 
 ##############################################################################
@@ -52,77 +76,64 @@ endfunction()
 # @param[in] _property     the property to unset
 ##############################################################################
 function(TPA_unset _property)
-    TPA_scope_name(_arguments_target)
-    set_property(TARGET ${_arguments_target} PROPERTY INTERFACE_${_property})
+    TPA_create_scope(${_doxypress_cmake_uuid} _scope)
+    set_property(TARGET ${_scope} PROPERTY INTERFACE_${_property})
 endfunction()
 
 ##############################################################################
 # @ingroup TargetPropertyAccess
-# @brief Unsets the given property.
-# @param[in] _name     the property to unset
-# @param[out] _out_var result variable
+# @brief Returns value of a given property.
+# @param[in] _property     the property to unset
+# @param[out] _out_var     output variable
 # @return property's value if found; empty string otherwise
 ##############################################################################
-function(TPA_get _name _out_var)
-    TPA_scope_name(_arguments_target)
-    if (NOT TARGET ${_arguments_target})
+function(TPA_get _property _out_var)
+    TPA_create_scope(${_doxypress_cmake_uuid} _scope)
+    if (NOT TARGET ${_scope})
         unset(${_out_var} PARENT_SCOPE)
     else ()
-        get_target_property(_property ${_arguments_target} INTERFACE_${_name})
-        if ("${_property}" STREQUAL "_property-NOTFOUND")
+        get_target_property(_value ${_scope} INTERFACE_${_property})
+        if ("${_value}" STREQUAL "_value-NOTFOUND")
             set(${_out_var} "" PARENT_SCOPE)
         else ()
-            set(${_out_var} "${_property}" PARENT_SCOPE)
+            set(${_out_var} "${_value}" PARENT_SCOPE)
         endif ()
     endif ()
 endfunction()
 
-
 ##############################################################################
 # @ingroup TargetPropertyAccess
-# @brief Appends given value to the existing property's list of values. If
-# the property's value is empty, the given value becomes the first one in the
-# list.
+# @brief Appends a given value to the existing property. The property is treated
+# as a list. If the given property's doesn't exist, it's created and set to
+# the given value.
 #
-# @param[in] _property     the property to extend
-# @param[in] _value        the value to append to `_property`
+# @param[in] _property     the property to update
+# @param[in] _value        the value to append
 ##############################################################################
 function(TPA_append _property _value)
-    TPA_get(${_property} _properties)
-    list(APPEND _properties "${_value}")
-    TPA_set(${_property} "${_properties}")
+    TPA_create_scope(${_doxypress_cmake_uuid} _scope)
+
+    TPA_get(${_property} _current_value)
+    list(APPEND _current_value "${_value}")
+
+    # don't call TPA_set in order to avoid endless recursion
+    set_property(
+            TARGET ${_scope}
+            PROPERTY INTERFACE_${_property}
+            "${_current_value}"
+    )
 endfunction()
 
 ##############################################################################
 # @ingroup TargetPropertyAccess
-# @brief Clears all properties previously set by calls to `TPA_set()`.
+# @brief Clears all properties previously set by calls to `TPA_set` and
+# `TPA_append`.
 ##############################################################################
 function(TPA_clear_scope)
     TPA_get(properties _properties)
     foreach(_property ${_properties})
-        TPA_unset(${_property}_DEFAULT)
-        TPA_unset(${_property}_SETTER)
-        TPA_unset(${_property}_UPDATER)
-        TPA_unset(${_property}_OVERWRITE)
-        TPA_unset(${_property}_INPUT)
-        TPA_unset(doxypress.${_property})
+        TPA_unset(${_property})
         doxypress_log(DEBUG "unset ${_property}...")
     endforeach()
     TPA_unset(properties)
-
-    TPA_get("option_args" _option_args)
-    foreach(_arg ${_option_args})
-        TPA_unset(${_arg})
-    endforeach()
-    TPA_get("one_value_args" _one_value_args)
-    foreach(_arg ${_one_value_args})
-        TPA_unset(${_arg})
-    endforeach()
-    TPA_get("multi_value_args" _multi_value_args)
-    foreach(_arg ${_multi_value_args})
-        TPA_unset(${_arg})
-    endforeach()
-    TPA_unset(option_args)
-    TPA_unset(one_value_args)
-    TPA_unset(multi_value_args)
 endfunction()
