@@ -1,4 +1,6 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/json-cmake")
+
+set(doxypress_dir ${PROJECT_SOURCE_DIR}/cmake)
 include(../cmake/DoxypressCMake.cmake)
 
 # doxypress_project_load(DoxypressTest1.json)
@@ -15,3 +17,4 @@ function(assert_list_contains list1 el)
 endfunction()
 
 include(TestTPA.cmake)
+include(TestJSON.cmake)
