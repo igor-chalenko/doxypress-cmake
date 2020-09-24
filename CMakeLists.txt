@@ -15,13 +15,13 @@ install_basic_package_files(${PROJECT_NAME}
         EXTRA_PATH_VARS_SUFFIX MODULE_DIR
         NO_CHECK_REQUIRED_COMPONENTS_MACRO)
 
-if (DEFINED CMAKE_INSTALL_DATADIR)
+if (DEFINED CMAKE_INSTALL_LIBDIR)
     set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
     install(FILES
             ${CMAKE_CURRENT_SOURCE_DIR}/cmake/DoxypressCMake.cmake
             DESTINATION ${config_install_dir})
 else()
-    message(WARNING "CMAKE_INSTALL_DATADIR is required (install step skipped).")
+    message(WARNING "CMAKE_INSTALL_LIBDIR is required (install step skipped).")
 endif()
 
