@@ -1,12 +1,20 @@
-## ----------------------------------------------------------------------------
-## @brief Choose whether debug output should be produced by `doxypress_add_docs`
-## and its nested functions/macros. If enabled,
+##############################################################################
+## @brief Specifies whether debug output should be produced by `doxypress_log`.
+## If enabled,
 ## @code
-## doxypress_log(text) <==> message(STATUS text)
+## doxypress_log(DEBUG text) <==> message(STATUS text)
 ## @endcode
-## If disabled, `doxypress_log(text)` doesn't do anything.
-## ----------------------------------------------------------------------------
+## If disabled, DEBUG messages are not printed.
+##############################################################################
 option(DOXYPRESS_DEBUG "Enable debug output." OFF)
+##############################################################################
+## @brief Specifies whether debug output should be produced by `doxypress_log`.
+## If enabled,
+## @code
+## doxypress_log(INFO text) <==> message(STATUS text)
+## @endcode
+## If disabled, neither INFO not DEBUG messages are not printed.
+##############################################################################
 option(DOXYPRESS_INFO "Enable info output" OFF)
 
 
@@ -24,10 +32,10 @@ elseif (NOT APPLE)
     set(DOXYPRESS_LAUNCHER_COMMAND xdg-open)
 endif ()
 
-## ----------------------------------------------------------------------------
+##############################################################################
 ## @brief Prints a given message if a corresponding log level is on (enabled
 ## by `DOXYPRESS_DEBUG` and `DOXYPRESS_INFO`). Does nothing otherwise.
-## ----------------------------------------------------------------------------
+##############################################################################
 function(doxypress_log _level _text)
     if (_level STREQUAL INFO)
         set(_level "INFO ")
