@@ -16,6 +16,21 @@ include(${doxypress_dir}/TargetPropertyAccess.cmake)
 include(${doxypress_dir}/JSONFunctions.cmake)
 
 ##############################################################################
+## @brief Generates documentation using Doxypress.
+## Performs the following tasks:
+## * Creates a target `${INPUT_TARGET}.doxypress` to run `Doxypress`; here
+## `INPUT_TARGET` is the argument, given to this function, or its default value
+## `${PROJECT_NAME}` if none given.
+## * Creates other targets to open the generated documentation
+## (`index.html`, 'refman.tex' or `refman.pdf`). An application that is
+## configured to open the files of corresponding type is used.
+## * Adds the generated files to the `install` target, if a non-empty value
+## of `INSTALL_COMPONENT` was given.
+##############################################################################
+function(doxypress_add_docs)
+endfunction()
+
+##############################################################################
 ## @brief Loads a given JSON project file into TPA scope.
 ## @param[in] _file_name a project file to load
 ##############################################################################
