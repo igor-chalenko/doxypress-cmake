@@ -1,3 +1,30 @@
+#.rst:
+# DoxypressCMake
+# --------------
+#
+# .. code-block:: cmake
+#
+#   find_package(DoxypressCMake)
+#
+# Supplies a function for building documentation with ``Doxypress``:
+#
+# .. cmake:command:: doxypress_add_docs
+#
+# .. code-block:: cmake
+#
+#    doxypress_add_docs([PROJECT_FILE] <name>
+#                       [INPUT_TARGET] <name>
+#                       [EXAMPLES] <directories>
+#                       [INPUTS] <directories>
+#                       [INSTALL_COMPONENT] <name>
+#                       [GENERATE_HTML]
+#                       [GENERATE_LATEX]
+#                       [GENERATE_PDF]
+#                       [GENERATE_XML]
+#                       [OUTPUT_DIRECTORY] <directory>)
+#
+# Generates blah blah...
+
 include(JSONParser)
 
 # We must run the following at "include" time, not at function call time,

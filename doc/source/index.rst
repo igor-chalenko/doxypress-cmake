@@ -11,6 +11,7 @@ generation via Doxypress_.
    :caption: Basics
 
    intro
+   BasicPlugin
 
 .. toctree::
    :maxdepth: 2

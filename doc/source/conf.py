@@ -1,3 +1,5 @@
+import sys
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -10,12 +12,14 @@
 
 # -- Project information -----------------------------------------------------
 
-project = '${PROJECT_NAME}'
+project = 'doxypress-cmake'
 copyright = '2020, Igor Chalenko'
 author = 'Igor Chalenko'
 
 # The full version, including alpha/beta/rc tags
-release = '${PROJECT_VERSION}'
+release = 'latest'
+
+sys.path.append('.')
 
 # -- General configuration ---------------------------------------------------
 
@@ -26,8 +30,8 @@ extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autosectionlabel',
     # 'sphinx.ext.pngmath',
+    'cmake',
     'sphinx.ext.todo',
-    'breathe',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -60,7 +64,4 @@ html_css_files = [
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['${CMAKE_CURRENT_SOURCE_DIR}/source/_static']
-
-breathe_projects = {"${PROJECT_NAME}": "${CMAKE_CURRENT_BINARY_DIR}/doxypress-generated/xml"}
-breathe_default_project = "${PROJECT_NAME}"
+html_static_path = ['_static']
