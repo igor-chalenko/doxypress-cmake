@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.3)
 project(DoxypressCMake VERSION 0.0.1 DESCRIPTION "Doxypress module for CMake")
 
 add_subdirectory(test)
-add_subdirectory(doc)
+# add_subdirectory(doc)
 
 include(cmake/InstallBasicPackageFiles.cmake)
 include(GNUInstallDirs)
