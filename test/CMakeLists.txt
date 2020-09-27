@@ -18,3 +18,4 @@ endfunction()
 
 include(TestTPA.cmake)
 include(TestJSON.cmake)
+# include(TestFindDoxypressCMake.cmake)
