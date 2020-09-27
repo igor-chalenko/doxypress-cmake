@@ -17,6 +17,7 @@ generation via Doxypress_.
    :maxdepth: 2
    :caption: API
 
+   FindDoxypress
    api
    description
 
