@@ -32,6 +32,7 @@ include(JSONParser)
 get_filename_component(doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
 
 include(${doxypress_dir}/TargetPropertyAccess.cmake)
+include(${doxypress_dir}/DoxypressTargets.cmake)
 
 ##############################################################################
 # @brief The JSON document is stored in TPA under this name.
