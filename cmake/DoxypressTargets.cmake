@@ -113,6 +113,8 @@ function(doxypress_create_open_targets _name_prefix)
     JSON_get(doxypress.output-latex.generate-latex _generate_latex)
     TPA_get(GENERATE_PDF _generate_pdf)
     JSON_get(doxypress.general.output-dir _output_directory)
+
+    message(STATUS "_output_directory = ${_output_directory}")
     # JSON_get(doxypress.output-html.html-file-extension _html_extension)
 
     if (DOXYPRESS_LAUNCHER_COMMAND)

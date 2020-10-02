@@ -40,6 +40,7 @@ include(${doxypress_dir}/DoxypressParameters.cmake)
 ##############################################################################
 set(_DOXYPRESS_PROJECT_KEY "json.parsed")
 set(_DOXYPRESS_JSON_PATHS_KEY "json.paths")
+set(_DOXYPRESS_INPUTS "inputs")
 
 include(${doxypress_dir}/DoxypressCommon.cmake)
 include(${doxypress_dir}/TargetPropertyAccess.cmake)
@@ -69,7 +70,8 @@ function(doxypress_add_docs)
     # update JSON properties
     doxypress_project_update()
     # save updated JSON
-    doxypress_project_save("${_project_file}")
+    doxypress_file_name(${_project_file} _file_name)
+    doxypress_project_save("${CMAKE_CURRENT_BINARY_DIR}/${_file_name}")
 
     doxypress_create_targets("${_project_file}")
     TPA_get(INSTALL_COMPONENT _install_component)
@@ -120,7 +122,7 @@ endfunction()
 function(doxypress_params_init)
     # TPA_create_scope(${_doxypress_cmake_uuid} _arguments_target)
     doxypress_param_string(PROJECT_FILE
-            UPDATER "update_doxyfile"
+            UPDATER "update_project_file"
             DEFAULT "${doxypress_dir}/DoxypressCMake.json")
     doxypress_param_string(INPUT_TARGET SETTER "set_input_target")
     doxypress_param_string(INSTALL_COMPONENT)
@@ -292,11 +294,11 @@ function(doxypress_set_latex_cmd_name _out_var)
     endif ()
 endfunction()
 
-function(doxypress_update_doxyfile _doxyfile _out_var)
+function(doxypress_update_project_file _project_file _out_var)
     set(_result "")
-    if (NOT IS_ABSOLUTE ${_doxyfile})
+    if (NOT IS_ABSOLUTE ${_project_file})
         get_filename_component(_result
-                ${CMAKE_CURRENT_SOURCE_DIR}/${_doxyfile} ABSOLUTE)
+                ${CMAKE_CURRENT_SOURCE_DIR}/${_project_file} ABSOLUTE)
         set(${_out_var} "${_result}" PARENT_SCOPE)
     endif ()
 endfunction()
