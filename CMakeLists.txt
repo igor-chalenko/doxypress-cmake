@@ -7,13 +7,23 @@ add_subdirectory(test)
 include(cmake/InstallBasicPackageFiles.cmake)
 include(GNUInstallDirs)
 
-install_basic_package_files(${PROJECT_NAME}
-        VERSION ${PROJECT_VERSION}
-        COMPATIBILITY AnyNewerVersion
-        #ARCH_INDEPENDENT
-        NO_EXPORT
-        EXTRA_PATH_VARS_SUFFIX MODULE_DIR
-        NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+if (${CMAKE_VERSION} VERSION_LESS 3.14)
+    install_basic_package_files(${PROJECT_NAME}
+            VERSION ${PROJECT_VERSION}
+            COMPATIBILITY AnyNewerVersion
+            #ARCH_INDEPENDENT
+            NO_EXPORT
+            EXTRA_PATH_VARS_SUFFIX MODULE_DIR
+            NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+else()
+    install_basic_package_files(${PROJECT_NAME}
+            VERSION ${PROJECT_VERSION}
+            COMPATIBILITY AnyNewerVersion
+            ARCH_INDEPENDENT
+            NO_EXPORT
+            EXTRA_PATH_VARS_SUFFIX MODULE_DIR
+            NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+endif()
 
 if (DEFINED CMAKE_INSTALL_LIBDIR)
     set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
@@ -24,4 +34,3 @@ if (DEFINED CMAKE_INSTALL_LIBDIR)
 else()
     message(WARNING "CMAKE_INSTALL_LIBDIR is required (install step skipped).")
 endif()
-
