@@ -70,10 +70,10 @@ function(doxypress_add_docs)
     # update JSON properties
     doxypress_project_update()
     # save updated JSON
-    doxypress_file_name(${_project_file} _file_name)
-    doxypress_project_save("${CMAKE_CURRENT_BINARY_DIR}/${_file_name}")
+    doxypress_project_generated_name(${_project_file} _file_name)
+    doxypress_project_save("${_file_name}")
 
-    doxypress_create_targets("${_project_file}")
+    doxypress_create_targets("${_project_file}" "${_file_name}")
     TPA_get(INSTALL_COMPONENT _install_component)
 
     if (_install_component)

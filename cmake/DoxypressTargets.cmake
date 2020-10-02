@@ -1,4 +1,4 @@
-function(doxypress_create_targets _project_file)
+function(doxypress_create_targets _project_file _generated_project_file)
     set(_outputs "")
     # todo constant
     # JSON_get(doxypress.output-html.html-file-extension _html_extension)
@@ -37,15 +37,13 @@ function(doxypress_create_targets _project_file)
                 TARGET "${_input_target}")
     endif()
 
-    doxypress_file_name("${_project_file}" _relative_file_name)
-
     add_custom_command(OUTPUT ${_outputs}
             COMMAND ${CMAKE_COMMAND} -E remove_directory ${_output_directory}
             DEPENDS ${_public_headers} ${_project_file}
             COMMAND Doxypress::doxypress
-            "${CMAKE_CURRENT_BINARY_DIR}/${_relative_file_name}"
+            "${_generated_project_file}"
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            MAIN_DEPENDENCY "${CMAKE_CURRENT_BINARY_DIR}/${_relative_file_name}"
+            MAIN_DEPENDENCY "${_generated_project_file}"
             COMMENT "Generating API documentation with Doxypress..."
             BYPRODUCTS "${_output_directory}"
             VERBATIM)
@@ -215,11 +213,11 @@ function(doxypress_install_docs _destination _component)
     endforeach ()
 endfunction()
 
-function(doxypress_file_name _full_name _out_var)
-    if (IS_ABSOLUTE "${_full_name}")
-        get_filename_component(_name "${_full_name}" NAME)
-        set(${_out_var} ${_name} PARENT_SCOPE)
+function(doxypress_project_generated_name _project_file _out_var)
+    if (IS_ABSOLUTE "${_project_file}")
+        get_filename_component(_name "${_project_file}" NAME)
+        set(${_out_var} ${CMAKE_CURRENT_BINARY_DIR}/${_name} PARENT_SCOPE)
     else()
-        set(${_out_var} ${_full_name} PARENT_SCOPE)
+        set(${_out_var} ${CMAKE_CURRENT_BINARY_DIR}/${_project_file} PARENT_SCOPE)
     endif ()
 endfunction()

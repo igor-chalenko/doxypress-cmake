@@ -8,7 +8,8 @@ function(test_create_targets)
     TPA_set(INPUT_TARGET _test)
     configure_file(DoxypressTest1.json
             ${CMAKE_CURRENT_BINARY_DIR}/DoxypressTest1.json @ONLY)
-    doxypress_create_targets(${PROJECT_SOURCE_DIR}/DoxypressTest1.json)
+    doxypress_create_targets(${PROJECT_SOURCE_DIR}/DoxypressTest1.json
+            ${CMAKE_CURRENT_BINARY_DIR}/DoxypressTest1.json)
 
     if (NOT TARGET _test.doxypress)
         assert_same("doxypress target `_test.doxypress` was not created")
