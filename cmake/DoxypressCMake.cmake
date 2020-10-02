@@ -120,7 +120,6 @@ endfunction()
 # @brief Prepares argument parsing context.
 ##############################################################################
 function(doxypress_params_init)
-    # TPA_create_scope(${_doxypress_cmake_uuid} _arguments_target)
     doxypress_param_string(PROJECT_FILE
             UPDATER "update_project_file"
             DEFAULT "${doxypress_dir}/DoxypressCMake.json")
