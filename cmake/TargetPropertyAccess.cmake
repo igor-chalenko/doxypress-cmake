@@ -15,13 +15,17 @@
 # @defgroup TargetPropertyAccess Simplified access to target properties
 # @brief Functions with prefix `TPA` manage state of a surrogate `INTERFACE`
 # target that is used as scope for stateful data. It's possible to set, unset,
-# or append to a target property using syntax similar to that of
-# `set(variable value)`. A call to `TPA_create_scope` with a previously unused
-# prefix creates a new scope; subsequent calls to `TPA` functions use this scope
-# implicitly until yet another scope is created. The actual prefix is held in
-# the variable `_doxypress_cmake_uuid` that should be defined in the outer
-# scope. If the variable is not defined, the scope will have a fixed name
-# "_properties".
+# or append to a target property using syntax similar to that of usual
+# variables:
+#
+# * TPA_set(variable value) # set(variable value)
+# * TPA_unset(variable) # unset(variable)
+# * TPA_append(variable value) # list(APPEND variable value)
+#
+# A call to `TPA_create_scope` creates a new scope in every `CMake` source
+# directory: the value of `${CMAKE_CURRENT_SOURCE_DIR}` is transformed to
+# satisfy requirements put on target names, and then used as a prefix for
+# a new target.
 ##############################################################################
 
 include(${doxypress_dir}/DoxypressCommon.cmake)
@@ -34,8 +38,10 @@ include(${doxypress_dir}/DoxypressCommon.cmake)
 # @param[out] _out_var        output variable
 # @return scope name
 ##############################################################################
-function(TPA_scope_name _prefix _out_var)
-    set(${_out_var} "${_prefix}_properties" PARENT_SCOPE)
+function(TPA_scope_name _out_var)
+    string(REPLACE "/" "." _replaced "${CMAKE_CURRENT_SOURCE_DIR}")
+    string(REPLACE "\\" "." _replaced "${_replaced}")
+    set(${_out_var} "${_replaced}.properties" PARENT_SCOPE)
 endfunction()
 
 ##############################################################################
@@ -48,8 +54,8 @@ endfunction()
 # @param[out] _out_var        output variable
 # @return scope's name, either a new one or one that existed beforehand
 ##############################################################################
-function(TPA_create_scope _prefix _out_var)
-    TPA_scope_name("${_prefix}" _scope_name)
+function(TPA_create_scope _out_var)
+    TPA_scope_name(_scope_name)
 
     if (NOT TARGET ${_scope_name})
         add_library(${_scope_name} INTERFACE)
@@ -65,7 +71,7 @@ endfunction()
 # @param[in] _value        _property's new value
 ##############################################################################
 function(TPA_set _property _value)
-    TPA_create_scope("${_doxypress_cmake_uuid}" _scope)
+    TPA_create_scope(_scope)
     set_property(TARGET ${_scope} PROPERTY INTERFACE_${_property} "${_value}")
 
     if (NOT ${_property} STREQUAL "properties")
@@ -90,7 +96,7 @@ endfunction()
 # @param[in] _property     the property to unset
 ##############################################################################
 function(TPA_unset _property)
-    TPA_create_scope("${_doxypress_cmake_uuid}" _scope)
+    TPA_create_scope(_scope)
     set_property(TARGET ${_scope} PROPERTY INTERFACE_${_property})
 
     TPA_get(properties _properties)
@@ -110,7 +116,7 @@ endfunction()
 # @return property's value if found; empty string otherwise
 ##############################################################################
 function(TPA_get _property _out_var)
-    TPA_create_scope("${_doxypress_cmake_uuid}" _scope)
+    TPA_create_scope(_scope)
     get_target_property(_value ${_scope} INTERFACE_${_property})
     # doxypress_log(DEBUG "[TPA_get] found ${_property} = `${_value}`")
     if ("${_value}" STREQUAL "_value-NOTFOUND")
@@ -130,7 +136,7 @@ endfunction()
 # @param[in] _value        the value to append
 ##############################################################################
 function(TPA_append _property _value)
-    TPA_create_scope("${_doxypress_cmake_uuid}" _scope)
+    TPA_create_scope(_scope)
 
     TPA_get(${_property} _current_value)
     if ("${_current_value}" STREQUAL "")

@@ -20,6 +20,5 @@ function(test_TPA_clear_scope)
     assert_same("${_setter}" "")
 endfunction()
 
-string(RANDOM LENGTH 5 _doxypress_cmake_uuid)
 test_TPA_get_set_append()
 test_TPA_clear_scope()
