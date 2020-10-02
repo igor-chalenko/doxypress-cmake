@@ -49,7 +49,7 @@ endfunction()
 # @return scope's name, either a new one or one that existed beforehand
 ##############################################################################
 function(TPA_create_scope _prefix _out_var)
-    TPA_scope_name(${_prefix} _scope_name)
+    TPA_scope_name("${_prefix}" _scope_name)
 
     if (NOT TARGET ${_scope_name})
         add_library(${_scope_name} INTERFACE)
@@ -65,9 +65,23 @@ endfunction()
 # @param[in] _value        _property's new value
 ##############################################################################
 function(TPA_set _property _value)
-    TPA_create_scope(${_doxypress_cmake_uuid} _scope)
+    TPA_create_scope("${_doxypress_cmake_uuid}" _scope)
     set_property(TARGET ${_scope} PROPERTY INTERFACE_${_property} "${_value}")
-    TPA_append(properties ${_property})
+
+    if (NOT ${_property} STREQUAL "properties")
+        TPA_get(properties _properties)
+        set(_flag false)
+        foreach(_existing ${_properties})
+            if (${_existing} STREQUAL ${_property})
+                set(_flag true)
+            endif()
+        endforeach()
+        if (NOT ${_flag})
+            list(APPEND _properties ${_property})
+            # set_property(TARGET ${_scope} PROPERTY properties "${_properties}")
+            TPA_set(properties "${_properties}")
+        endif()
+    endif()
 endfunction()
 
 ##############################################################################
@@ -76,8 +90,16 @@ endfunction()
 # @param[in] _property     the property to unset
 ##############################################################################
 function(TPA_unset _property)
-    TPA_create_scope(${_doxypress_cmake_uuid} _scope)
+    TPA_create_scope("${_doxypress_cmake_uuid}" _scope)
     set_property(TARGET ${_scope} PROPERTY INTERFACE_${_property})
+
+    TPA_get(properties _properties)
+    foreach(_existing ${_properties})
+        if (${_existing} STREQUAL ${_property})
+            list(REMOVE_ITEM _properties ${_existing})
+        endif()
+    endforeach()
+    TPA_set(properties "${_properties}")
 endfunction()
 
 ##############################################################################
@@ -88,16 +110,13 @@ endfunction()
 # @return property's value if found; empty string otherwise
 ##############################################################################
 function(TPA_get _property _out_var)
-    TPA_create_scope(${_doxypress_cmake_uuid} _scope)
-    if (NOT TARGET ${_scope})
-        unset(${_out_var} PARENT_SCOPE)
+    TPA_create_scope("${_doxypress_cmake_uuid}" _scope)
+    get_target_property(_value ${_scope} INTERFACE_${_property})
+    # doxypress_log(DEBUG "[TPA_get] found ${_property} = `${_value}`")
+    if ("${_value}" STREQUAL "_value-NOTFOUND")
+        set(${_out_var} "" PARENT_SCOPE)
     else ()
-        get_target_property(_value ${_scope} INTERFACE_${_property})
-        if ("${_value}" STREQUAL "_value-NOTFOUND")
-            set(${_out_var} "" PARENT_SCOPE)
-        else ()
-            set(${_out_var} "${_value}" PARENT_SCOPE)
-        endif ()
+        set(${_out_var} "${_value}" PARENT_SCOPE)
     endif ()
 endfunction()
 
@@ -111,17 +130,24 @@ endfunction()
 # @param[in] _value        the value to append
 ##############################################################################
 function(TPA_append _property _value)
-    TPA_create_scope(${_doxypress_cmake_uuid} _scope)
+    TPA_create_scope("${_doxypress_cmake_uuid}" _scope)
 
     TPA_get(${_property} _current_value)
-    list(APPEND _current_value "${_value}")
+    if ("${_current_value}" STREQUAL "")
+        TPA_set(${_property} "${_value}")
+    else()
+        # no need to update the index
+        list(APPEND _current_value "${_value}")
 
-    # don't call TPA_set in order to avoid endless recursion
-    set_property(
-            TARGET ${_scope}
-            PROPERTY INTERFACE_${_property}
-            "${_current_value}"
-    )
+        # ???
+        TPA_set(${_property} "${_current_value}")
+        # don't call TPA_set in order to avoid endless recursion
+        # set_property(
+        #        TARGET ${_scope}
+        #        PROPERTY INTERFACE_${_property}
+        #        "${_current_value}"
+        #)
+    endif()
 endfunction()
 
 ##############################################################################
@@ -133,7 +159,7 @@ function(TPA_clear_scope)
     TPA_get(properties _properties)
     foreach(_property ${_properties})
         TPA_unset(${_property})
-        doxypress_log(DEBUG "unset ${_property}...")
+        # doxypress_log(DEBUG "unset ${_property}...")
     endforeach()
     TPA_unset(properties)
 endfunction()

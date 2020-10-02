@@ -38,6 +38,7 @@ function(test_JSON_get)
 
     JSON_get("doxypress.source.inline-source" _property)
     assert_same("${_property}" false)
+    TPA_clear_scope()
 endfunction()
 
 function(test_JSON_serialize)
@@ -62,6 +63,7 @@ function(test_JSON_serialize)
     assert_same(${_new_value} true)
     JSON_get("doxypress.input.input-source" _input_source)
     assert_same("${_input_source}" "include2;include3")
+    TPA_clear_scope()
 endfunction()
 
 function(test_JSON_set)
@@ -78,6 +80,7 @@ function(test_JSON_set)
     JSON_get("doxypress.source.suffix-exclude-navtree" _property)
     assert_list_contains("${_property}" x1)
     assert_list_contains("${_property}" x2)
+    TPA_clear_scope()
 endfunction()
 
 # test_JSON_format()
