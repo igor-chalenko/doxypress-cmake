@@ -6,6 +6,13 @@ function(doxypress_create_targets _project_file)
     JSON_get(doxypress.output-html.generate-html _generate_html)
     JSON_get(doxypress.output-latex.generate-latex _generate_latex)
     TPA_get(GENERATE_PDF _generate_pdf)
+    TPA_get(INPUT_DIRECTORIES _input_directories)
+    TPA_get(INPUT_TARGET _input_target)
+
+    # todo remove after debugging
+    if (NOT _output_directory)
+        message(FATAL_ERROR "Output directory may not be empty.")
+    endif()
 
     if (_generate_html)
         set(_html_index_file ${_output_directory}/html/index.html)
@@ -20,12 +27,15 @@ function(doxypress_create_targets _project_file)
         list(APPEND _outputs ${_pdf_file})
     endif()
 
-    TPA_get(INPUT_DIRECTORIES _input_directories)
-    TPA_get(INPUT_TARGET _input_target)
-
-    doxypress_find_inputs(_public_headers
-            DIRECTORIES "${_input_directories}"
-            TARGET "${_input_target}")
+    if (NOT _input_target)
+        doxypress_find_inputs(_public_headers
+                DIRECTORIES "${_input_directories}")
+        set(_input_target ${PROJECT_NAME})
+    else()
+        doxypress_find_inputs(_public_headers
+                DIRECTORIES "${_input_directories}"
+                TARGET "${_input_target}")
+    endif()
 
     doxypress_file_name("${_project_file}" _relative_file_name)
 
