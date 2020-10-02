@@ -1,0 +1,465 @@
+{
+    "clang": {
+        "clang-compilation-path": "",
+        "clang-dialect": "",
+        "clang-flags": [
+            ""
+        ],
+        "clang-parsing": false,
+        "clang-use-headers": true
+    },
+    "configuration": {
+        "allow-sub-grouping": false,
+        "allow-unicode-names": false,
+        "always-detailed-sec": false,
+        "auto-link": true,
+        "brief-member-desc": true,
+        "built-in-stl-support": true,
+        "case-sensitive-fname": true,
+        "cpp-cli-support": true,
+        "create-subdirs": false,
+        "duplicate-docs": false,
+        "enabled-sections": [
+            ""
+        ],
+        "extract-all": true,
+        "extract-anon-namespaces": false,
+        "extract-local-classes": false,
+        "extract-local-methods": false,
+        "extract-package": false,
+        "extract-private": false,
+        "extract-static": true,
+        "file-version-filter": "",
+        "force-local-includes": false,
+        "full-path-names": false,
+        "generate-bug-list": true,
+        "generate-deprecate-list": true,
+        "generate-test-list": true,
+        "generate-todo-list": true,
+        "group-nested-compounds": false,
+        "hide-compound-ref": false,
+        "hide-friend-compounds": false,
+        "hide-in-body-docs": false,
+        "hide-navtree-members": false,
+        "hide-scope-names": false,
+        "hide-undoc-classes": true,
+        "hide-undoc-members": true,
+        "idl-support": true,
+        "inherit-docs": true,
+        "inline-grouped-classes": false,
+        "inline-info": false,
+        "inline-inherited-member": false,
+        "inline-simple-struct": false,
+        "internal-docs": false,
+        "javadoc-auto-brief": true,
+        "language-mapping": [
+            "inl=C++",
+            "txx=C++",
+            "inc=C++",
+            "sh=C++",
+            "m=C++",
+            "cmake=C++",
+            "ctest=C++"
+        ],
+        "layout-file": "",
+        "main-page-name": "",
+        "main-page-omit": false,
+        "markdown": true,
+        "max-init-lines": 30,
+        "multiline-cpp-brief": false,
+        "ns-alias": [
+            ""
+        ],
+        "qt-auto-brief": false,
+        "repeat-brief": true,
+        "separate-member-pages": false,
+        "short-names": false,
+        "show-file-page": true,
+        "show-grouped-members-inc": false,
+        "show-include-files": false,
+        "show-namespace-page": true,
+        "show-used-files": false,
+        "sip-support": false,
+        "sort-brief-docs": false,
+        "sort-by-scope-name": true,
+        "sort-class-case-sensitive": false,
+        "sort-constructors-first": false,
+        "sort-group-names": false,
+        "sort-member-docs": false,
+        "strict-sig-matching": false,
+        "tcl-subst": [
+            ""
+        ],
+        "toc-include-headers": 0,
+        "use-typedef-name": false
+    },
+    "dot": {
+        "class-diagrams": true,
+        "dia-file-dirs": [
+            ""
+        ],
+        "dia-path": "",
+        "directory-graph": true,
+        "dot-call": false,
+        "dot-called-by": false,
+        "dot-class-graph": false,
+        "dot-cleanup": true,
+        "dot-collaboration": false,
+        "dot-file-dirs": [
+            ""
+        ],
+        "dot-font-name": "",
+        "dot-font-path": "",
+        "dot-font-size": 10,
+        "dot-graph-max-depth": 0,
+        "dot-graph-max-nodes": 50,
+        "dot-hierarchy": true,
+        "dot-image-format": "png",
+        "dot-include": true,
+        "dot-included-by": false,
+        "dot-multiple-targets": false,
+        "dot-num-threads": 0,
+        "dot-path": "",
+        "dot-transparent": false,
+        "generate-legend": true,
+        "group-graphs": true,
+        "have-dot": false,
+        "hide-undoc-relations": true,
+        "interactive-svg": false,
+        "msc-file-dirs": [
+            ""
+        ],
+        "mscgen-path": "",
+        "plantuml-cfg-file": "",
+        "plantuml-inc-path": [
+            ""
+        ],
+        "plantuml-jar-path": "",
+        "template-relations": false,
+        "uml-limit-num-fields": 10,
+        "uml-look": true
+    },
+    "doxypress-format": 1,
+    "doxypress-updated": "",
+    "external": {
+        "all-externals": false,
+        "external-groups": true,
+        "external-pages": true,
+        "generate-tagfile": "",
+        "perl-path": "",
+        "tag-files": [
+            ""
+        ]
+    },
+    "general": {
+        "abbreviate-brief": [
+            ""
+        ],
+        "aliases": [
+            "api=<a href=\\\"http://en.wikipedia.org/wiki/Application_programming_interface\\\">API</a>",
+            "abi=<a href=\\\"http://en.wikipedia.org/wiki/Application_binary_interface\\\">ABI</a>"
+        ],
+        "lookup-cache-size": 0,
+        "optimize-c": false,
+        "optimize-cplus": true,
+        "optimize-fortran": false,
+        "optimize-java": false,
+        "optimize-python": false,
+        "output-dir": "",
+        "output-language": "English",
+        "strip-from-inc-path": [
+        ],
+        "strip-from-path": [
+        ],
+        "tab-size": 4
+    },
+    "index": {
+        "alpha-index": false,
+        "cols-in-index": 1,
+        "ignore-prefix": [
+            ""
+        ]
+    },
+    "input": {
+        "example-patterns": [
+            ""
+        ],
+        "example-recursive": true,
+        "example-source": [
+            ""
+        ],
+        "exclude-files": [
+            ""
+        ],
+        "exclude-patterns": [
+            "*/.svn/*",
+            "*/.git/*",
+            "*/Testing*",
+            "*/CMakeFiles/*.cmake"
+        ],
+        "exclude-symbols": [
+            ""
+        ],
+        "exclude-symlinks": false,
+        "filter-patterns": [
+            ""
+        ],
+        "filter-program": "",
+        "filter-source-files": false,
+        "filter-source-patterns": [
+            ""
+        ],
+        "image-path": [
+            ""
+        ],
+        "input-encoding": "UTF-8",
+        "input-patterns": [
+            "*.c",
+            "*.cc",
+            "*.cxx",
+            "*.cpp",
+            "*.txx",
+            "*.inl",
+            "*.inc",
+            "*.h",
+            "*.hh",
+            "*.hxx",
+            "*.hpp",
+            "*.java",
+            "*.php",
+            "*.py",
+            "*.pl",
+            "*.pm",
+            "*.php3",
+            "*.m",
+            "*.mm",
+            "*.f90",
+            "*.sh",
+            "*.cmake",
+            "*.ctest"
+        ],
+        "input-recursive": "",
+        "input-source": [
+            ""
+        ],
+        "mdfile-mainpage": ""
+    },
+    "messages": {
+        "quiet": true,
+        "warn-doc-error": true,
+        "warn-format": "",
+        "warn-logfile": "",
+        "warn-undoc": false,
+        "warn-undoc-param": true,
+        "warnings": true
+    },
+    "output-chm": {
+        "binary-toc": false,
+        "chm-file": "",
+        "chm-index-encoding": "",
+        "generate-chi": false,
+        "generate-chm": false,
+        "hhc-location": "",
+        "toc-expanded": false
+    },
+    "output-docbook": {
+        "docbook-output": "docbook",
+        "docbook-program-listing": false,
+        "generate-docbook": false
+    },
+    "output-docset": {
+        "docset-bundle-id": "org.doxygen.Project",
+        "docset-feedname": "Doxygen generated docs",
+        "docset-publisher-id": "org.doxygen.Publisher",
+        "docset-publisher-name": "Publisher",
+        "generate-docset": false
+    },
+    "output-eclipse": {
+        "eclipse-doc-id": "org.doxygen.Project",
+        "generate-eclipse": false
+    },
+    "output-html": {
+        "disable-index": true,
+        "enum-values-per-line": 4,
+        "external-links-in-window": false,
+        "formula-fontsize": 10,
+        "formula-transparent": true,
+        "generate-html": true,
+        "generate-treeview": true,
+        "ghostscript": "",
+        "html-colorstyle-gamma": 80,
+        "html-colorstyle-hue": 220,
+        "html-colorstyle-sat": 100,
+        "html-dynamic-sections": true,
+        "html-extra-files": [
+            ""
+        ],
+        "html-file-extension": ".html",
+        "html-footer": "",
+        "html-header": "",
+        "html-index-num-entries": 100,
+        "html-output": "",
+        "html-search": true,
+        "html-stylesheets": [
+            ""
+        ],
+        "html-timestamp": true,
+        "mathjax-codefile": "",
+        "mathjax-extensions": [
+            ""
+        ],
+        "mathjax-format": "HTML-CSS",
+        "mathjax-relpath": "http://cdn.mathjax.org/mathjax/latest",
+        "search-data-file": "searchdata.xml",
+        "search-external": false,
+        "search-external-id": "",
+        "search-external-url": "",
+        "search-mappings": [
+            ""
+        ],
+        "search-server-based": false,
+        "treeview-width": 270,
+        "use-mathjax": false
+    },
+    "output-latex": {
+        "cite-bib-files": [
+            ""
+        ],
+        "generate-latex": false,
+        "latex-batch-mode": false,
+        "latex-bib-style": "plain",
+        "latex-cmd-name": "latex",
+        "latex-compact": false,
+        "latex-extra-files": [
+            ""
+        ],
+        "latex-extra-packages": [
+            ""
+        ],
+        "latex-footer": "",
+        "latex-header": "",
+        "latex-hide-indices": false,
+        "latex-hyper-pdf": true,
+        "latex-output": "",
+        "latex-paper-type": "",
+        "latex-pdf": false,
+        "latex-ps": false,
+        "latex-source-code": false,
+        "latex-stylesheets": [
+            ""
+        ],
+        "latex-timestamp": true,
+        "make-index-cmd-name": "makeindex"
+    },
+    "output-man": {
+        "generate-man": false,
+        "man-extension": "",
+        "man-links": false,
+        "man-output": "",
+        "man-subdir": ""
+    },
+    "output-perl": {
+        "generate-perl": false,
+        "perl-latex": false,
+        "perl-prefix": "",
+        "perl-pretty": true
+    },
+    "output-qhelp": {
+        "generate-qthelp": false,
+        "qch-file": "",
+        "qhp-cust-attrib": [
+            ""
+        ],
+        "qhp-cust-filter-name": "",
+        "qhp-namespace": "",
+        "qhp-sect-attrib": [
+            ""
+        ],
+        "qhp-virtual-folder": "doc",
+        "qthelp-gen-path": ""
+    },
+    "output-rtf": {
+        "generate-rtf": false,
+        "rtf-compact": false,
+        "rtf-extension": "",
+        "rtf-hyperlinks": false,
+        "rtf-output": "",
+        "rtf-paper-type": "a4",
+        "rtf-source-code": false,
+        "rtf-stylesheet": ""
+    },
+    "output-xml": {
+        "generate-xml": "",
+        "xml-output": "xml",
+        "xml-program-listing": false
+    },
+    "preprocessor": {
+        "enable-preprocessing": true,
+        "expand-as-defined": [
+            ""
+        ],
+        "expand-only-predefined": false,
+        "include-path": [
+            ""
+        ],
+        "include-patterns": [
+            ""
+        ],
+        "macro-expansion": true,
+        "predefined-macros": [
+            "DOXYGEN_INVOKED"
+        ],
+        "search-includes": true,
+        "skip-function-macros": true
+    },
+    "project": {
+        "project-brief": "",
+        "project-logo": "",
+        "project-name": "",
+        "project-version": ""
+    },
+    "source": {
+        "inline-source": false,
+        "ref-by-relation": true,
+        "ref-link-source": true,
+        "ref-relation": true,
+        "source-code": false,
+        "source-tooltips": true,
+        "strip-code-comments": false,
+        "suffix-exclude-navtree": [
+            "doc",
+            "dox",
+            "md",
+            "markdown",
+            "txt"
+        ],
+        "suffix-header-navtree": [
+            "h",
+            "hh",
+            "hxx",
+            "hpp",
+            "h++",
+            "idl",
+            "ddl",
+            "pidl"
+        ],
+        "suffix-source-navtree": [
+            "c",
+            "cc",
+            "cxx",
+            "cpp",
+            "c++",
+            "ii",
+            "ixx",
+            "ipp",
+            "i++",
+            "inl",
+            "java",
+            "m",
+            "mm",
+            "xml"
+        ],
+        "use-htags": false,
+        "verbatim-headers": false
+    }
+}
