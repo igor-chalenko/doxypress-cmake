@@ -2,7 +2,7 @@ function(test_input_directories_full_3)
     set("output-latex.generate-latex" false)
     doxypress_add_docs(
             INPUT_TARGET main
-            INPUT_DIRECTORIES dir1 dir2 GENERATE_LATEX)
+            INPUTS dir1 dir2 GENERATE_LATEX)
 
     doxypress_project_load(${CMAKE_CURRENT_BINARY_DIR}/DoxypressCMake.json)
     JSON_get("doxypress.input.input-source" _inputs)

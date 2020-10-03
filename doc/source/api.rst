@@ -56,7 +56,7 @@ doxypress_add_docs
     doxypress_add_docs(
         PROJECT_FILE
         INPUT_TARGET
-        INPUT_DIRECTORIES
+        INPUTS
         INSTALL_COMPONENT
         EXAMPLE_DIRECTORIES
         GENERATE_HTML
@@ -116,9 +116,9 @@ Parameters
     sources in the generated project file.
     Default is `${PROJECT_NAME}` if such target exists, empty otherwise.
 
-**INPUT_DIRECTORIES**
-    A list of directories to be processed by Doxypress; takes priority over
-    `INPUT_TARGET`.
+**INPUTS**
+    A list of files and directories to be processed by Doxypress; takes priority
+    over `INPUT_TARGET`.
 
 **INSTALL_COMPONENT**
     If specified, an installation command for generated docs will be added to
