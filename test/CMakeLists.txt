@@ -16,6 +16,10 @@ function(assert_list_contains list1 el)
     endif ()
 endfunction()
 
+add_executable(main main.cc)
+set_target_properties(main PROPERTIES EXCLUDE_FROM_ALL 1)
+target_include_directories(main PUBLIC include4 include5)
+
 include(TestTPA.cmake)
 include(TestJSON.cmake)
 include(TestCreateTargets.cmake)

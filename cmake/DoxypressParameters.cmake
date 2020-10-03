@@ -212,8 +212,6 @@ function(doxypress_params_update _name _value)
     TPA_get("${_name}_SETTER" _setter)
     TPA_get("${_name}_DEFAULT" _default)
 
-    # doxypress_log(DEBUG "[params_update] ${_name}: `${_setter}` `${_updater}` `${_default}`")
-
     # convert CMake booleans to JSON's
     if ("${_value}" STREQUAL "TRUE")
         set(_value true)
@@ -233,7 +231,6 @@ function(doxypress_params_update _name _value)
         endif ()
         if (_value STREQUAL "")
             # if no default, nothing happens
-            # doxypress_log(DEBUG "updating ${_name} to default `${_default}` ?")
             if (NOT _default STREQUAL "")
                 set(_value "${_default}")
             endif ()
@@ -243,7 +240,7 @@ function(doxypress_params_update _name _value)
             doxypress_call(doxypress_${_updater} "${_value}" _value)
         endif ()
     endif ()
-    doxypress_log(INFO "[input] ${_name} = ${_value}")
+    doxypress_log(DEBUG "[input] ${_name} = ${_value}")
     TPA_set(${_name} "${_value}")
 endfunction()
 

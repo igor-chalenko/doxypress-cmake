@@ -169,10 +169,6 @@ function(test_latex_find_package)
     TPA_clear_scope()
 endfunction()
 
-add_executable(main main.cc)
-set_target_properties(main PROPERTIES EXCLUDE_FROM_ALL 1)
-target_include_directories(main PUBLIC include4 include5)
-
 message(STATUS "Running tests...")
 test_input_flags_1()
 test_input_flags_2()
