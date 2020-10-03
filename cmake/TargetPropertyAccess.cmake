@@ -32,20 +32,6 @@ include(${doxypress_dir}/DoxypressCommon.cmake)
 
 ##############################################################################
 # @ingroup TargetPropertyAccess
-# @brief Implements scope naming scheme. This function should not be used
-# anywhere except in `TPA_create_scope`.
-# @param[in]  _prefix         prefix of the scope name
-# @param[out] _out_var        output variable
-# @return scope name
-##############################################################################
-function(TPA_scope_name _out_var)
-    string(REPLACE "/" "." _replaced "${CMAKE_CURRENT_SOURCE_DIR}")
-    string(REPLACE "\\" "." _replaced "${_replaced}")
-    set(${_out_var} "${_replaced}.properties" PARENT_SCOPE)
-endfunction()
-
-##############################################################################
-# @ingroup TargetPropertyAccess
 # @brief Creates a new scope with a given name prefix. If a scope with such
 # prefix already exists, simply returns the scope name. This function is meant
 # to be called by other `TPA` functions repeatedly to obtain the right scope
@@ -55,11 +41,11 @@ endfunction()
 # @return scope's name, either a new one or one that existed beforehand
 ##############################################################################
 function(TPA_create_scope _out_var)
-    TPA_scope_name(_scope_name)
+    _TPA_scope_name(_scope_name)
 
     if (NOT TARGET ${_scope_name})
         add_library(${_scope_name} INTERFACE)
-        doxypress_log(DEBUG "Created INTERFACE target ${_scope_name}")
+        _doxypress_log(DEBUG "Created INTERFACE target ${_scope_name}")
     endif()
     set(${_out_var} "${_scope_name}" PARENT_SCOPE)
 endfunction()
@@ -166,4 +152,18 @@ function(TPA_clear_scope)
         TPA_unset(${_property})
     endforeach()
     TPA_unset(properties)
+endfunction()
+
+##############################################################################
+# @ingroup TargetPropertyAccess
+# @brief Implements scope naming scheme. This function should not be used
+# anywhere except in `TPA_create_scope`.
+# @param[in]  _prefix         prefix of the scope name
+# @param[out] _out_var        output variable
+# @return scope name
+##############################################################################
+function(_TPA_scope_name _out_var)
+    string(REPLACE "/" "." _replaced "${CMAKE_CURRENT_SOURCE_DIR}")
+    string(REPLACE "\\" "." _replaced "${_replaced}")
+    set(${_out_var} "${_replaced}.properties" PARENT_SCOPE)
 endfunction()

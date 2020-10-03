@@ -1,14 +1,14 @@
 function(test_create_targets)
-    JSON_set(doxypress.general.output-dir "${CMAKE_CURRENT_BINARY_DIR}")
-    JSON_set(doxypress.output-html.generate-html true)
-    JSON_set(doxypress.output-latex.generate-latex true)
+    _JSON_set(doxypress.general.output-dir "${CMAKE_CURRENT_BINARY_DIR}")
+    _JSON_set(doxypress.output-html.generate-html true)
+    _JSON_set(doxypress.output-latex.generate-latex true)
     TPA_set(GENERATE_PDF true)
 
     add_custom_target(_test COMMAND "${CMAKE_COMMAND} --version")
     TPA_set(INPUT_TARGET _test)
     configure_file(DoxypressTest1.json
             ${CMAKE_CURRENT_BINARY_DIR}/DoxypressTest1.json @ONLY)
-    doxypress_create_targets(${PROJECT_SOURCE_DIR}/DoxypressTest1.json
+    _doxypress_create_targets(${PROJECT_SOURCE_DIR}/DoxypressTest1.json
             ${CMAKE_CURRENT_BINARY_DIR}/DoxypressTest1.json)
 
     if (NOT TARGET _test.doxypress)
