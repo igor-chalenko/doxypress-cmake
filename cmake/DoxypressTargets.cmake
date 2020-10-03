@@ -1,10 +1,10 @@
-function(doxypress_create_targets _project_file _generated_project_file)
+function(_doxypress_create_targets _project_file _generated_project_file)
     set(_outputs "")
     # todo constant
-    # JSON_get(doxypress.output-html.html-file-extension _html_extension)
-    JSON_get(doxypress.general.output-dir _output_directory)
-    JSON_get(doxypress.output-html.generate-html _generate_html)
-    JSON_get(doxypress.output-latex.generate-latex _generate_latex)
+    # _JSON_get(doxypress.output-html.html-file-extension _html_extension)
+    _JSON_get(doxypress.general.output-dir _output_directory)
+    _JSON_get(doxypress.output-html.generate-html _generate_html)
+    _JSON_get(doxypress.output-latex.generate-latex _generate_latex)
     TPA_get(GENERATE_PDF _generate_pdf)
     TPA_get(INPUTS _inputs)
     TPA_get(INPUT_TARGET _input_target)
@@ -28,11 +28,11 @@ function(doxypress_create_targets _project_file _generated_project_file)
     endif()
 
     if (NOT _input_target)
-        doxypress_find_inputs(_public_headers
+        _doxypress_find_inputs(_public_headers
                 DIRECTORIES "${_inputs}")
         set(_input_target ${PROJECT_NAME})
     else()
-        doxypress_find_inputs(_public_headers
+        _doxypress_find_inputs(_public_headers
                 DIRECTORIES "${_inputs}"
                 TARGET "${_input_target}")
     endif()
@@ -70,7 +70,7 @@ function(doxypress_create_targets _project_file _generated_project_file)
                 "${_output_directory}/pdf/refman.pdf")
     endif ()
 
-    doxypress_create_open_targets(${_input_target}.doxypress)
+    _doxypress_create_open_targets(${_input_target}.doxypress)
 endfunction()
 
 # -----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ endfunction()
 # @param[in] TARGET            input target name to read
 # @param[out] out_var          output variable
 # -----------------------------------------------------------------------------
-function(doxypress_find_inputs _out_var)
+function(_doxypress_find_inputs _out_var)
     set(options "")
     set(oneValueArgs DIRECTORIES TARGET)
     set(multiValueArgs "")
@@ -116,28 +116,28 @@ for `doxypress_add_docs`]=])
     set(${_out_var} "${all_public_headers}" PARENT_SCOPE)
 endfunction()
 
-function(doxypress_create_open_targets _name_prefix)
-    JSON_get(doxypress.output-html.generate-html _generate_html)
-    JSON_get(doxypress.output-latex.generate-latex _generate_latex)
+function(_doxypress_create_open_targets _name_prefix)
+    _JSON_get(doxypress.output-html.generate-html _generate_html)
+    _JSON_get(doxypress.output-latex.generate-latex _generate_latex)
     TPA_get(GENERATE_PDF _generate_pdf)
-    JSON_get(doxypress.general.output-dir _output_directory)
+    _JSON_get(doxypress.general.output-dir _output_directory)
 
     if (DOXYPRESS_LAUNCHER_COMMAND)
         if (_generate_html AND NOT TARGET ${_name_prefix}.open_html)
             # Create a target to open the generated HTML file.
-            doxypress_create_open_target(
+            _doxypress_create_open_target(
                     ${_name_prefix}.open_html
                     ${_name_prefix}
                     "${_output_directory}/html/index.html")
         endif ()
         if (_generate_latex AND NOT TARGET ${_name_prefix}.open_latex)
-            doxypress_create_open_target(
+            _doxypress_create_open_target(
                     ${_name_prefix}.open_latex
                     ${_name_prefix}
                     "${_output_directory}/latex/refman.tex")
         endif ()
         if (_generate_pdf AND NOT TARGET ${_name_prefix}.open_pdf)
-            doxypress_create_open_target(
+            _doxypress_create_open_target(
                     ${_name_prefix}.open_pdf
                     ${_name_prefix}
                     "${_output_directory}/latex/refman.pdf")
@@ -156,8 +156,8 @@ endfunction()
 #                                  the target `target_name`, created by this
 #                                  function.
 # @param[in] file                  a file to open, such as `index.html`
-function(doxypress_create_open_target _target_name _parent_target_name _file)
-    doxypress_log(INFO "Adding launch target ${_target_name} for ${_file}...")
+function(_doxypress_create_open_target _target_name _parent_target_name _file)
+    _doxypress_log(INFO "Adding launch target ${_target_name} for ${_file}...")
     add_custom_target(${_target_name}
             COMMAND ${DOXYPRESS_LAUNCHER_COMMAND} "${_file}"
             VERBATIM)
@@ -178,10 +178,10 @@ endfunction()
 # @param[in] destination           install directory
 # @param[in] component             install component name
 # -----------------------------------------------------------------------------
-function(doxypress_install_docs _destination _component)
-    JSON_get(doxypress.general.output-dir _output_directory)
-    JSON_get(doxypress.output-html.generate-html _generate_html)
-    JSON_get(doxypress.output-latex.generate-latex _generate_latex)
+function(_doxypress_install_docs _destination _component)
+    _JSON_get(doxypress.general.output-dir _output_directory)
+    _JSON_get(doxypress.output-html.generate-html _generate_html)
+    _JSON_get(doxypress.output-latex.generate-latex _generate_latex)
     TPA_get(GENERATE_PDF _generate_pdf)
 
     if (_generate_html)
@@ -196,7 +196,7 @@ function(doxypress_install_docs _destination _component)
     endif ()
 
     foreach (_artifact ${_artifacts})
-        doxypress_log(INFO "install ${_artifact} to ${_destination}...")
+        _doxypress_log(INFO "install ${_artifact} to ${_destination}...")
         if (IS_DIRECTORY ${_artifact})
             install(DIRECTORY ${_artifact}
                     DESTINATION ${_destination}
@@ -209,7 +209,7 @@ function(doxypress_install_docs _destination _component)
     endforeach ()
 endfunction()
 
-function(doxypress_project_generated_name _project_file _out_var)
+function(_doxypress_project_generated_name _project_file _out_var)
     if (IS_ABSOLUTE "${_project_file}")
         get_filename_component(_name "${_project_file}" NAME)
         set(${_out_var} ${CMAKE_CURRENT_BINARY_DIR}/${_name} PARENT_SCOPE)

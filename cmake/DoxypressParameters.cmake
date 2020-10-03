@@ -5,7 +5,7 @@
 # https://opensource.org/licenses/MIT
 ##############################################################################
 
-function(doxypress_param_option name)
+function(_doxypress_param_option name)
     set(_options "")
     set(_one_value_args SETTER UPDATER DEFAULT)
     set(_multi_value_args "")
@@ -30,7 +30,7 @@ function(doxypress_param_option name)
     endif ()
 endfunction()
 
-function(doxypress_param_string name)
+function(_doxypress_param_string name)
     set(_options OVERWRITE)
     set(_one_value_args SETTER UPDATER DEFAULT)
     set(_multi_value_args "")
@@ -55,7 +55,7 @@ function(doxypress_param_string name)
     endif ()
 endfunction()
 
-function(doxypress_param_list name)
+function(_doxypress_param_list name)
     set(_options "")
     set(_one_value_args SETTER UPDATER DEFAULT)
     set(_multi_value_args "")
@@ -109,7 +109,7 @@ endfunction()
 # * Setter f
 # Resulting variables are stored using `TPA`.
 ##############################################################################
-function(doxypress_json_property _property)
+function(_doxypress_json_property _property)
     set(_options OVERWRITE)
     set(_one_value_args
             INPUT_OPTION
@@ -161,11 +161,11 @@ endfunction()
 
 ##############################################################################
 # @brief Parse the input arguments previously defined by
-# `doxypress_param_string`, `doxypress_param_option`, and
-# `doxypress_param_list`.
+# `_doxypress_param_string`, `_doxypress_param_option`, and
+# `_doxypress_param_list`.
 # @param[in] ARGN input arguments
 ##############################################################################
-function(doxypress_params_parse)
+function(_doxypress_params_parse)
     TPA_get("option_args" _option_args)
     TPA_get("one_value_args" _one_value_args)
     TPA_get("multi_value_args" _multi_value_args)
@@ -177,13 +177,13 @@ function(doxypress_params_parse)
             "${ARGN}")
 
     foreach (_option ${_option_args})
-        doxypress_params_update(${_option} "${DOXYPRESS_${_option}}")
+        _doxypress_params_update(${_option} "${DOXYPRESS_${_option}}")
     endforeach ()
     foreach (_arg ${_one_value_args})
-        doxypress_params_update(${_arg} "${DOXYPRESS_${_arg}}")
+        _doxypress_params_update(${_arg} "${DOXYPRESS_${_arg}}")
     endforeach ()
     foreach (_list ${_multi_value_args})
-        doxypress_params_update(${_list} "${DOXYPRESS_${_list}}")
+        _doxypress_params_update(${_list} "${DOXYPRESS_${_list}}")
     endforeach ()
 
     # save explicitly given input arguments so that we can correctly handle
@@ -207,7 +207,7 @@ endfunction()
 # @param[in] _name      parameter's name
 # @param[in] _value     parameter's value in the input arguments
 ##############################################################################
-function(doxypress_params_update _name _value)
+function(_doxypress_params_update _name _value)
     TPA_get("${_name}_UPDATER" _updater)
     TPA_get("${_name}_SETTER" _setter)
     TPA_get("${_name}_DEFAULT" _default)
@@ -222,11 +222,11 @@ function(doxypress_params_update _name _value)
 
     if (_value STREQUAL "")
         if (_setter)
-            doxypress_call(doxypress_${_setter} _value)
+            _doxypress_call(_doxypress_${_setter} _value)
         endif ()
         if (NOT _value STREQUAL "")
             if (_updater)
-                doxypress_call(doxypress_${_updater} "${_value}" _value)
+                _doxypress_call(_doxypress_${_updater} "${_value}" _value)
             endif ()
         endif ()
         if (_value STREQUAL "")
@@ -237,10 +237,10 @@ function(doxypress_params_update _name _value)
         endif ()
     else ()
         if (_updater)
-            doxypress_call(doxypress_${_updater} "${_value}" _value)
+            _doxypress_call(_doxypress_${_updater} "${_value}" _value)
         endif ()
     endif ()
-    doxypress_log(DEBUG "[input] ${_name} = ${_value}")
+    _doxypress_log(DEBUG "[input] ${_name} = ${_value}")
     TPA_set(${_name} "${_value}")
 endfunction()
 
@@ -251,7 +251,7 @@ endfunction()
 ## @param[in] _arg1       the first argument to `_id`
 ## @param[in] ARGN        arguments to pass to the callable `_id`
 ##############################################################################
-macro(doxypress_call _id _arg1)
+macro(_doxypress_call _id _arg1)
     if (NOT COMMAND ${_id})
         message(FATAL_ERROR "Unsupported function/macro \"${_id}\"")
     else ()
@@ -271,11 +271,3 @@ macro(doxypress_call _id _arg1)
         include("${_helper}")
     endif ()
 endmacro()
-
-function(doxypress_set_input_target _out_var)
-    if (TARGET ${PROJECT_NAME})
-        set(${_out_var} ${PROJECT_NAME} PARENT_SCOPE)
-    else()
-        set(${_out_var} "" PARENT_SCOPE)
-    endif()
-endfunction()

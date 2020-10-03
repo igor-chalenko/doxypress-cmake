@@ -3,7 +3,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/externals/json-cmake")
 set(doxypress_dir ${PROJECT_SOURCE_DIR}/cmake)
 include(../cmake/DoxypressCMake.cmake)
 
-# doxypress_project_load(DoxypressTest1.json)
+# _doxypress_project_load(DoxypressTest1.json)
 function(assert_same str1 str2)
     if (NOT "${str1}" STREQUAL "${str2}")
         message(SEND_ERROR "`${str1}` is not the same as `${str2}`")
