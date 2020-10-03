@@ -122,9 +122,6 @@ function(doxypress_create_open_targets _name_prefix)
     TPA_get(GENERATE_PDF _generate_pdf)
     JSON_get(doxypress.general.output-dir _output_directory)
 
-    message(STATUS "_output_directory = ${_output_directory}")
-    # JSON_get(doxypress.output-html.html-file-extension _html_extension)
-
     if (DOXYPRESS_LAUNCHER_COMMAND)
         if (_generate_html AND NOT TARGET ${_name_prefix}.open_html)
             # Create a target to open the generated HTML file.
@@ -193,7 +190,6 @@ function(doxypress_install_docs _destination _component)
     if (_generate_latex)
         file(GLOB _tex_files "${_output_directory}/latex/*.tex")
         list(APPEND _artifacts ${_tex_files})
-        # doxypress_log(INFO "LaTex docs will be installed...")
     endif ()
     if (_generate_pdf)
         list(APPEND _artifacts "${_output_directory}/pdf/refman.pdf")
