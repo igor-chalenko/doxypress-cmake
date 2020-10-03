@@ -6,7 +6,7 @@ function(doxypress_create_targets _project_file _generated_project_file)
     JSON_get(doxypress.output-html.generate-html _generate_html)
     JSON_get(doxypress.output-latex.generate-latex _generate_latex)
     TPA_get(GENERATE_PDF _generate_pdf)
-    TPA_get(INPUT_DIRECTORIES _input_directories)
+    TPA_get(INPUTS _inputs)
     TPA_get(INPUT_TARGET _input_target)
 
     # todo remove after debugging
@@ -29,11 +29,11 @@ function(doxypress_create_targets _project_file _generated_project_file)
 
     if (NOT _input_target)
         doxypress_find_inputs(_public_headers
-                DIRECTORIES "${_input_directories}")
+                DIRECTORIES "${_inputs}")
         set(_input_target ${PROJECT_NAME})
     else()
         doxypress_find_inputs(_public_headers
-                DIRECTORIES "${_input_directories}"
+                DIRECTORIES "${_inputs}"
                 TARGET "${_input_target}")
     endif()
 
@@ -93,8 +93,8 @@ function(doxypress_find_inputs _out_var)
             ${ARGN})
 
     set(all_public_headers "")
-    if (DEFINED INPUT_DIRECTORIES)
-        foreach (dir ${INPUT_DIRECTORIES})
+    if (DEFINED INPUTS)
+        foreach (dir ${INPUTS})
             file(GLOB_RECURSE public_headers ${dir}/*)
             list(APPEND all_public_headers "${public_headers}")
         endforeach ()
@@ -109,7 +109,7 @@ function(doxypress_find_inputs _out_var)
     else ()
         # todo better message
         message(FATAL_ERROR [=[
-Either INPUT_DIRECTORIES or INPUT_TARGET must be specified as input argument
+Either INPUTS or INPUT_TARGET must be specified as input argument
 for `doxypress_add_docs`]=])
     endif ()
 

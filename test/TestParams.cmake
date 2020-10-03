@@ -34,10 +34,10 @@ endfunction()
 # give input directories as input and read them back
 function(test_input_directories_1)
     doxypress_params_init()
-    doxypress_params_parse(INPUT_DIRECTORIES dir1 dir2)
+    doxypress_params_parse(INPUTS dir1 dir2)
     doxypress_project_update()
 
-    TPA_get("INPUT_DIRECTORIES" _inputs)
+    TPA_get("INPUTS" _inputs)
     assert_same("${_inputs}"
             "${CMAKE_CURRENT_SOURCE_DIR}/dir1;${CMAKE_CURRENT_SOURCE_DIR}/dir2")
     TPA_clear_scope()
@@ -47,11 +47,11 @@ endfunction()
 # empty.
 function(test_input_directories_2)
     doxypress_params_init()
-    doxypress_params_parse(PROJECT_FILE DoxypressTest1.json INPUT_DIRECTORIES x)
+    doxypress_params_parse(PROJECT_FILE DoxypressTest1.json INPUTS x)
     doxypress_project_load(DoxypressTest1.json)
     doxypress_project_update()
 
-    TPA_get("INPUT_DIRECTORIES" _inputs)
+    TPA_get("INPUTS" _inputs)
     assert_same("${_inputs}"
             "${CMAKE_CURRENT_SOURCE_DIR}/include2;${CMAKE_CURRENT_SOURCE_DIR}/include3;${CMAKE_CURRENT_SOURCE_DIR}/x")
     TPA_clear_scope()
@@ -63,7 +63,7 @@ function(test_input_directories_3)
     doxypress_params_parse(INPUT_TARGET main)
     doxypress_project_update()
 
-    TPA_get("INPUT_DIRECTORIES" _inputs)
+    TPA_get(INPUTS _inputs)
     assert_same("${_inputs}"
             "${CMAKE_CURRENT_SOURCE_DIR}/include4;${CMAKE_CURRENT_SOURCE_DIR}/include5")
     TPA_clear_scope()
@@ -117,7 +117,7 @@ function(test_input_directories_full_1)
     set("messages.quiet" false)
 
     doxypress_params_init()
-    doxypress_params_parse(INPUT_DIRECTORIES dir1 dir2)
+    doxypress_params_parse(INPUTS dir1 dir2)
     doxypress_project_load(../cmake/DoxypressCMake.json)
     doxypress_project_update()
     doxypress_project_save(${CMAKE_CURRENT_BINARY_DIR}/DoxypressCMake.json)
@@ -152,9 +152,6 @@ function(test_input_directories_full_2)
     assert_same(${_warnings} false)
     TPA_clear_scope()
 endfunction()
-
-
-
 
 # Make sure LATEX module is imported when GENERATE_LATEX is true.
 # Will only perform the tests if latex is installed.

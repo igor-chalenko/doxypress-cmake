@@ -147,7 +147,7 @@ function(doxypress_params_init)
             DEFAULT "${CMAKE_CURRENT_BINARY_DIR}/doxypress-generated")
 
     doxypress_json_property("input.input-source"
-            INPUT_LIST INPUT_DIRECTORIES
+            INPUT_LIST INPUTS
             UPDATER "update_input_source")
 
     doxypress_json_property("input.example-source"
@@ -382,12 +382,12 @@ function(doxypress_update_input_source _sources _out_var)
     set(_inputs "")
     # doxypress_log(DEBUG "input sources before update: ${_sources}")
     if (_sources)
-        foreach (_dir ${_sources})
-            if (NOT IS_ABSOLUTE ${_dir})
-                get_filename_component(_dir ${CMAKE_CURRENT_SOURCE_DIR}/${_dir}
+        foreach (_path ${_sources})
+            if (NOT IS_ABSOLUTE ${_path})
+                get_filename_component(_path ${CMAKE_CURRENT_SOURCE_DIR}/${_path}
                         ABSOLUTE)
             endif ()
-            list(APPEND _inputs ${_dir})
+            list(APPEND _inputs ${_path})
         endforeach ()
     else()
         TPA_get("INPUT_TARGET" _input_target)
