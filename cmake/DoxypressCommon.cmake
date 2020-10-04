@@ -6,24 +6,8 @@
 ## @endcode
 ## If disabled, DEBUG messages are not printed.
 ##############################################################################
-option(DOXYPRESS_DEBUG "Enable debug output." OFF)
-##############################################################################
-## @brief Specifies whether debug output should be produced by `_doxypress_log`.
-## If enabled,
-## @code
-## _doxypress_log(INFO text) <==> message(STATUS text)
-## @endcode
-## If disabled, neither INFO not DEBUG messages are not printed.
-##############################################################################
-option(DOXYPRESS_INFO "Enable info output" OFF)
-
-
-##############################################################################
-## @brief Prints a given message if a corresponding log level is on (enabled
-## by `DOXYPRESS_DEBUG` and `DOXYPRESS_INFO`). Does nothing otherwise.
-##############################################################################
-option(DOXYPRESS_DEBUG "Enable debug output." OFF)
-option(DOXYPRESS_INFO "Enable info output" OFF)
+option(DOXYPRESS_LOG_LEVEL "Enable log output above this level." INFO)
+option(DOXYPRESS_PROMOTE_WARNINGS "Promote log warnings to CMake warnings" ON)
 
 ## @brief Platform-specific executable for file opening
 if (WIN32)
@@ -32,20 +16,24 @@ elseif (NOT APPLE)
     set(DOXYPRESS_LAUNCHER_COMMAND xdg-open)
 endif ()
 
-##############################################################################
-## @brief Prints a given message if a corresponding log level is on (enabled
-## by `DOXYPRESS_DEBUG` and `DOXYPRESS_INFO`). Does nothing otherwise.
-##############################################################################
+unset(_doxypress_log_levels)
+list(APPEND _doxypress_log_levels DEBUG)
+list(APPEND _doxypress_log_levels INFO)
+list(APPEND _doxypress_log_levels WARN)
+
 function(_doxypress_log _level _text)
-    if (_level STREQUAL INFO)
-        set(_level "INFO ")
+    list(FIND _doxypress_log_levels ${_level} _ind)
+    if (_ind EQUAL -1)
+        set(_ind 2)
     endif()
-    if (${DOXYPRESS_DEBUG})
+    list(FIND _doxypress_log_levels ${DOXYPRESS_LOG_LEVEL} _ind2)
+    if (_ind2 EQUAL -1)
+        set(_ind2 1)
+    endif()
+    # message(STATUS "${_ind}:${DOXYPRESS_LOG_LEVEL}")
+    if (${_ind} GREATER_EQUAL ${_ind2})
         message(STATUS "[${_level}] ${_text}")
     endif ()
-    if (${DOXYPRESS_INFO} AND NOT ${_level} STREQUAL DEBUG)
-        message(STATUS "[${_level}] ${_text}")
-    endif()
 endfunction()
 
 function(_doxypress_cut_prefix _var _out_var)
