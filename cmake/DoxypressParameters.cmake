@@ -5,50 +5,7 @@
 # https://opensource.org/licenses/MIT
 ##############################################################################
 
-##############################################################################
-#.rst:
-#
-# Doxypress parameters
-# --------------------
-#
-# Input parameters to ``doxypress_add_docs`` are defined dynamically using
-# the functions ``_doxypress_param_string``, ``_doxypress_param_option``,
-# and ``_doxypress_param_list``. This allows for easy modification of
-# input parameter set in ``_doxypress_param_init``; that function is also
-# the only one that needs to be changed in case inputs change.
-##############################################################################
-
-##############################################################################
-#.rst:
-# .. cmake:command:: _doxypress_param_option
-#
-#  ..  code-block:: cmake
-#
-#    _doxypress_param_option(<property>
-#                 [SETTER <function name>]
-#                 [UPDATER <function name>]
-#                 [DEFAULT <value>])
-#
-# Attaches read/write logic to a given input option. Declarations made
-# using this function are interpreted later by ``_doxypress_params_parse``.
-# The following arguments are recognized:
-# * ``DEFAULT``
-#
-#   If the input option was not set in either ``ARGN``, setter, or updater,
-#   it is set to this value.
-#
-# * ``SETTER``
-#
-#   A function with this name is called if the input option's value is
-#   empty. The setter's output variable holds the option's new value.
-#
-# * ``UPDATER``
-#
-#   A function with this name is called if the current value of the option
-#   is not empty. The current value is given as an argument. The output variable
-#   holds the option's new value.
-##############################################################################
-function(_doxypress_param_option _name)
+function(_doxypress_param_option name)
     set(_options "")
     set(_one_value_args SETTER UPDATER DEFAULT)
     set(_multi_value_args "")
@@ -59,51 +16,21 @@ function(_doxypress_param_option _name)
             "${ARGN}")
 
     TPA_get("option_args" _option_args)
-    list(APPEND _option_args ${_name})
+    list(APPEND _option_args ${name})
     TPA_set("option_args" "${_option_args}")
 
     if (DEFINED IN_SETTER)
-        TPA_set(${_name}_SETTER ${IN_SETTER})
+        TPA_set(${name}_SETTER ${IN_SETTER})
     endif ()
     if (DEFINED IN_UPDATER)
-        TPA_set(${_name}_UPDATER ${IN_UPDATER})
+        TPA_set(${name}_UPDATER ${IN_UPDATER})
     endif ()
     if (DEFINED IN_DEFAULT)
-        TPA_set(${_name}_DEFAULT ${IN_DEFAULT})
+        TPA_set(${name}_DEFAULT ${IN_DEFAULT})
     endif ()
 endfunction()
 
-##############################################################################
-#.rst:
-# .. cmake:command:: _doxypress_param_string
-#
-#  ..  code-block:: cmake
-#
-#    _doxypress_param_string(<property>
-#                 [SETTER <function name>]
-#                 [UPDATER <function name>]
-#                 [DEFAULT <value>])
-#
-# Attaches read/write logic to a given input single-value parameter.
-# Declarations made using this function are interpreted later by
-# ``_doxypress_params_parse``. The following arguments are recognized:
-# * ``DEFAULT``
-#
-#   If the input multi-value parameter was not set in either ``ARGN``, setter,
-#   or updater, it is set to this value.
-#
-# * ``SETTER``
-#
-#   A function with this name is called if the input parameter's value is
-#   empty. The setter's output variable holds the parameter's new value.
-#
-# * ``UPDATER``
-#
-#   A function with this name is called if the current value of the parameter
-#   is not empty. The current value is given as an argument. The output variable
-#   holds the parameter's new value.
-##############################################################################
-function(_doxypress_param_string _name)
+function(_doxypress_param_string name)
     set(_options OVERWRITE)
     set(_one_value_args SETTER UPDATER DEFAULT)
     set(_multi_value_args "")
@@ -114,51 +41,21 @@ function(_doxypress_param_string _name)
             "${ARGN}")
 
     TPA_get("one_value_args" _one_value_args)
-    list(APPEND _one_value_args ${_name})
+    list(APPEND _one_value_args ${name})
     TPA_set("one_value_args" "${_one_value_args}")
 
     if (DEFINED IN_SETTER)
-        TPA_set(${_name}_SETTER ${IN_SETTER})
+        TPA_set(${name}_SETTER ${IN_SETTER})
     endif ()
     if (DEFINED IN_UPDATER)
-        TPA_set(${_name}_UPDATER ${IN_UPDATER})
+        TPA_set(${name}_UPDATER ${IN_UPDATER})
     endif ()
     if (DEFINED IN_DEFAULT)
-        TPA_set(${_name}_DEFAULT ${IN_DEFAULT})
+        TPA_set(${name}_DEFAULT ${IN_DEFAULT})
     endif ()
 endfunction()
 
-##############################################################################
-#.rst:
-# .. cmake:command:: _doxypress_param_list
-#
-#  ..  code-block:: cmake
-#
-#    _doxypress_param_list(<property>
-#                 [SETTER <function name>]
-#                 [UPDATER <function name>]
-#                 [DEFAULT <value>])
-#
-# Attaches read/write logic to a given input multi-value parameter. Declarations
-# made using this function are interpreted later by ``_doxypress_params_parse``.
-# The following arguments are recognized:
-# * ``DEFAULT``
-#
-#   If the input multi-value parameter was not set in either ``ARGN``, setter,
-#   or updater, it is set to this value.
-#
-# * ``SETTER``
-#
-#   A function with this name is called if the input parameter's value is
-#   empty. The setter's output variable holds the parameter's new value.
-#
-# * ``UPDATER``
-#
-#   A function with this name is called if the current value of the parameter
-#   is not empty. The current value is given as an argument. The output variable
-#   holds the parameter's new value.
-##############################################################################
-function(_doxypress_param_list _name)
+function(_doxypress_param_list name)
     set(_options "")
     set(_one_value_args SETTER UPDATER DEFAULT)
     set(_multi_value_args "")
@@ -169,76 +66,48 @@ function(_doxypress_param_list _name)
             "${ARGN}")
 
     TPA_get("multi_value_args" _multi_value_args)
-    list(APPEND _multi_value_args ${_name})
+    list(APPEND _multi_value_args ${name})
     TPA_set("multi_value_args" "${_multi_value_args}")
 
     if (DEFINED IN_SETTER)
-        TPA_set(${_name}_SETTER ${IN_SETTER})
+        TPA_set(${name}_SETTER ${IN_SETTER})
     endif ()
     if (DEFINED IN_UPDATER)
-        TPA_set(${_name}_UPDATER ${IN_UPDATER})
+        TPA_set(${name}_UPDATER ${IN_UPDATER})
     endif ()
     if (DEFINED IN_DEFAULT)
-        TPA_set(${_name}_DEFAULT ${IN_DEFAULT})
+        TPA_set(${name}_DEFAULT ${IN_DEFAULT})
     endif ()
 endfunction()
 
 ##############################################################################
-# .rst:
-# .. cmake:command:: _doxypress_json_property
-#
-#  ..  code-block:: cmake
-#
-#    _doxypress_json_property(<property>
-#                 [INPUT_OPTION <name>]
-#                 [INPUT_STRING <name>]
-#                 [INPUT_LIST <name>]
-#                 [SETTER <function name>]
-#                 [UPDATER <function name>]
-#                 [DEFAULT <value>]
-#                 [USE_PRODUCT_NAME]
-#                 [OVERWRITE])
-#
-# Attaches read/write logic to a given JSON path. Declarations made
-# using this function are interpreted later by ``_doxypress_parse``.
+# @brief Attaches read/write logic to a given JSON path. Declarations made
+# using this function are interpreted later by `doxypress_parse()`.
 # The following arguments are recognized:
-#
-# * ``INPUT_OPTION``, ``INPUT_STRING``, ``INPUT_LIST``
-#
+# * `INPUT_OPTION`, `INPUT_STRING`, `INPUT_LIST`
 #   This JSON path can be updated if an input argument specified by one of
 #   these options is provided. For example, `INPUT_OPTION GENERATE_XML`
 #   specifies that `GENERATE_XML` is a valid argument of `doxypress_add_docs`.
 #   If given, it will overwrite an existing value at the corresponding JSON
 #   path; otherwise other handlers are invoked.
-#
-# * ``DEFAULT``
-#
+# * `DEFAULT`
 #   If the value in input JSON is empty, and no other handlers set it either,
 #   this value is put into JSON path.
-#
-# * ``SETTER``
-#
+# * `SETTER`
 #   A function with this name is called if the current property value is empty.
 #   The output variable becomes the new value in JSON.
-#
-# * ``UPDATER``
-#
+# * `UPDATER`
 #   A function with this name is called if the current value of the property
 #   is not empty. the current value is given as an argument. The output variable
 #   becomes the new value in JSON.
-#
-# * ``OVERWRITE``
-#
+# * `OVERWRITE`
 #   If given, the value in JSON is ignored and a given setter is called if
 #   it was specified by `SETTER` argument. In other words, makes a call to
 #   setter unconditional.
 #
 # The above handlers are invoked in the following order for each JSON property:
-# * ``SETTER`` (if the current property value is empty);
-# * ``UPDATER`` (if the current property value is **NOT** empty);
-# * ``DEFAULT`` (if the current property value is still empty);
-#
-# Resulting variables are stored in the current :ref:`TPA scope`.
+# * Setter f
+# Resulting variables are stored using `TPA`.
 ##############################################################################
 function(_doxypress_json_property _property)
     set(_options OVERWRITE)
@@ -291,25 +160,10 @@ function(_doxypress_json_property _property)
 endfunction()
 
 ##############################################################################
-# .rst:
-# .. cmake:command:: _doxypress_params_parse
-#
-# .. code-block:: cmake
-#
-#    doxypress_add_docs([PROJECT_FILE] <name>
-#                       [INPUT_TARGET] <name>
-#                       [EXAMPLES] <directories>
-#                       [INPUTS] <files and directories>
-#                       [INSTALL_COMPONENT] <name>
-#                       [GENERATE_HTML]
-#                       [GENERATE_LATEX]
-#                       [GENERATE_PDF]
-#                       [GENERATE_XML]
-#                       [OUTPUT_DIRECTORY] <directory>)
-#
-# Parses the input arguments previously defined by
-# :ref:`_doxypress_param_string`, :ref:`_doxypress_param_option`, and
-# :ref:`_doxypress_param_list`.
+# @brief Parse the input arguments previously defined by
+# `_doxypress_param_string`, `_doxypress_param_option`, and
+# `_doxypress_param_list`.
+# @param[in] ARGN input arguments
 ##############################################################################
 function(_doxypress_params_parse)
     TPA_get("option_args" _option_args)
@@ -348,17 +202,10 @@ function(_doxypress_params_parse)
 endfunction()
 
 ##############################################################################
-# .rst:
-# .. cmake:command:: _doxypress_params_update(_name _value)
-#
-# Updates value of an input parameter (not referenced by the project file),
-# based on the logic defined by previous calls to the functions
-# ``doxypress_param_*``.
-#
-# Parameters:
-#
-# * ``_name``  parameter's name
-# * ``_value`` parameter's value after applying setter, updater, and defaults
+# @brief Calculates the value of an input parameter that is not referenced by
+# JSON project file.
+# @param[in] _name      parameter's name
+# @param[in] _value     parameter's value in the input arguments
 ##############################################################################
 function(_doxypress_params_update _name _value)
     TPA_get("${_name}_UPDATER" _updater)
@@ -398,11 +245,11 @@ function(_doxypress_params_update _name _value)
 endfunction()
 
 ##############################################################################
-# @brief Calls a function or a macro given its name. Writes actual call code
-# into a temporary file, which is then included.
-# @param[in] _id         name of the function or macro to call
-# @param[in] _arg1       the first argument to `_id`
-# @param[in] ARGN        arguments to pass to the callable `_id`
+## @brief Calls a function or a macro given its name. Writes actual call code
+## into a temporary file, which is then included.
+## @param[in] _id         name of the function or macro to call
+## @param[in] _arg1       the first argument to `_id`
+## @param[in] ARGN        arguments to pass to the callable `_id`
 ##############################################################################
 macro(_doxypress_call _id _arg1)
     if (NOT COMMAND ${_id})

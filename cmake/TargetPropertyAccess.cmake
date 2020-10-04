@@ -6,63 +6,58 @@
 ##############################################################################
 
 ##############################################################################
-#.rst:
-# Target Property Access (TPA)
-# ----------------------------
+# @file TargetPropertyAccess.cmake
+# @brief Contains functions that simplify access to target properties.
+# @author Igor Chalenko
+##############################################################################
+
+##############################################################################
+# @defgroup TargetPropertyAccess Simplified access to target properties
+# @brief Functions with prefix `TPA` manage state of a surrogate `INTERFACE`
+# target that is used as scope for stateful data. It's possible to set, unset,
+# or append to a target property using syntax similar to that of usual
+# variables:
 #
-# Functions with prefix ``TPA`` manage state a surrogate `INTERFACE` target:
-# properties of this targets are used as global cache for stateful data.
-# This surrogate target is called `TPA scope` throughout this document.
-# It's possible to set, unset, or append to a target property using syntax
-# similar to that of usual variables:
+# * TPA_set(variable value) # set(variable value)
+# * TPA_unset(variable) # unset(variable)
+# * TPA_append(variable value) # list(APPEND variable value)
 #
-# .. code-block:: cmake
-#
-#   # set(variable value)
-#   TPA_set(variable value)
-#   # unset(variable)
-#   TPA_unset(variable)
-#   # list(APPEND variable value)
-#   TPA_append(variable value)
-#
-# ---------
-# TPA scope
-# ---------
-#
-# TPA scope is a dictionary of some target's properties. Therefore, it is
-# a named global scope with a lifetime of the underlying target. Variables never
-# go out of scope in `TPA` and must be deleted explicitly (if needed). `CMake`
-# doesn't allow arbitrary property names; therefore, input property names are
-# prefixed with ``INTERFACE_`` to obtain the actual property name in that
-# `INTERFACE` target. Each TPA scope maintains index of properties
-# it contains; this makes it easy to clear up a scope entirely and re-use it
-# afterwards. There could be as many different TPA scopes as there are different
-# values of the ``CMAKE_CURRENT_SOURCE_DIR`` variable. Therefore, it's safe
-# to run parallel builds as long as there is only one CMake process working
-# on a given directory.
+# A call to `TPA_create_scope` creates a new scope in every `CMake` source
+# directory: the value of `${CMAKE_CURRENT_SOURCE_DIR}` is transformed to
+# satisfy requirements put on target names, and then used as a prefix for
+# a new target.
+##############################################################################
 
 include(${doxypress_dir}/DoxypressCommon.cmake)
 
 ##############################################################################
-#.rst:
-# -------------
-# TPA functions
-# -------------
+# @ingroup TargetPropertyAccess
+# @brief Creates a new scope with a given name prefix. If a scope with such
+# prefix already exists, simply returns the scope name. This function is meant
+# to be called by other `TPA` functions repeatedly to obtain the right scope
+# without additional checking.
+# @param[in]  _prefix         new scope's name prefix
+# @param[out] _out_var        output variable
+# @return scope's name, either a new one or one that existed beforehand
 ##############################################################################
+function(TPA_create_scope _out_var)
+    _TPA_scope_name(_scope_name)
+
+    if (NOT TARGET ${_scope_name})
+        add_library(${_scope_name} INTERFACE)
+        _doxypress_log(DEBUG "Created INTERFACE target ${_scope_name}")
+    endif()
+    set(${_out_var} "${_scope_name}" PARENT_SCOPE)
+endfunction()
 
 ##############################################################################
-#.rst:
-# .. cmake:command:: TPA_set(_property _value)
-#
-# Sets the given property to a new value.
-#
-# Parameters:
-#
-# * ``_property``     a property to modify
-# * ``_value``        _property's new value
+# @ingroup TargetPropertyAccess
+# @brief Sets the given property to a new value.
+# @param[in] _property     a property to modify
+# @param[in] _value        _property's new value
 ##############################################################################
 function(TPA_set _property _value)
-    _TPA_current_scope(_scope)
+    TPA_create_scope(_scope)
     set_property(TARGET ${_scope} PROPERTY INTERFACE_${_property} "${_value}")
 
     if (NOT ${_property} STREQUAL "properties")
@@ -82,17 +77,12 @@ function(TPA_set _property _value)
 endfunction()
 
 ##############################################################################
-#.rst:
-# .. cmake:command:: TPA_unset(_property)
-#
-# Unsets the property given by ``_property``.
-#
-# Parameters:
-#
-# * ``_property`` a property to unset
+# @ingroup TargetPropertyAccess
+# @brief Unsets the given property.
+# @param[in] _property     the property to unset
 ##############################################################################
 function(TPA_unset _property)
-    _TPA_current_scope(_scope)
+    TPA_create_scope(_scope)
     set_property(TARGET ${_scope} PROPERTY INTERFACE_${_property})
 
     TPA_get(properties _properties)
@@ -105,18 +95,14 @@ function(TPA_unset _property)
 endfunction()
 
 ##############################################################################
-#.rst:
-# .. cmake:command:: TPA_get(_property _out_var)
-#
-# Returns the value of a given property.
-#
-# Parameters:
-#
-# * ``_property`` the property to unset
-# * ``_out_var``  the property's value if found; empty string otherwise
+# @ingroup TargetPropertyAccess
+# @brief Returns value of a given property.
+# @param[in] _property     the property to unset
+# @param[out] _out_var     output variable
+# @return property's value if found; empty string otherwise
 ##############################################################################
 function(TPA_get _property _out_var)
-    _TPA_current_scope(_scope)
+    TPA_create_scope(_scope)
     get_target_property(_value ${_scope} INTERFACE_${_property})
     if ("${_value}" STREQUAL "_value-NOTFOUND")
         set(${_out_var} "" PARENT_SCOPE)
@@ -126,19 +112,16 @@ function(TPA_get _property _out_var)
 endfunction()
 
 ##############################################################################
-#.rst:
-# .. cmake:command:: TPA_append(_property _value)
+# @ingroup TargetPropertyAccess
+# @brief Appends a given value to the existing property. The property is treated
+# as a list. If the given property's doesn't exist, it's created and set to
+# the given value.
 #
-# If the property `_property` exists, it is treated as a list, and the given
-# value is appended to it. Otherwise, it's created and set to the given value.
-#
-# Parameters:
-#
-# * ``_property``     the property to update
-# * ``_value``        the value to append
+# @param[in] _property     the property to update
+# @param[in] _value        the value to append
 ##############################################################################
 function(TPA_append _property _value)
-    _TPA_current_scope(_scope)
+    TPA_create_scope(_scope)
 
     TPA_get(${_property} _current_value)
     if ("${_current_value}" STREQUAL "")
@@ -146,7 +129,15 @@ function(TPA_append _property _value)
     else()
         # no need to update the index
         list(APPEND _current_value "${_value}")
+
+        # ???
         TPA_set(${_property} "${_current_value}")
+        # don't call TPA_set in order to avoid endless recursion
+        # set_property(
+        #        TARGET ${_scope}
+        #        PROPERTY INTERFACE_${_property}
+        #        "${_current_value}"
+        #)
     endif()
 endfunction()
 
@@ -164,39 +155,15 @@ function(TPA_clear_scope)
 endfunction()
 
 ##############################################################################
-#.rst:
-# .. cmake:command:: _TPA_current_scope(_out_var)
-#
-# Defines what the current scope is. Upon first invocation in the current
-# `CMake` source directory, creates an `INTERFACE` with a name derived
-# from the value of the variable ``CMAKE_CURRENT_SOURCE_DIR``. Afterwards,
-# this name is written into the output variable ``_out_var``. This function is
-# used by other `TPA` functions to obtain the current scope; it's not meant
-# to be used outside the module.
-##############################################################################
-function(_TPA_current_scope _out_var)
-    _TPA_scope_name(_scope_name)
-
-    if (NOT TARGET ${_scope_name})
-        add_library(${_scope_name} INTERFACE)
-        _doxypress_log(DEBUG "Created INTERFACE target ${_scope_name}")
-    endif()
-    set(${_out_var} "${_scope_name}" PARENT_SCOPE)
-endfunction()
-
-##############################################################################
-#.rst:
-# .. cmake:command:: _TPA_scope_name(_out_var)
-#
-# Implements scope naming scheme. The current directory's name is transformed
-# to satisfy requirements for valid target names, and then used as a prefix
-# for the resulting name. This name is then written into ``_out_var``.
-#
-# This function should not be used anywhere except in `_TPA_current_scope`.
+# @ingroup TargetPropertyAccess
+# @brief Implements scope naming scheme. This function should not be used
+# anywhere except in `TPA_create_scope`.
+# @param[in]  _prefix         prefix of the scope name
+# @param[out] _out_var        output variable
+# @return scope name
 ##############################################################################
 function(_TPA_scope_name _out_var)
     string(REPLACE "/" "." _replaced "${CMAKE_CURRENT_SOURCE_DIR}")
     string(REPLACE "\\" "." _replaced "${_replaced}")
     set(${_out_var} "${_replaced}.properties" PARENT_SCOPE)
 endfunction()
-
