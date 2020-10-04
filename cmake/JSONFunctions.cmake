@@ -6,61 +6,53 @@
 ##############################################################################
 
 ##############################################################################
-# @file JSONFunctions.cmake
-# @brief Contains functions that provide read/write access to JSON documents.
-# @author Igor Chalenko
-##############################################################################
-
-##############################################################################
-# @defgroup JSONFunctions JSON-related functions
+#.rst:
+#
+# JSON manipulation functions
+# ---------------------------
+#
+# These functions implement read/write access to the properties of `Doxypress`
+# project file. A property is identified by its JSON path, here's a few
+# examples:
+#
+# .. code-block:: cpp
+#
+#    input.input-source
+#    messages.warnings
+#    dot.have-dot
+#
+# When a project file is loaded, a prefix ``doxypress.`` is added to every
+# property's path by the JSON parser implementation. This has to be taken into
+# account when the loaded properties are accessed:
+#
+# .. code-block:: cmake
+#
+#    JSON_get(doxypress.input.input-source _inputs)
+#    JSON_get(doxypress.messages.warnings _warnings)
+#    JSON_get(doxypress.dot.have-dot _have_dot)
+#
+# Parsed JSON document is stored in the current :ref:`TPA scope` under the key
+# ``_DOXYPRESS_PROJECT_KEY``.
 ##############################################################################
 
 # "New" IN_LIST syntax
 cmake_policy(SET CMP0057 NEW)
 
 ##############################################################################
-# @brief Converts a given value into a properly formatted JSON value:
-# * booleans are converted to `true` or `false`;
-# * numbers are written "as-is";
-# * strings are written with quotes around them, if not quoted already, or
-#   "as-is" otherwise.
+#.rst:
+# .. cmake:command:: _JSON_get(_path _out_var)
 #
-# @param[in]  _value             input value
-# @param[out] _out_var           output variable
-# @return a value suited for putting into a JSON document
-##############################################################################
-function(_JSON_format _value _out_var)
-    set(_true_values true TRUE ON on)
-    set(_false_values false FALSE OFF off)
-    if ("${_value}" IN_LIST _true_values)
-        set(${_out_var} "true" PARENT_SCOPE)
-    else ()
-        if ("${_value}" IN_LIST _false_values)
-            set(${_out_var} "false" PARENT_SCOPE)
-        else ()
-            if (_value MATCHES "^[0-9]+$")
-                set(${_out_var} "${_value}" PARENT_SCOPE)
-            else ()
-                if (_value MATCHES "^\"(.*)\"$")
-                    set(${_out_var} "${_value}" PARENT_SCOPE)
-                else()
-                    set(${_out_var} "\"${_value}\"" PARENT_SCOPE)
-                endif()
-            endif ()
-        endif ()
-    endif ()
-endfunction()
-
-##############################################################################
-# @brief Given a JSON path, returns a value located at that path. The input
+# Given a JSON path, returns a value located at that path. The input
 # variable's name is the JSON path, and its value is the value in the original
 # JSON document. If the input property is a JSON leaf, the value of the input
-# variable is formatted and returned. If it is a JSON array, nested properties
-# of that array are collected into a list and that list is returned.
+# variable is formatted and written into ``_out_var``. If it is a JSON array,
+# nested properties of that array are collected into a list and that list is
+# written into ``_out_var``.
 #
-# @param[in]  _path              a variable created by `sbeParseJson`
-# @param[out] _out_var           output variable
-# @return the value under the JSON path `_path`
+# Parameters:
+#
+# - ``_path`` a JSON path (a variable created by `sbeParseJson`)
+# - ``_out_var`` the value under `_path`
 ##############################################################################
 function(_JSON_get _path _out_var)
     TPA_get(${_path} _value)
@@ -87,14 +79,21 @@ function(_JSON_get _path _out_var)
 endfunction()
 
 ##############################################################################
-# @brief Sets a value for a leaf under a given JSON path. If the input property
-# under `_path` is a JSON leaf, the value of `_path` is simply updated.
-# If it is a JSON array, nested properties of that array are removed, and
-# `_new_value` is treated as a list, which is then decomposed into individual
-# values inside the JSON array.
+#.rst:
+# .. cmake:command:: _JSON_set(_path _new_value)
 #
-# @param[in] _path              a variable created by `sbeParseJson`
-# @param[in] _new_value         a value to put under the path `_path`
+# Sets a value of a property identified by a given JSON path. The currently
+# loaded JSON document is taken from the current :ref:`TPA scope`. If updated
+# property is a JSON leaf, the value of ``_path`` is simply updated to a new
+# value. If it is a JSON array, nested properties of that array are removed,
+# `_new_value` is treated as a list that is decomposed into individual values
+# inside the JSON array.
+#
+# Parameters:
+#
+# * ``_path`` a JSON path (a variable created by `sbeParseJson`)
+# * ``_new_value`` a new value of ``_path`` in the currently loaded JSON
+#
 ##############################################################################
 function(_JSON_set _path _new_value)
     TPA_get(${_path} _current_value)
@@ -130,23 +129,26 @@ function(_JSON_set _path _new_value)
         endwhile ()
         TPA_set(${_path} "${_index_value}")
     else ()
-        # _JSON_format("${_new_value}" _new_value)
         _doxypress_log(DEBUG "${_path} -> ${_new_value}...")
         TPA_set(${_path} "${_new_value}")
     endif ()
     TPA_set(${_DOXYPRESS_PROJECT_KEY} "${_doxypress}")
 endfunction()
 
-# -----------------------------------------------------------------------------
-# @brief Forms a JSON document from a flat list of variables, previously
-# created by `sbeParseJson`. Handles the format of Doxypress configuration
+##############################################################################
+#.rst:
+# .. cmake:command:: _JSON_serialize(_variables _out_json)
+#
+# Forms a JSON string from a flat list of variables, previously
+# created by ``sbeParseJson``. Handles format of `doxypress` configuration
 # files, not arbitrary JSON.
 #
-# @param[in] _variables        list of variables that represents flattened
-#                              JSON file that was previously parsed via
-#                              `sbeParseJson`
-# @param[out] _out_json        serialized JSON
-# -----------------------------------------------------------------------------
+# Parameters:
+#
+# * ``_variables`` a list of variables that that was obtained by invoking
+#   ``sbeParseJson``
+# * ``_out_json``  output JSON string
+##############################################################################
 function(_JSON_serialize _variables _out_json)
     set(_json "{\n")
     set(_section "")
@@ -259,4 +261,43 @@ function(_JSON_serialize _variables _out_json)
     string(APPEND _json "}")
 
     set(${_out_json} "${_json}" PARENT_SCOPE)
+endfunction()
+
+##############################################################################
+#.rst:
+# .. cmake:command:: _JSON_format(_value _out_var)
+#
+# Converts a given string into a properly formatted JSON value:
+# * booleans are converted to `true` or `false`;
+# * numbers are written "as-is";
+# * strings are written with quotes around them, if not quoted already, or
+# "as-is" otherwise.
+#
+# Converted value is written into the output variable ``_out_var``.
+#
+# Parameters:
+#
+# * ``_value`` input value
+# * ``_out_var`` JSON-formatted input value
+##############################################################################
+function(_JSON_format _value _out_var)
+    set(_true_values true TRUE ON on)
+    set(_false_values false FALSE OFF off)
+    if ("${_value}" IN_LIST _true_values)
+        set(${_out_var} "true" PARENT_SCOPE)
+    else ()
+        if ("${_value}" IN_LIST _false_values)
+            set(${_out_var} "false" PARENT_SCOPE)
+        else ()
+            if (_value MATCHES "^[0-9]+$")
+                set(${_out_var} "${_value}" PARENT_SCOPE)
+            else ()
+                if (_value MATCHES "^\"(.*)\"$")
+                    set(${_out_var} "${_value}" PARENT_SCOPE)
+                else()
+                    set(${_out_var} "\"${_value}\"" PARENT_SCOPE)
+                endif()
+            endif ()
+        endif ()
+    endif ()
 endfunction()

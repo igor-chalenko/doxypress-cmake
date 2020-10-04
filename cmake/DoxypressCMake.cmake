@@ -15,7 +15,7 @@
 #    doxypress_add_docs([PROJECT_FILE] <name>
 #                       [INPUT_TARGET] <name>
 #                       [EXAMPLES] <directories>
-#                       [INPUTS] <directories>
+#                       [INPUTS] <files and directories>
 #                       [INSTALL_COMPONENT] <name>
 #                       [GENERATE_HTML]
 #                       [GENERATE_LATEX]
