@@ -1,5 +1,5 @@
 ##############################################################################
-## @brief Specifies whether debug output should be produced by `_doxypress_log`.
+# @brief Specifies whether debug output should be produced by `_doxypress_log`.
 ## If enabled,
 ## @code
 ## _doxypress_log(DEBUG text) <==> message(STATUS text)
@@ -16,7 +16,6 @@ option(DOXYPRESS_DEBUG "Enable debug output." OFF)
 ## If disabled, neither INFO not DEBUG messages are not printed.
 ##############################################################################
 option(DOXYPRESS_INFO "Enable info output" OFF)
-
 
 ##############################################################################
 ## @brief Prints a given message if a corresponding log level is on (enabled
@@ -46,11 +45,4 @@ function(_doxypress_log _level _text)
     if (${DOXYPRESS_INFO} AND NOT ${_level} STREQUAL DEBUG)
         message(STATUS "[${_level}] ${_text}")
     endif()
-endfunction()
-
-function(_doxypress_cut_prefix _var _out_var)
-    string(FIND ${_var} "." _ind)
-    math(EXPR _ind "${_ind} + 1")
-    string(SUBSTRING ${_var} ${_ind} -1 _cut_var)
-    set(${_out_var} ${_cut_var} PARENT_SCOPE)
 endfunction()

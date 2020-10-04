@@ -47,16 +47,41 @@ include(${doxypress_dir}/TargetPropertyAccess.cmake)
 include(${doxypress_dir}/JSONFunctions.cmake)
 
 ##############################################################################
-## @brief Generates documentation using Doxypress.
-## Performs the following tasks:
-## * Creates a target `${INPUT_TARGET}.doxypress` to run `Doxypress`; here
-## `INPUT_TARGET` is the argument, given to this function, or its default value
-## `${PROJECT_NAME}` if none given.
-## * Creates other targets to open the generated documentation
-## (`index.html`, 'refman.tex' or `refman.pdf`). An application that is
-## configured to open the files of corresponding type is used.
-## * Adds the generated files to the `install` target, if a non-empty value
-## of `INSTALL_COMPONENT` was given.
+#.rst:
+# DoxypressCMake
+# --------------
+#
+# .. code-block:: cmake
+#
+#   find_package(DoxypressCMake)
+#
+# Supplies a function for building documentation with ``Doxypress``:
+#
+# .. cmake:command:: doxypress_add_docs
+#
+# .. code-block:: cmake
+#
+#    doxypress_add_docs([PROJECT_FILE] <name>
+#                       [INPUT_TARGET] <name>
+#                       [EXAMPLES] <directories>
+#                       [INPUTS] <files and directories>
+#                       [INSTALL_COMPONENT] <name>
+#                       [GENERATE_HTML]
+#                       [GENERATE_LATEX]
+#                       [GENERATE_PDF]
+#                       [GENERATE_XML]
+#                       [OUTPUT_DIRECTORY] <directory>)
+#
+# Generates documentation using Doxypress. Performs the following tasks:
+#
+# * Creates a target `${prefix}.doxypress` to run `Doxypress`; here prefix
+#   is the value of ``INPUT_TARGET`` if one was given, or ``PROJECT_NAME``
+#   otherwise.
+# * Creates additional targets to open the generated documentation
+#   (``index.html``, ``refman.tex`` or ``refman.pdf``). An application that is
+#   configured to open the files of corresponding type is used.
+# * Adds the generated files to the ``install`` target, if a non-empty value
+#   of ``INSTALL_COMPONENT`` was given.
 ##############################################################################
 function(doxypress_add_docs)
     # initialize parameter/property descriptions
@@ -80,7 +105,7 @@ function(doxypress_add_docs)
     if (_install_component)
         _doxypress_log(DEBUG "CMAKE_INSTALL_DOCDIR = ${CMAKE_INSTALL_DOCDIR}")
         _doxypress_install_docs("${CMAKE_INSTALL_DOCDIR}" ${_install_component})
-    endif()
+    endif ()
 
     # export input arguments if requested
     # doxypress_export_input_args()
@@ -152,9 +177,9 @@ function(_doxypress_params_init)
             UPDATER "update_input_source")
 
     _doxypress_json_property("input.example-source"
-           INPUT_LIST EXAMPLE_DIRECTORIES
-           SETTER "set_example_source"
-           UPDATER "update_example_source")
+            INPUT_LIST EXAMPLE_DIRECTORIES
+            SETTER "set_example_source"
+            UPDATER "update_example_source")
 
     _doxypress_json_property("dot.have-dot" SETTER "set_have_dot" OVERWRITE)
     _doxypress_json_property("dot.dot-path" SETTER "set_dot_path" OVERWRITE)
@@ -195,8 +220,8 @@ macro(_doxypress_project_update)
         if (NOT LATEX_FOUND)
             _JSON_set("doxypress.output-latex.generate-latex" false)
             message(STATUS "LATEX was not found; skip LaTex generation.")
-        endif()
-    endif()
+        endif ()
+    endif ()
 
     TPA_get("${_DOXYPRESS_JSON_PATHS_KEY}" _properties)
 
@@ -206,7 +231,6 @@ macro(_doxypress_project_update)
 endmacro()
 
 function(_doxypress_json_update_property _property)
-    # _doxypress_cut_prefix(${_property} xxx)
     TPA_get(${_property}_UPDATER _updater)
     TPA_get(${_property}_SETTER _setter)
     TPA_get(${_property}_DEFAULT _default)
@@ -220,10 +244,10 @@ function(_doxypress_json_update_property _property)
         # convert CMake booleans to JSON's
         if ("${_input_value}" STREQUAL TRUE)
             set(_input_value true)
-        endif()
+        endif ()
         if ("${_input_value}" STREQUAL FALSE)
             set(_input_value false)
-        endif()
+        endif ()
         _doxypress_action(${_property} input "${_input_value}")
     endif ()
     set(_value "${_input_value}")
@@ -257,12 +281,12 @@ function(_doxypress_json_update_property _property)
         TPA_get(doxypress.${_property} _json_value)
         if (NOT _input_value STREQUAL "" AND "${_json_value}" MATCHES "^([0-9]+;)*([0-9]+)$")
             _JSON_get(doxypress.${_property} _json_value)
-            foreach(_val ${_value})
+            foreach (_val ${_value})
                 list(APPEND _json_value "${_val}")
-            endforeach()
+            endforeach ()
             set(_value ${_json_value})
             _doxypress_action(${_property} merge "${_value}")
-        endif()
+        endif ()
 
         if (_updater)
             _doxypress_call(_doxypress_${_updater} "${_value}" _value)
@@ -286,14 +310,14 @@ function(_doxypress_set_latex_cmd_name _out_var)
         set(${_out_var} "${PDFLATEX_COMPILER}" PARENT_SCOPE)
         _doxypress_action("output-latex.latex-cmd-name"
                 setter "${PDFLATEX_COMPILER}")
-    else()
+    else ()
         if (LATEX_FOUND)
             set(${_out_var} "${LATEX_COMPILER}" PARENT_SCOPE)
             _doxypress_action("output-latex.latex-cmd-name"
                     setter "${LATEX_COMPILER}")
-        else()
+        else ()
             set(${_out_var} "" PARENT_SCOPE)
-        endif()
+        endif ()
     endif ()
 endfunction()
 
@@ -306,12 +330,15 @@ function(_doxypress_update_project_file _project_file _out_var)
     endif ()
 endfunction()
 
+##############################################################################
+# todo
+##############################################################################
 function(_doxypress_set_input_target _out_var)
     if (TARGET ${PROJECT_NAME})
         set(${_out_var} ${PROJECT_NAME} PARENT_SCOPE)
-    else()
+    else ()
         set(${_out_var} "" PARENT_SCOPE)
-    endif()
+    endif ()
 endfunction()
 
 ##############################################################################
@@ -349,7 +376,7 @@ function(_doxypress_set_makeindex_cmd_name _out_var)
         set(${_out_var} "${MAKEINDEX_COMPILER}" PARENT_SCOPE)
         _doxypress_action("output-latex.makeindex-cmd-name"
                 setter "${MAKEINDEX_COMPILER}")
-    else()
+    else ()
         set(${_out_var} "" PARENT_SCOPE)
     endif ()
 endfunction()
@@ -382,7 +409,7 @@ function(_doxypress_update_input_source _sources _out_var)
             endif ()
             list(APPEND _inputs ${_path})
         endforeach ()
-    else()
+    else ()
         TPA_get("INPUT_TARGET" _input_target)
         if (TARGET ${_input_target})
             get_target_property(_inputs "${_input_target}"
@@ -390,7 +417,7 @@ function(_doxypress_update_input_source _sources _out_var)
             _doxypress_log(DEBUG
                     "input sources from ${_input_target}: ${_inputs}")
         endif ()
-    endif()
+    endif ()
     # _doxypress_log(DEBUG "input sources after update: ${_inputs}")
     _doxypress_action("input.input-source" "updater" "${_inputs}")
     set(${_out_var} "${_inputs}" PARENT_SCOPE)
@@ -405,14 +432,14 @@ endfunction()
 function(_doxypress_update_example_source _value _out_var)
     if (_value)
         set(_result "")
-        foreach(_dir ${_value})
+        foreach (_dir ${_value})
             if (NOT IS_ABSOLUTE "${_dir}")
                 get_filename_component(_dir
                         "${CMAKE_CURRENT_SOURCE_DIR}/${_dir}"
                         ABSOLUTE)
             endif ()
             list(APPEND _result "${_dir}")
-        endforeach()
+        endforeach ()
         _doxypress_action("input.example-source" "updater" "${_result}")
         set(${_out_var} "${_result}" PARENT_SCOPE)
     endif ()
@@ -453,9 +480,9 @@ endfunction()
 function(_doxypress_set_input_target _out_var)
     if (TARGET ${PROJECT_NAME})
         set(${_out_var} ${PROJECT_NAME} PARENT_SCOPE)
-    else()
+    else ()
         set(${_out_var} "" PARENT_SCOPE)
-    endif()
+    endif ()
 endfunction()
 
 ##############################################################################
@@ -496,24 +523,24 @@ function(_doxypress_action _property _action _value)
     set(_message "")
     if ("${_value}" STREQUAL "")
         set(_value "<<empty>>")
-    endif()
+    endif ()
     if (${_action} STREQUAL setter)
         set(_message "[setter] ${_value}")
-    elseif(${_action} STREQUAL updater)
+    elseif (${_action} STREQUAL updater)
         set(_message "[updater] ${_value}")
-    elseif(${_action} STREQUAL default)
+    elseif (${_action} STREQUAL default)
         set(_message "[default] ${_value}")
-    elseif(${_action} STREQUAL source)
+    elseif (${_action} STREQUAL source)
         set(_message "[source] ${_value}")
-    elseif(${_action} STREQUAL input)
+    elseif (${_action} STREQUAL input)
         set(_message "[input] ${_value}")
-    elseif(${_action} STREQUAL merge)
+    elseif (${_action} STREQUAL merge)
         set(_message "[merged] ${_value}")
-    endif()
+    endif ()
     TPA_get("histories" _histories)
     TPA_append("history.${_property}" "${_message}")
 
     if (NOT ${_property} IN_LIST _histories)
         TPA_append("histories" ${_property})
-    endif()
+    endif ()
 endfunction()
