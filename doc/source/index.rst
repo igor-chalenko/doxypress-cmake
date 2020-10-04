@@ -19,6 +19,10 @@ generation via Doxypress_.
 
    FindDoxypress
    api
+   TPA
+   DoxypressParameters
+   JSONFunctions
+   DoxypressTargets
    description
 
 .. toctree::
