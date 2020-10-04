@@ -194,7 +194,7 @@ macro(_doxypress_project_update)
         find_package(LATEX OPTIONAL_COMPONENTS MAKEINDEX PDFLATEX)
         if (NOT LATEX_FOUND)
             _JSON_set("doxypress.output-latex.generate-latex" false)
-            message(STATUS "LATEX was not found; skip LaTex generation.")
+            _doxypress_log(WARN "LATEX was not found; skip LaTex generation.")
         endif()
     endif()
 
