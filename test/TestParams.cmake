@@ -19,7 +19,7 @@ function(test_input_flags_2)
 
     _doxypress_params_init()
     _doxypress_params_parse(GENERATE_LATEX)
-    _doxypress_project_update()
+    _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     TPA_get(GENERATE_XML _xml)
     TPA_get(GENERATE_LATEX _latex)
@@ -35,7 +35,7 @@ endfunction()
 function(test_input_directories_1)
     _doxypress_params_init()
     _doxypress_params_parse(INPUTS dir1 dir2)
-    _doxypress_project_update()
+    _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     TPA_get("INPUTS" _inputs)
     assert_same("${_inputs}"
@@ -48,8 +48,7 @@ endfunction()
 function(test_input_directories_2)
     _doxypress_params_init()
     _doxypress_params_parse(PROJECT_FILE DoxypressTest1.json INPUTS x)
-    _doxypress_project_load(DoxypressTest1.json)
-    _doxypress_project_update()
+    _doxypress_project_update(DoxypressTest1.json _out)
 
     TPA_get("INPUTS" _inputs)
     assert_same("${_inputs}"
@@ -61,7 +60,7 @@ endfunction()
 function(test_input_directories_3)
     _doxypress_params_init()
     _doxypress_params_parse(INPUT_TARGET main)
-    _doxypress_project_update()
+    _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     TPA_get(INPUTS _inputs)
     assert_same("${_inputs}"
@@ -73,8 +72,7 @@ function(test_output_directory)
     _doxypress_params_init()
     _doxypress_params_parse(PROJECT_FILE DoxypressTest1.json
             OUTPUT_DIRECTORY "docs2")
-    _doxypress_project_load(DoxypressTest1.json)
-    _doxypress_project_update()
+    _doxypress_project_update(DoxypressTest1.json _out)
 
     TPA_get("OUTPUT_DIRECTORY" _output)
     assert_same("${_output}" "${CMAKE_CURRENT_BINARY_DIR}/docs2")
@@ -84,8 +82,7 @@ endfunction()
 function(test_custom_project_file_1)
     _doxypress_params_init()
     _doxypress_params_parse(PROJECT_FILE DoxypressTest1.json)
-    _doxypress_project_load(DoxypressTest1.json)
-    _doxypress_project_update()
+    _doxypress_project_update(DoxypressTest1.json _out)
 
     TPA_get("PROJECT_FILE" _project_file)
     TPA_get("OUTPUT_DIRECTORY" _output)
@@ -103,8 +100,7 @@ function(test_custom_project_file_2)
     _doxypress_params_init()
     _doxypress_params_parse(PROJECT_FILE DoxypressTest1.json
             EXAMPLE_DIRECTORIES x1 x2)
-    _doxypress_project_load(DoxypressTest1.json)
-    _doxypress_project_update()
+    _doxypress_project_update(DoxypressTest1.json _out)
 
     TPA_get("EXAMPLE_DIRECTORIES" _examples)
     assert_same("${_examples}"
@@ -118,12 +114,10 @@ function(test_input_directories_full_1)
 
     _doxypress_params_init()
     _doxypress_params_parse(INPUTS dir1 dir2)
-    _doxypress_project_load(../cmake/DoxypressCMake.json)
-    _doxypress_project_update()
-    _doxypress_project_save(${CMAKE_CURRENT_BINARY_DIR}/DoxypressCMake.json)
+    _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
-    _doxypress_project_load(${CMAKE_CURRENT_BINARY_DIR}/DoxypressCMake.json)
-    _JSON_get("doxypress.input.input-source" _inputs)
+    _doxypress_project_load(${_out})
+    _JSON_get("doxypress.${_DOXYPRESS_INPUT_SOURCE}" _inputs)
     assert_same("${_inputs}"
             "${CMAKE_CURRENT_SOURCE_DIR}/dir1;${CMAKE_CURRENT_SOURCE_DIR}/dir2")
 
@@ -139,13 +133,11 @@ function(test_input_directories_full_2)
 
     _doxypress_params_init()
     _doxypress_params_parse(INPUT_TARGET main)
-    _doxypress_project_load(../cmake/DoxypressCMake.json)
-    _doxypress_project_update()
-    _doxypress_project_save(${CMAKE_CURRENT_BINARY_DIR}/DoxypressCMake.json)
+    _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
-    _doxypress_project_load(${CMAKE_CURRENT_BINARY_DIR}/DoxypressCMake.json)
+    _doxypress_project_load(${_out})
 
-    _JSON_get("doxypress.input.input-source" _inputs)
+    _JSON_get("doxypress.${_DOXYPRESS_INPUT_SOURCE}" _inputs)
     assert_same("${_inputs}"
             "${CMAKE_CURRENT_SOURCE_DIR}/include4;${CMAKE_CURRENT_SOURCE_DIR}/include5")
     _JSON_get("doxypress.messages.warnings" _warnings)
@@ -158,7 +150,7 @@ endfunction()
 function(test_latex_find_package)
     _doxypress_params_init()
     _doxypress_params_parse(GENERATE_LATEX)
-    _doxypress_project_update()
+    _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     if (NOT DEFINED LATEX_FOUND)
         assert_same("LATEX_FOUND not set" "")

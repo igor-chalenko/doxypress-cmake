@@ -11,24 +11,27 @@ generation via Doxypress_.
    :caption: Basics
 
    intro
-   BasicPlugin
 
 .. toctree::
    :maxdepth: 2
    :caption: API
 
    FindDoxypress
+   DoxypressCMake
+   DoxypressCommon
    api
    TPA
    DoxypressParameters
    JSONFunctions
    DoxypressTargets
+   Setters
    description
 
 .. toctree::
    :maxdepth: 2
    :caption: Additional info
 
+   glossary
    platforms
    changelog
    license

@@ -233,12 +233,7 @@ endfunction()
 #   it was specified by `SETTER` argument. In other words, makes a call to
 #   setter unconditional.
 #
-# The above handlers are invoked in the following order for each JSON property:
-# * ``SETTER`` (if the current property value is empty);
-# * ``UPDATER`` (if the current property value is **NOT** empty);
-# * ``DEFAULT`` (if the current property value is still empty);
-#
-# Resulting variables are stored in the current :ref:`TPA scope`.
+# The input arguments are parsed and stored in the current :ref:`TPA scope`.
 ##############################################################################
 function(_doxypress_json_property _property)
     set(_options OVERWRITE)

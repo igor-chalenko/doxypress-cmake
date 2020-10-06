@@ -28,8 +28,7 @@ endif()
 if (DEFINED CMAKE_INSTALL_LIBDIR)
     set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-    install(FILES
-            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/DoxypressCMake.cmake
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
             DESTINATION ${config_install_dir})
 else()
     message(WARNING "CMAKE_INSTALL_LIBDIR is required (install step skipped).")

@@ -5,7 +5,7 @@ function(test_input_directories_full_3)
             INPUTS dir1 dir2 GENERATE_LATEX)
 
     _doxypress_project_load(${CMAKE_CURRENT_BINARY_DIR}/DoxypressCMake.json)
-    _JSON_get("doxypress.input.input-source" _inputs)
+    _JSON_get("doxypress.${_DOXYPRESS_INPUT_SOURCE}" _inputs)
     assert_same("${_inputs}"
             "${CMAKE_CURRENT_SOURCE_DIR}/dir1;${CMAKE_CURRENT_SOURCE_DIR}/dir2")
 endfunction()

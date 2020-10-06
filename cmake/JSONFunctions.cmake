@@ -171,7 +171,7 @@ function(_JSON_serialize _variables _out_json)
         endif()
 
         if (NOT _found)
-            if (NOT "${_var_without_prefix}" STREQUAL "input.input-source")
+            if (NOT "${_var_without_prefix}" STREQUAL "${_DOXYPRESS_INPUT_SOURCE}")
                 if (DEFINED ${_var_without_prefix})
                     set(_message "CMake override ${_var_without_prefix} found:")
                     _doxypress_log(DEBUG "${_message} ${${_var_without_prefix}}")
