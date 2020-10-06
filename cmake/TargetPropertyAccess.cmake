@@ -151,9 +151,11 @@ function(TPA_append _property _value)
 endfunction()
 
 ##############################################################################
-# @ingroup TargetPropertyAccess
-# @brief Clears all properties previously set by calls to `TPA_set` and
-# `TPA_append`.
+#.rst:
+# .. cmake:command:: TPA_clear_scope
+#
+# Clears all properties previously set by calls to `TPA_set` and `TPA_append`.
+# Uses index variable ``properties`` to get the list of all properties.
 ##############################################################################
 function(TPA_clear_scope)
     TPA_get(properties _properties)

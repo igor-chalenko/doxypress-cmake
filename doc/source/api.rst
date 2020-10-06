@@ -5,7 +5,7 @@ Public functions and variables
 FindDoxypressCMake
 ==================
 
-This module looks for `Doxypress` and some optional tools it supports. These
+This module looks for `DoxyPress` and some optional tools it supports. These
 tools are enabled as components in the `find_package()` command:
 
 * `dot`
@@ -34,7 +34,7 @@ The following variables are defined by this module:
  * `DOXYGEN_VERSION`
    The version reported by doxypress --version.
 
-The module defines IMPORTED targets for `Doxypress` and each component found.
+The module defines IMPORTED targets for `DoxyPress` and each component found.
 The following import targets are defined if their corresponding executable
 could be found (the component import targets will only be defined if that
 component was requested):
@@ -70,7 +70,7 @@ doxypress_add_docs
 
 Performs the following tasks:
 
-* Creates a target `${INPUT_TARGET}.doxypress` to run `Doxypress`; here
+* Creates a target `${INPUT_TARGET}.doxypress` to run `DoxyPress`; here
   `INPUT_TARGET` is the argument, given to this function, or its default value
   `${PROJECT_NAME}` if none given.
 
@@ -103,7 +103,7 @@ Parameters
 ----------
 
 **PROJECT_FILE**
-    JSON project file that `Doxypress` uses as input. Antwerp will read
+    JSON project file that `DoxyPress` uses as input. Antwerp will read
     this file during CMake configuration phase, update it accordingly, write
     the updated file back, and use the result as actual configuration. See
     :ref:`Algorithm description` for a detailed description of what the package

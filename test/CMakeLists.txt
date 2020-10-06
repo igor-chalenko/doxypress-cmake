@@ -1,5 +1,3 @@
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/externals/json-cmake")
-
 set(doxypress_dir ${PROJECT_SOURCE_DIR}/cmake)
 include(../cmake/DoxypressCMake.cmake)
 

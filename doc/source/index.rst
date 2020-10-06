@@ -16,6 +16,7 @@ generation via Doxypress_.
    :maxdepth: 2
    :caption: API
 
+   components
    FindDoxypress
    DoxypressCMake
    DoxypressCommon

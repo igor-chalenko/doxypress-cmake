@@ -13,10 +13,18 @@
 #
 # Input parameters to ``doxypress_add_docs`` are defined dynamically using
 # the functions ``_doxypress_param_string``, ``_doxypress_param_option``,
-# and ``_doxypress_param_list``. This allows for easy modification of
-# input parameter set in ``_doxypress_param_init``; that function is also
-# the only one that needs to be changed in case inputs change.
+# and ``_doxypress_param_list``. This dynamic definition enables declarative
+# binding between parameters and their handlers. These declarations are then
+# interpreted by the code that is does not depend on any specific parameter.
 ##############################################################################
+
+unset(IN_INPUT_STRING)
+unset(IN_INPUT_OPTION)
+unset(IN_INPUT_LIST)
+unset(IN_DEFAULT)
+unset(IN_SETTER)
+unset(IN_UPDATER)
+unset(IN_OVERWRITE)
 
 ##############################################################################
 #.rst:
@@ -237,26 +245,11 @@ endfunction()
 ##############################################################################
 function(_doxypress_json_property _property)
     set(_options OVERWRITE)
-    set(_one_value_args
-            INPUT_OPTION
-            INPUT_STRING
-            DEFAULT
-            SETTER
-            UPDATER)
+    set(_one_value_args INPUT_OPTION INPUT_STRING DEFAULT SETTER UPDATER)
     set(_multi_value_args INPUT_LIST)
-    unset(IN_INPUT_STRING)
-    unset(IN_INPUT_OPTION)
-    unset(IN_INPUT_LIST)
-    unset(IN_DEFAULT)
-    unset(IN_SETTER)
-    unset(IN_UPDATER)
-    unset(IN_OVERWRITE)
 
-    cmake_parse_arguments(IN
-            "${_options}"
-            "${_one_value_args}"
-            "${_multi_value_args}"
-            "${ARGN}")
+    cmake_parse_arguments(IN "${_options}" "${_one_value_args}"
+            "${_multi_value_args}" "${ARGN}")
 
     if (DEFINED IN_INPUT_STRING)
         TPA_append(one_value_args ${IN_INPUT_STRING})
@@ -270,9 +263,6 @@ function(_doxypress_json_property _property)
         TPA_append(multi_value_args ${IN_INPUT_LIST})
         TPA_set(${_property}_INPUT "${IN_INPUT_LIST}")
     endif ()
-
-    TPA_append(${_DOXYPRESS_JSON_PATHS_KEY} ${_property})
-
     if (DEFINED IN_DEFAULT)
         TPA_set(${_property}_DEFAULT ${IN_DEFAULT})
     endif ()
@@ -283,6 +273,8 @@ function(_doxypress_json_property _property)
         TPA_set(${_property}_UPDATER ${IN_UPDATER})
     endif ()
     TPA_set(${_property}_OVERWRITE ${IN_OVERWRITE})
+
+    TPA_append(${_DOXYPRESS_JSON_PATHS_KEY} ${_property})
 endfunction()
 
 ##############################################################################

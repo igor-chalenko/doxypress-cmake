@@ -1,5 +1,6 @@
 function(test_input_directories_full_3)
     set("output-latex.generate-latex" false)
+    set(LATEX_FOUND true)
     doxypress_add_docs(
             INPUT_TARGET main
             INPUTS dir1 dir2 GENERATE_LATEX)
@@ -8,6 +9,9 @@ function(test_input_directories_full_3)
     _JSON_get("doxypress.${_DOXYPRESS_INPUT_SOURCE}" _inputs)
     assert_same("${_inputs}"
             "${CMAKE_CURRENT_SOURCE_DIR}/dir1;${CMAKE_CURRENT_SOURCE_DIR}/dir2")
+    _JSON_get("doxypress.output-latex.generate-latex" _latex)
+    assert_same(${_latex} true)
+    unset(LATEX_FOUND)
 endfunction()
 
 function(test_logging)
@@ -29,6 +33,6 @@ function(test_logging)
     TPA_clear_scope()
 endfunction()
 
+set(DOXYPRESS_LOG_LEVEL DEBUG)
 test_input_directories_full_3()
-set(DOXYPRESS_INFO ON)
 # test_logging()

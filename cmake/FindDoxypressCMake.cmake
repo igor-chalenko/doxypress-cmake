@@ -14,10 +14,10 @@
 #
 # * ``dot`` Graphviz dot utility used to render various graphs;
 #
-# * ``mscgen`` Message Chart Generator utility used by `Doxypress`’ ``msc`` and
+# * ``mscgen`` Message Chart Generator utility used by `DoxyPress`’ ``msc`` and
 #   ``mscfile`` commands;
 #
-# * ``dia`` Dia the diagram editor used by `Doxypress`' `diafile` command.
+# * ``dia`` Dia the diagram editor used by `DoxyPress`' `diafile` command.
 #
 # .. _Doxypress: https://www.copperspice.com/docs/doxypress/index.html
 #
@@ -30,10 +30,10 @@
 #                 REQUIRED dot
 #                 OPTIONAL_COMPONENTS mscgen dia)
 #
-# If `Doxypress` was found, the following definitions are created:
+# If `DoxyPress` was found, the following definitions are created:
 #
 # * The variable ``DOXYPRESS_FOUND`` is set to `YES` (it is set to `NO`
-#   if `Doxypress` was not found)
+#   if `DoxyPress` was not found)
 #
 # * The variable ``DOXYPRESS_EXECUTABLE`` contains the full path to the found
 #   executable
@@ -246,9 +246,9 @@ macro(_Doxypress_find_mscgen)
     unset(_x86)
 endmacro()
 
-# Make sure `doxypress` is one of the components to find
+# Make sure `DoxyPress` is one of the components to find
 if (NOT Doxypress_FIND_COMPONENTS)
-    # Search at least for `doxypress` executable
+    # Search at least for `DoxyPress` executable
     set(Doxypress_FIND_COMPONENTS doxypress)
     # Preserve backward compatibility:
     # search for `dot` also if `DOXYPRESS_SKIP_DOT` is not explicitly disable this.

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.3)
 project(DoxypressCMake VERSION 0.0.1 DESCRIPTION "Doxypress module for CMake")
 
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/externals/json-cmake")
+
 add_subdirectory(test)
 add_subdirectory(doc)
 

@@ -21,7 +21,7 @@
 #
 #    _doxypress_create_targets(<project file> <processed project file>)
 #
-# Creates a `doxypress` target and an `open generated docs` target for every
+# Creates a `DoxyPress` target and an `open generated docs` target for every
 # output format that was requested.
 #
 # Parameters:
@@ -150,7 +150,7 @@ endfunction()
 # * ``_name_prefix`` a string prepended to the names of the targets being
 #   created
 # * ``_output_dir`` a directory where documentation files will be generated
-#   by the ``doxypress`` target
+#   by the ``DoxyPress`` target
 ##############################################################################
 function(_doxypress_add_open_targets _name_prefix _output_dir)
     _JSON_get(doxypress.output-html.generate-html _generate_html)
@@ -296,7 +296,7 @@ endfunction()
 #   _doxypress_list_outputs(<output directory> <output variable>)
 #
 # Collects file names into a list that is used in the ``OUTPUTS`` parameter of
-# the `doxypress` target. If HTML generation was requested, ``index.html``
+# the `DoxyPress` target. If HTML generation was requested, ``index.html``
 # is added to the list. If LaTex generation was requested, ''refman.tex` is
 # added. If PDF was requested, ``refman.pdf`` is added.
 ##############################################################################

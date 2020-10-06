@@ -11,7 +11,7 @@
 # JSON manipulation functions
 # ---------------------------
 #
-# These functions implement read/write access to the properties of `Doxypress`
+# These functions implement read/write access to the properties of `DoxyPress`
 # project file. A property is identified by its JSON path, here's a few
 # examples:
 #
@@ -140,7 +140,7 @@ endfunction()
 # .. cmake:command:: _JSON_serialize(_variables _out_json)
 #
 # Forms a JSON string from a flat list of variables, previously
-# created by ``sbeParseJson``. Handles format of `doxypress` configuration
+# created by ``sbeParseJson``. Handles format of `DoxyPress` configuration
 # files, not arbitrary JSON.
 #
 # Parameters:
@@ -155,32 +155,10 @@ function(_JSON_serialize _variables _out_json)
 
     # todo ?
     set(_array_length 0)
-    TPA_get(properties _properties)
-    TPA_get(${_DOXYPRESS_INPUTS} _inputs)
+    # TPA_get(properties _properties)
+    # TPA_get(${_DOXYPRESS_INPUTS} _inputs)
     foreach (_var ${_variables})
         TPA_get(${_var} _value)
-
-        # search for an override
-        set(_found false)
-        _doxypress_cut_prefix(${_var} _var_without_prefix)
-        if (${_var_without_prefix}_INPUT IN_LIST _properties)
-            TPA_get(${_var_without_prefix}_INPUT _input_parameter)
-            if (${_input_parameter} IN_LIST _inputs)
-                set(_found true)
-            endif()
-        endif()
-
-        if (NOT _found)
-            if (NOT "${_var_without_prefix}" STREQUAL "${_DOXYPRESS_INPUT_SOURCE}")
-                if (DEFINED ${_var_without_prefix})
-                    set(_message "CMake override ${_var_without_prefix} found:")
-                    _doxypress_log(DEBUG "${_message} ${${_var_without_prefix}}")
-                    set(_value "${${_var_without_prefix}}")
-                endif()
-            endif ()
-        else()
-            _doxypress_log(DEBUG "Won't override ${_var_without_prefix}")
-        endif()
 
         # parse var
         if (_var MATCHES "doxypress\\.([a-z0-9_\\-]+)\\.([a-z0-9_\\-]+)")
