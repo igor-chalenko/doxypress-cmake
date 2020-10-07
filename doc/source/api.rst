@@ -45,7 +45,7 @@ component was requested):
  * `Doxypress::dia`
 
 ==================
-doxypress_add_docs
+doxypress_add_docx
 ==================
 
 # .. doxygenfunction:: doxypress_add_docs

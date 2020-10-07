@@ -34,7 +34,7 @@
 #    _doxypress_log(INFO text) # does nothing
 #    _doxypress_log(WARN text) # equivalent to message(STATUS text)
 ##############################################################################
-set(DOXYPRESS_LOG_LEVEL INFO)
+set(DOXYPRESS_LOG_LEVEL DEBUG)
 
 ##############################################################################
 #.rst:

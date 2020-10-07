@@ -1,4 +1,4 @@
-include(../cmake/FindDoxypressCMake.cmake)
+include(../cmake/FindAddDocs.cmake)
 
 if (NOT TARGET Doxypress::doxypress)
     assert_same("Doxypress imported target not found" "")

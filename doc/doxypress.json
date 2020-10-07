@@ -267,9 +267,9 @@
         ],
         "input-recursive": true,
         "input-source": [
-            "../cmake/DoxypressCMake.cmake",
-            "../cmake/DoxypressCommon.cmake",
-            "../cmake/TargetPropertyAccess.cmake"
+            "../cmake/AddDocs.cmake",
+            "../cmake/Logging.cmake",
+            "../cmake/TPA.cmake"
         ],
         "mdfile-mainpage": ""
     },

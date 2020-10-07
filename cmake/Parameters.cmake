@@ -274,7 +274,7 @@ function(_doxypress_json_property _property)
     endif ()
     TPA_set(${_property}_OVERWRITE ${IN_OVERWRITE})
 
-    TPA_append(${_DOXYPRESS_JSON_PATHS_KEY} ${_property})
+    TPA_append(${_DOXYPRESS_JSON_PATHS_KEY} "${_property}")
 endfunction()
 
 ##############################################################################

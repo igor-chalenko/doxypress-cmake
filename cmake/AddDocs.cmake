@@ -11,10 +11,10 @@ include(JSONParser)
 # to find the path to this module rather than the path to a calling list file
 get_filename_component(doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
 
-include(${doxypress_dir}/TargetPropertyAccess.cmake)
+include(${doxypress_dir}/TPA.cmake)
 include(${doxypress_dir}/DoxypressTargets.cmake)
-include(${doxypress_dir}/DoxypressParameters.cmake)
-include(${doxypress_dir}/Properties.cmake)
+include(${doxypress_dir}/Parameters.cmake)
+include(${doxypress_dir}/ProjectFunctions.cmake)
 
 ##############################################################################
 # @brief The JSON document is stored in TPA under this name.
@@ -28,17 +28,15 @@ set(_DOXYPRESS_MAKEINDEX_CMD_NAME "output-latex.makeindex-cmd-name")
 set(_DOXYPRESS_EXAMPLE_SOURCE "input.example-source")
 set(_DOXYPRESS_INPUT_SOURCE "input.input-source")
 
-include(${doxypress_dir}/DoxypressCommon.cmake)
-include(${doxypress_dir}/TargetPropertyAccess.cmake)
+include(${doxypress_dir}/Logging.cmake)
+include(${doxypress_dir}/TPA.cmake)
 include(${doxypress_dir}/JSONFunctions.cmake)
 include(${doxypress_dir}/Setters.cmake)
 
 ##############################################################################
 #.rst:
-# DoxypressCMake
-# --------------
-#
-# .. cmake:command:: doxypress_add_docs
+# doxypress_add_docs
+# ------------------
 #
 # .. code-block:: cmake
 #
@@ -215,6 +213,32 @@ include(${doxypress_dir}/Setters.cmake)
 #   which is then written to a file that becomes the final Doxypress
 #   configuration. Property overrides are applied during serialization phase.
 #
+# There are four sources of property values that may contribute to the final,
+# processed project file:
+#
+# * input arguments provided to :ref:`doxypress_add_docs`;
+# * defaults set by `doxypress-cmake`;
+# * input project file;
+# * CMake variables that override the values in the project file.
+#
+# The order of evaluation is:
+#
+# ``inputs`` -> ``overrides`` -> ``project file`` -> ``defaults``
+#
+# That is, once a value is set upstream, downstream sources are ignored (with
+# an exception for merging):
+#
+# * If an input value is given for a property, the override of the corresponding
+#   property is ignored. The corresponding value in the input project file is
+#   ignored as well unless it is an array; in this case, the input value is
+#   appended to the array in the project file.
+# * If an input parameter is empty, but there is an override for it,
+#   the corresponding value in the input project file is ignored.
+# * If an input parameter is empty and there's no override for the corresponding
+#   property, the value in the project remains unchanged.
+# * If the first three source didn't provide a non-empty value, the property
+#   receives a default value.
+#
 # .. _json-cmake: https://github.com/sbellus/json-cmake
 ##############################################################################
 function(doxypress_add_docs)
@@ -223,15 +247,14 @@ function(doxypress_add_docs)
     # parse input arguments
     _doxypress_params_parse(${ARGN})
     # get the project file name
-    TPA_get(PROJECT_FILE _input_project_file)
+    TPA_get(PROJECT_FILE _project_file)
     # update project file
-    _doxypress_project_update("${_input_project_file}" _output_project_file)
+    _doxypress_project_update("${_project_file}" _updated_project_file)
     # create target(s)
-    _doxypress_create_targets("${_input_project_file}" "${_output_project_file}")
+    _doxypress_create_targets("${_project_file}" "${_updated_project_file}")
 
     TPA_get(INSTALL_COMPONENT _install_component)
     if (_install_component)
-        include(GNUInstallDirs)
         _doxypress_install_docs("${CMAKE_INSTALL_DOCDIR}" ${_install_component})
     endif ()
 
@@ -415,15 +438,7 @@ endfunction()
 macro(_doxypress_project_update _project_file _out_var)
     _doxypress_project_load(${_project_file})
 
-    TPA_get(GENERATE_LATEX _generate_latex)
-    if ("${_generate_latex}" AND NOT DEFINED LATEX_FOUND)
-        _doxypress_log(INFO "LaTex generation requested, importing LATEX...")
-        find_package(LATEX OPTIONAL_COMPONENTS MAKEINDEX PDFLATEX)
-        if (NOT LATEX_FOUND)
-            _JSON_set("doxypress.output-latex.generate-latex" false)
-            _doxypress_log(WARN "LATEX was not found; skip LaTex generation.")
-        endif()
-    endif()
+    _doxypress_check_latex()
 
     TPA_get("${_DOXYPRESS_JSON_PATHS_KEY}" _properties)
 
@@ -437,37 +452,6 @@ macro(_doxypress_project_update _project_file _out_var)
     _doxypress_project_save("${_file_name}")
     set(${_out_var} "${_file_name}")
 endmacro()
-
-##############################################################################
-#.rst:
-#
-# .. cmake:command:: _doxypress_get_input_value
-#
-# .. code-block:: cmake
-#
-#   _doxypress_get_input_value(<input argument> <output variable>)
-#
-# Finds the input argument ``_input_arg_name`` in the current TPA scope,
-# converts `CMake`'s boolean values to ``true``/``false`` format, and writes
-# the result into the output variable.
-#
-# Parameters:
-#
-# * ``_input_arg_name`` an input parameter to read
-# * ``_out_var`` the output variable
-##############################################################################
-function(_doxypress_get_input_value _input_arg_name _out_var)
-    TPA_get(${_input_arg_name} _input_value)
-
-    # convert CMake booleans to JSON's
-    if ("${_input_value}" STREQUAL TRUE)
-        set(_input_value true)
-    endif ()
-    if ("${_input_value}" STREQUAL FALSE)
-        set(_input_value false)
-    endif ()
-    set(${_out_var} "${_input_value}" PARENT_SCOPE)
-endfunction()
 
 ##############################################################################
 #.rst:
@@ -498,3 +482,14 @@ function(_doxypress_find_directory _base_dir _names _out_var)
     set(${_out_var} "${_result}" PARENT_SCOPE)
 endfunction()
 
+macro(_doxypress_check_latex)
+    TPA_get(GENERATE_LATEX _generate_latex)
+    if (_generate_latex AND NOT DEFINED LATEX_FOUND)
+        _doxypress_log(INFO "LaTex generation requested, importing LATEX...")
+        find_package(LATEX OPTIONAL_COMPONENTS MAKEINDEX PDFLATEX)
+        if (NOT LATEX_FOUND)
+            _JSON_set("doxypress.output-latex.generate-latex" false)
+            _doxypress_log(WARN "LATEX was not found; skip LaTex generation.")
+        endif()
+    endif()
+endmacro()

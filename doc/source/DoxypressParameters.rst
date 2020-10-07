@@ -1,1 +1,1 @@
-.. cmake-module:: ../../cmake/DoxypressParameters.cmake
+.. cmake-module:: ../../cmake/Parameters.cmake

@@ -302,4 +302,4 @@ else ()
     set(DOXYPRESS_FOUND "NO")
 endif ()
 
-include(${doxypress_dir}/DoxypressCMake.cmake)
+include(${doxypress_dir}/AddDocs.cmake)

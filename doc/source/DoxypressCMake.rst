@@ -1,1 +1,1 @@
-.. cmake-module:: ../../cmake/DoxypressCMake.cmake
+.. cmake-module:: ../../cmake/AddDocs.cmake

@@ -1,2 +1,2 @@
-.. cmake-module:: ../../cmake/TargetPropertyAccess.cmake
+.. cmake-module:: ../../cmake/TPA.cmake
 

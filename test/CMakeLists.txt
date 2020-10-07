@@ -1,5 +1,5 @@
 set(doxypress_dir ${PROJECT_SOURCE_DIR}/cmake)
-include(../cmake/DoxypressCMake.cmake)
+include(../cmake/AddDocs.cmake)
 
 # _doxypress_project_load(DoxypressTest1.json)
 function(assert_same str1 str2)
@@ -24,5 +24,5 @@ if (NOT DEFINED DOXYPRESS_SKIP_TEST OR NOT DOXYPRESS_SKIP_TEST)
     include(TestCreateTargets.cmake)
     include(TestParams.cmake)
     include(TestAddDocs.cmake)
-    # include(TestFindDoxypressCMake.cmake)
+    # include(TestFindAddDocs.cmake)
 endif()

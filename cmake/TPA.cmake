@@ -7,8 +7,8 @@
 
 ##############################################################################
 #.rst:
-# Target Property Access (TPA)
-# ----------------------------
+# Target Property Accessors (TPA)
+# -------------------------------
 #
 # Functions with prefix ``TPA`` manage state a surrogate `INTERFACE` target:
 # properties of this targets are used as global cache for stateful data.
@@ -41,7 +41,7 @@
 # to run parallel builds as long as there is only one CMake process working
 # on a given directory.
 
-include(${doxypress_dir}/DoxypressCommon.cmake)
+include(${doxypress_dir}/Logging.cmake)
 
 ##############################################################################
 #.rst:

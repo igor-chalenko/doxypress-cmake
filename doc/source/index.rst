@@ -14,13 +14,17 @@ generation via Doxypress_.
 
 .. toctree::
    :maxdepth: 2
-   :caption: API
+   :caption: Public API
 
-   components
    FindDoxypress
    DoxypressCMake
-   DoxypressCommon
-   api
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Implementation
+
+   components
+   Logging
    TPA
    DoxypressParameters
    JSONFunctions
