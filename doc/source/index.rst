@@ -26,7 +26,6 @@ generation via Doxypress_.
    components
    Logging
    TPA
-   DoxypressParameters
    JSONFunctions
    DoxypressTargets
    Setters

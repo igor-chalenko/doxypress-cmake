@@ -19,6 +19,8 @@ set_target_properties(main PROPERTIES EXCLUDE_FROM_ALL 1)
 target_include_directories(main PUBLIC include4 include5)
 
 if (NOT DEFINED DOXYPRESS_SKIP_TEST OR NOT DOXYPRESS_SKIP_TEST)
+    message(STATUS "Running tests...")
+    set(DOXYPRESS_LOG_LEVEL WARN)
     include(TestTPA.cmake)
     include(TestJSON.cmake)
     include(TestCreateTargets.cmake)

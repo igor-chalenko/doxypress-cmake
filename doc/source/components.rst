@@ -3,10 +3,12 @@ Components
 
 .. image:: _static/img/components.png
 
-* ``Logging`` module provides functions useful for debugging
-* ``TPA`` module implements :ref:`TPA scopes<TPA scope>`
-* ``JSONFunctions`` module implements "low-level" JSON access functions
+* ``AddDocs`` processes input arguments and then delegates the work to
+  the downstream modules
 * ``ProjectFunctions`` module implements project file manipulation functions
-* ``Properties`` module introduces a notion of a :ref:`Properties<property>`
-* ``AddDocs`` generates processed project file, creates requested CMake targets,
-  and add installation commands to the ``install`` target
+* ``CMakeTargets`` module creates targets as requested by inputs: `DoxyPress`
+  target, open targets for every generated format, and install commands
+* ``Interpreter`` module generates the processed project file
+* ``JSONFunctions`` module implements "low-level" JSON access functions
+* ``TPA`` module implements :ref:`TPA scopes<TPA scope>`
+* ``Logging`` module provides functions useful for debugging

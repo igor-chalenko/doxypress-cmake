@@ -41,8 +41,6 @@
 # to run parallel builds as long as there is only one CMake process working
 # on a given directory.
 
-include(${doxypress_dir}/Logging.cmake)
-
 ##############################################################################
 #.rst:
 # -------------

@@ -1,1 +1,1 @@
-.. cmake-module:: ../../cmake/Setters.cmake
+.. cmake-module:: ../../cmake/PropertyHandlers.cmake

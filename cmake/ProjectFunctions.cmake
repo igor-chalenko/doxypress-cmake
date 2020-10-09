@@ -1,213 +1,179 @@
 ##############################################################################
 #.rst:
 #
-# .. cmake:command:: _doxypress_property_update
+# .. cmake:command:: _doxypress_project_load
 #
-# ..code-block::
+# .. code-block:: cmake
 #
-#   _doxypress_property_update(<JSON path>)
+#    _doxypress_project_load(<project file name>
 #
-# Applies update logic to a given property. The property is updated in the
-# loaded JSON document and in the stored input parameter, if one is defined
-# for this property. See :ref:`algorithm<Algorithm>` for a detailed description
-# of actions taken by the function.
+# Loads a given project file into the current TPA scope. Name of every resulting
+# property is prefixed with ``doxypress.`` in order to avoid name clashes.
+#
+# Parameters:
+#
+# * ``_file_name`` a project file to load
 ##############################################################################
-function(_doxypress_property_update _property)
-    TPA_get(${_property}_INPUT _input_param)
-    TPA_get(${_property}_SETTER _setter)
-    TPA_get(${_property}_UPDATER _updater)
-    TPA_get(${_property}_DEFAULT _default)
-    TPA_get(${_property}_OVERWRITE _overwrite)
+function(_doxypress_project_load _file_name)
+    _doxypress_log(INFO "Loading project template ${_file_name}...")
+    file(READ "${_file_name}" _contents)
+    sbeParseJson(doxypress _contents)
+    foreach (_property ${doxypress})
+        TPA_set(${_property} "${${_property}}")
+    endforeach ()
+    TPA_set(${_DOXYPRESS_PROJECT_KEY} "${doxypress}")
+    # clean up JSON variables
+    sbeClearJson(doxypress)
+endfunction()
 
-    if (_input_param)
-        _doxypress_property_read_input(${_property} ${_input_param} _input_value)
-    endif ()
-    # apply overrides
-    _doxypress_property_override(${_property} _input_value)
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_project_save
+#
+# .. code-block:: cmake
+#
+#    _doxypress_project_save(<project file name>)
+#
+# Saves a parsed JSON document into a given file. The JSON tree is taken
+# from the current TPA scope. Any existing file with the same name will be
+# overwritten.
+#
+# Parameters:
+#
+# * ``_file_name`` output file name
+##############################################################################
+function(_doxypress_project_save _file_name)
+    TPA_get(${_DOXYPRESS_PROJECT_KEY} _variables)
 
-    _doxypress_property_read_json(${_property} _json_value)
+    _JSON_serialize("${_variables}" _json)
+    _doxypress_log(INFO "Saving processed project file ${_file_name}...")
+    file(WRITE "${_file_name}" ${_json})
+endfunction()
 
-    set(_value "")
-    if (_setter)
-        if (_json_value STREQUAL "" AND _input_value STREQUAL "" OR _overwrite)
-            _doxypress_property_apply_setter(${_property} ${_setter} _value)
-        endif()
-    endif()
-    _doxypress_property_merge(${_property} "${_json_value}" "${_input_value}" _value)
-    if (_updater)
-        _doxypress_property_apply_updater(${_property} ${_updater} "${_value}" _value)
-    endif()
-    if (_default)
-        _doxypress_property_apply_default(${_property} "${_default}" "${_value}" _value)
-    endif()
+function(_doxypress_get _property _out_var)
+    _JSON_get("doxypress.${_property}" _json_value)
+    set(${_out_var} "${_json_value}" PARENT_SCOPE)
+endfunction()
 
+function(_doxypress_set _property _value)
     _JSON_set(doxypress.${_property} "${_value}")
-    _doxypress_log(DEBUG "${_property} = ${_value}")
-    if (_input_param)
-        TPA_set(${_input_param} "${_value}")
+endfunction()
+
+##############################################################################
+# @brief Calls a function or a macro given its name. Writes actual call code
+# into a temporary file, which is then included.
+# @param[in] _id         name of the function or macro to call
+# @param[in] _arg1       the first argument to `_id`
+# @param[in] ARGN        arguments to pass to the callable `_id`
+##############################################################################
+macro(_doxypress_call _id _arg1)
+    if (NOT COMMAND ${_id})
+        message(FATAL_ERROR "Unsupported function/macro \"${_id}\"")
+    else ()
+        set(_helper "${CMAKE_BINARY_DIR}/helpers/macro_helper_${_id}.cmake")
+        # todo get this back?
+        #if (NOT EXISTS "${_helper}")
+        if ("${_arg1}" MATCHES "^\"(.*)\"$")
+            file(WRITE "${_helper}" "${_id}(${_arg1} ${ARGN})\n")
+        else()
+            file(WRITE "${_helper}" "${_id}(\"${_arg1}\" ${ARGN})\n")
+        endif()
+        #foreach(_arg ${ARGN})
+        #    file(APPEND "${_helper}" "\"${_arg}\" ")
+        #endforeach()
+        #file(APPEND "${_helper}" ")\n")
+        #endif ()
+        include("${_helper}")
     endif ()
-endfunction()
-
-function(_doxypress_property_has_input _property _out_var)
-    TPA_get(properties _properties)
-    TPA_get(${_DOXYPRESS_INPUTS} _inputs)
-
-    if (${_property}_INPUT IN_LIST _properties)
-        TPA_get(${_property}_INPUT _input_parameter)
-        if (${_input_parameter} IN_LIST _inputs)
-            set(${_out_var} true PARENT_SCOPE)
-            return()
-        endif()
-    endif()
-    set(${_out_var} false PARENT_SCOPE)
-endfunction()
+endmacro()
 
 ##############################################################################
 #.rst:
 #
-# .. cmake:command:: _doxypress_property_override
-#
-# ..code-block::
-#
-#   _doxypress_property_override(<JSON path> <output variable>)
-#
-# Applies override logic to a given property. The override is defined for
-# the property ``_property``, if there was a call
+# .. cmake:command:: _doxypress_find_directory
 #
 # .. code-block:: cmake
 #
-#   set(_property value)
+#   _doxypress_find_directory(<base directory> <names> <output variable>)
 #
-# previously. If a property ``_property`` was specified in the input arguments,
-# the override is not applied.
-#
-# Parameters:
-#
-# * ``_property`` a property to override
-##############################################################################
-function(_doxypress_property_override _property _out_var)
-    # search for an override
-    _doxypress_property_has_input(${_property} _found_input)
-
-    if (NOT _found_input)
-        if (DEFINED ${_property})
-            set(_message "CMake override ${_property} found:")
-            _doxypress_log(DEBUG "${_message} ${${_property}}")
-            set(${_out_var} "${${_property}}" PARENT_SCOPE)
-        endif()
-    else()
-        # todo a better message
-        _doxypress_log(WARN "Won't override ${_property}")
-    endif()
-endfunction()
-
-##############################################################################
-#.rst:
-#
-# .. cmake:command:: _doxypress_property_merge
-#
-# .. code-block:: cmake
-#
-#   _doxypress_property_merge(<JSON path>
-#                            <value>
-#                            <input argument>
-#                            <output variable>)
-#
-# Helper function that handles `merge` part of the property update
-# logic.
+# Searches for a directory with a name from the given list. Sets the output
+# variable to contain absolute path of every found directory.
 #
 # Parameters:
 #
-# * ``_property`` a property to update, specified by its JSON path
-# * ``_value`` the property's current value, read from JSON; could be empty
-# * ``_input_value`` the value of ``_property`` from a corresponding input
-#   parameter
+# * ``_base_dir`` a directory to search
+# * ``_names`` directories to find under ``_base_dir``
 # * ``_out_var`` the output variable
 ##############################################################################
-function(_doxypress_property_merge _property _json_value _input_value _out_var)
-    # if it's an array and input was non-empty, merge the two
-    # _doxypress_merge_lists()
-    TPA_get(doxypress.${_property} _json_value_raw)
-    if (NOT _input_value STREQUAL "" AND "${_json_value_raw}" MATCHES "^([0-9]+;)*([0-9]+)$")
-        # _JSON_get(doxypress.${_property} _json_value)
-        _doxypress_log(DEBUG "_json_value = ${_json_value}")
-        _doxypress_log(DEBUG "_input_value = ${_input_value}")
-        foreach (_val ${_input_value})
-            list(APPEND _json_value "${_val}")
-        endforeach ()
-        # set(_value ${_json_value})
-        _doxypress_action(${_property} merge "${_json_value}")
-    else()
-        if (NOT _input_value STREQUAL "")
-            set(_json_value "${_input_value}")
-        endif()
-    endif ()
-    set(${_out_var} "${_json_value}" PARENT_SCOPE)
-endfunction()
-
-function(_doxypress_property_apply_setter _property _name _out_var)
-    # call setter
-    _doxypress_log(DEBUG "call setter ${_name}")
-    _doxypress_call(_doxypress_${_name} _new_value)
-    _doxypress_action(${_property} setter "${_new_value}")
-    set(${_out_var} ${_new_value} PARENT_SCOPE)
-endfunction()
-
-function(_doxypress_property_apply_updater _property _name _value _out_var)
-    # call updater
-    _doxypress_log(DEBUG "call updater ${_name}(${_value})")
-    _doxypress_call(_doxypress_${_name} "${_value}" _new_value)
-    _doxypress_action(${_property} updater "${_new_value}")
-    set(${_out_var} "${_new_value}" PARENT_SCOPE)
-endfunction()
-
-function(_doxypress_property_apply_default _property _default _value _out_var)
-    if (_value STREQUAL "")
-        _doxypress_action(${_property} default "${_default}")
-        set(${_out_var} "${_default}" PARENT_SCOPE)
-    endif ()
-endfunction()
-
-##############################################################################
-#.rst:
-#
-# .. cmake:command:: _doxypress_property_read_input
-#
-# .. code-block:: cmake
-#
-#   _doxypress_property_read_input(<property> <argument name> <output variable>)
-#
-# Finds the input argument ``_input_arg_name`` in the current TPA scope,
-# converts `CMake`'s boolean values to ``true``/``false`` format, and writes
-# the result into the output variable.
-#
-# Parameters:
-#
-# * ``_property`` a property being processed
-# * ``_input_arg_name`` an input parameter to read
-# * ``_out_var`` the output variable
-##############################################################################
-function(_doxypress_property_read_input _property _input_arg_name _out_var)
-    # _doxypress_get_input_value(${_input_arg_name} _input_value)
-    TPA_get(${_input_arg_name} _input_value)
-
-    if (NOT _input_value STREQUAL "")
-        # convert CMake booleans to JSON's
-        if (_input_value STREQUAL TRUE)
-            set(_input_value true)
-        elseif (_input_value STREQUAL FALSE)
-            set(_input_value false)
+function(_doxypress_find_directory _base_dir _names _out_var)
+    set(_result "")
+    foreach (_name ${_names})
+        if (IS_DIRECTORY ${_base_dir}/${_name})
+            _doxypress_log(DEBUG "Found directory ${_base_dir}/${_name}")
+            list(APPEND _result ${_base_dir}/${_name})
         endif ()
-
-        _doxypress_action(${_property} input "${_input_value}")
-        set(${_out_var} "${_input_value}" PARENT_SCOPE)
-    endif()
+    endforeach ()
+    set(${_out_var} "${_result}" PARENT_SCOPE)
 endfunction()
 
-function(_doxypress_property_read_json _property _out_var)
-    _JSON_get(doxypress.${_property} _json_value)
-    if (NOT _json_value STREQUAL "")
-        _doxypress_action(${_property} source "${_json_value}")
+macro(_doxypress_check_latex)
+    TPA_get(GENERATE_LATEX _generate_latex)
+    if (_generate_latex AND NOT DEFINED LATEX_FOUND)
+        _doxypress_log(INFO "LaTex generation requested, importing LATEX...")
+        find_package(LATEX OPTIONAL_COMPONENTS MAKEINDEX PDFLATEX)
+        if (NOT LATEX_FOUND)
+            _doxypress_set("output-latex.generate-latex" false)
+            _doxypress_log(WARN "LATEX was not found; skip LaTex generation.")
+        endif()
     endif()
-    set(${_out_var} "${_json_value}" PARENT_SCOPE)
+endmacro()
+
+##############################################################################
+#.rst:
+# .. cmake:command:: _doxypress_find_inputs(_out_var)
+#
+# Collects input file names based on value of input parameters that control
+# input sources:
+# * If ``INPUTS`` is not empty, collects all files in the paths given by
+# ``INPUTS``. Files are added to the resulting list directly, and directories
+# are globbed. Puts the resulting list into ``_out_var``.
+# * If ``INPUT_TARGET`` is not empty, takes include directories from
+# the corresponding target. Every directory is then globbed to get the files.
+# * If none of the above holds, an error is raised.
+#
+# Parameters:
+#
+# * ``_out_var`` the list of files in input sources
+##############################################################################
+function(_doxypress_find_inputs _out_var)
+    TPA_get(INPUTS _inputs)
+    TPA_get(INPUT_TARGET _input_target)
+
+    set(_all_inputs "")
+    if (_inputs)
+        foreach (_dir ${_inputs})
+            if (IS_DIRECTORY ${_dir})
+                file(GLOB_RECURSE _inputs ${_dir}/*)
+                list(APPEND _all_inputs "${_inputs}")
+            else()
+                list(APPEND _all_inputs "${_dir}")
+            endif()
+        endforeach ()
+    elseif (_input_target)
+        get_target_property(public_header_dirs
+                ${_input_target}
+                INTERFACE_INCLUDE_DIRECTORIES)
+        foreach (_dir ${public_header_dirs})
+            file(GLOB_RECURSE _inputs ${_dir}/*)
+            list(APPEND _all_inputs "${_inputs}")
+        endforeach ()
+    else ()
+        # todo better message
+        message(FATAL_ERROR [=[
+Either INPUTS or INPUT_TARGET must be specified as input argument
+for `doxypress_add_docs`]=])
+    endif ()
+
+    set(${_out_var} "${_all_inputs}" PARENT_SCOPE)
 endfunction()

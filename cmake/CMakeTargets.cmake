@@ -30,7 +30,7 @@
 # * ``_updated_project_file`` processed project file name
 ##############################################################################
 function(_doxypress_create_targets _project_file _updated_project_file)
-    _JSON_get(doxypress.general.output-dir _output_dir)
+    _doxypress_get(general.output-dir _output_dir)
     if (NOT _output_dir)
         message(FATAL_ERROR "Output directory may not be empty.")
     endif ()
@@ -42,15 +42,18 @@ function(_doxypress_create_targets _project_file _updated_project_file)
     else ()
         set(_prefix ${PROJECT_NAME})
     endif ()
-
     set(_doxypress_target ${_prefix}.doxypress)
+
     if (NOT TARGET "${_doxypress_target}")
         _doxypress_add_doc_targets("${_doxypress_target}" "${_output_dir}")
-        _doxypress_add_open_targets("${_doxypress_target}" "${_output_dir}")
     endif ()
+    if (DOXYPRESS_ADD_OPEN_TARGETS)
+        _doxypress_add_open_targets("${_doxypress_target}" "${_output_dir}")
+    endif()
 endfunction()
 
 function(_doxypress_add_doc_targets _doxypress_target_name _output_dir)
+    message(STATUS "_doxypress_target_name = ${_doxypress_target_name}")
     # collect inputs for `DEPENDS` parameter
     _doxypress_find_inputs(_inputs)
     # collect outputs for the `OUTPUTS` parameter
@@ -90,55 +93,6 @@ endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: _doxypress_find_inputs(_out_var)
-#
-# Collects input file names based on value of input parameters that control
-# input sources:
-# * If ``INPUTS`` is not empty, collects all files in the paths given by
-# ``INPUTS``. Files are added to the resulting list directly, and directories
-# are globbed. Puts the resulting list into ``_out_var``.
-# * If ``INPUT_TARGET`` is not empty, takes include directories from
-# the corresponding target. Every directory is then globbed to get the files.
-# * If none of the above holds, an error is raised.
-#
-# Parameters:
-#
-# * ``_out_var`` the list of files in input sources
-##############################################################################
-function(_doxypress_find_inputs _out_var)
-    TPA_get(INPUTS _inputs)
-    TPA_get(INPUT_TARGET _input_target)
-
-    set(_all_inputs "")
-    if (_inputs)
-        foreach (_dir ${_inputs})
-            if (IS_DIRECTORY ${_dir})
-                file(GLOB_RECURSE _inputs ${_dir}/*)
-                list(APPEND _all_inputs "${_inputs}")
-            else()
-                list(APPEND _all_inputs "${_dir}")
-            endif()
-        endforeach ()
-    elseif (_input_target)
-        get_target_property(public_header_dirs
-                ${_input_target}
-                INTERFACE_INCLUDE_DIRECTORIES)
-        foreach (_dir ${public_header_dirs})
-            file(GLOB_RECURSE _inputs ${_dir}/*)
-            list(APPEND _all_inputs "${_inputs}")
-        endforeach ()
-    else ()
-        # todo better message
-        message(FATAL_ERROR [=[
-Either INPUTS or INPUT_TARGET must be specified as input argument
-for `doxypress_add_docs`]=])
-    endif ()
-
-    set(${_out_var} "${_all_inputs}" PARENT_SCOPE)
-endfunction()
-
-##############################################################################
-#.rst:
 # .. cmake:command:: _doxypress_add_open_targets
 #
 # ..  code-block:: cmake
@@ -153,8 +107,8 @@ endfunction()
 #   by the ``DoxyPress`` target
 ##############################################################################
 function(_doxypress_add_open_targets _name_prefix _output_dir)
-    _JSON_get(doxypress.output-html.generate-html _generate_html)
-    _JSON_get(doxypress.output-latex.generate-latex _generate_latex)
+    _doxypress_get(output-html.generate-html _generate_html)
+    _doxypress_get(output-latex.generate-latex _generate_latex)
     TPA_get(GENERATE_PDF _generate_pdf)
 
     if (DOXYPRESS_LAUNCHER_COMMAND)
@@ -216,25 +170,23 @@ endfunction()
 #.rst:
 # .. cmake:command:: _doxypress_install_docs
 #
-# ..  code-block:: cmake
-#
-#   _doxypress_install_docs(<destination directory> <install component>)
-#
 # Sets up install commands for the generated documentation.
 # * HTML files are installed under ``_destination``/``html``
 # * LaTex files are installed under ``_destination``/``latex``
 # * PDF file is installed under ``_destination``/``pdf``
-#
-# Parameters:
-#
-# - ``destination`` install directory
-# - ``component`` the value of ``COMPONENT`` parameter in the `install` command
 ##############################################################################
-function(_doxypress_install_docs _destination _component)
-    _JSON_get(doxypress.general.output-dir _output_directory)
-    _JSON_get(doxypress.output-html.generate-html _generate_html)
-    _JSON_get(doxypress.output-latex.generate-latex _generate_latex)
+function(_doxypress_install_docs)
+    _doxypress_get(general.output-dir _output_directory)
+    _doxypress_get(output-html.generate-html _generate_html)
+    _doxypress_get(output-latex.generate-latex _generate_latex)
     TPA_get(GENERATE_PDF _generate_pdf)
+    TPA_get(INSTALL_COMPONENT _component)
+
+    if (NOT DEFINED CMAKE_INSTALL_DOCDIR)
+        set(CMAKE_INSTALL_DOCDIR "${CMAKE_INSTALL_PREFIX}")
+        include(GNUInstallDirs)
+    endif()
+    set(_destination ${CMAKE_INSTALL_DOCDIR})
 
     if (_generate_html)
         list(APPEND _artifacts ${_output_directory}/html)
@@ -302,8 +254,8 @@ endfunction()
 ##############################################################################
 function(_doxypress_list_outputs _output_directory _out_var)
     # can't override these because they are in input parameters
-    _JSON_get(doxypress.output-html.generate-html _html)
-    _JSON_get(doxypress.output-latex.generate-latex _latex)
+    _doxypress_get(output-html.generate-html _html)
+    _doxypress_get(output-latex.generate-latex _latex)
     TPA_get(GENERATE_PDF _pdf)
 
     if (_html)

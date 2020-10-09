@@ -23,5 +23,3 @@ endfunction()
 test_TPA_get_set_append()
 test_TPA_clear_scope()
 
-include(../cmake/VM.cmake)
-test1()

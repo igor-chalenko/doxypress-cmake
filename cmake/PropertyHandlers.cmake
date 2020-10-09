@@ -17,7 +17,7 @@
 #   and targets.
 #
 # These functions are never called directly; they are configured to participate
-# in the JSON update pipeline via ``_doxypress_json_property``.
+# in the JSON update pipeline via ``_doxypress_property_add``.
 ##############################################################################
 
 ##############################################################################

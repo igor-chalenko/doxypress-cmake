@@ -5,6 +5,8 @@
 # https://opensource.org/licenses/MIT
 ##############################################################################
 
+include(JSONParser)
+
 ##############################################################################
 #.rst:
 #
@@ -153,10 +155,7 @@ function(_JSON_serialize _variables _out_json)
     set(_json "{\n")
     set(_section "")
 
-    # todo ?
     set(_array_length 0)
-    # TPA_get(properties _properties)
-    # TPA_get(${_DOXYPRESS_INPUTS} _inputs)
     foreach (_var ${_variables})
         TPA_get(${_var} _value)
 
@@ -278,12 +277,4 @@ function(_JSON_format _value _out_var)
             endif ()
         endif ()
     endif ()
-endfunction()
-
-# todo
-function(_doxypress_cut_prefix _var _out_var)
-    string(FIND ${_var} "." _ind)
-    math(EXPR _ind "${_ind} + 1")
-    string(SUBSTRING ${_var} ${_ind} -1 _cut_var)
-    set(${_out_var} ${_cut_var} PARENT_SCOPE)
 endfunction()

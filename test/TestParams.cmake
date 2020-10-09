@@ -2,7 +2,7 @@ function(test_input_flags_1)
     include(../cmake/FindDoxypressCMake.cmake)
 
     _doxypress_params_init()
-    _doxypress_params_parse(GENERATE_XML GENERATE_LATEX GENERATE_HTML false)
+    _doxypress_inputs_parse(GENERATE_XML GENERATE_LATEX GENERATE_HTML false)
 
     TPA_get(GENERATE_XML _xml)
     TPA_get(GENERATE_LATEX _latex)
@@ -18,7 +18,7 @@ function(test_input_flags_2)
     include(../cmake/FindDoxypressCMake.cmake)
 
     _doxypress_params_init()
-    _doxypress_params_parse(GENERATE_LATEX)
+    _doxypress_inputs_parse(GENERATE_LATEX)
     _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     TPA_get(GENERATE_XML _xml)
@@ -34,7 +34,7 @@ endfunction()
 # give input directories as input and read them back
 function(test_input_directories_1)
     _doxypress_params_init()
-    _doxypress_params_parse(INPUTS dir1 dir2)
+    _doxypress_inputs_parse(INPUTS dir1 dir2)
     _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     TPA_get("INPUTS" _inputs)
@@ -47,7 +47,7 @@ endfunction()
 # empty.
 function(test_input_directories_2)
     _doxypress_params_init()
-    _doxypress_params_parse(PROJECT_FILE DoxypressTest1.json INPUTS x)
+    _doxypress_inputs_parse(PROJECT_FILE DoxypressTest1.json INPUTS x)
     _doxypress_project_update(DoxypressTest1.json _out)
 
     TPA_get("INPUTS" _inputs)
@@ -59,7 +59,7 @@ endfunction()
 # includes are taken from the input target
 function(test_input_directories_3)
     _doxypress_params_init()
-    _doxypress_params_parse(INPUT_TARGET main)
+    _doxypress_inputs_parse(INPUT_TARGET main)
     _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     TPA_get(INPUTS _inputs)
@@ -70,7 +70,7 @@ endfunction()
 
 function(test_output_directory)
     _doxypress_params_init()
-    _doxypress_params_parse(PROJECT_FILE DoxypressTest1.json
+    _doxypress_inputs_parse(PROJECT_FILE DoxypressTest1.json
             OUTPUT_DIRECTORY "docs2")
     _doxypress_project_update(DoxypressTest1.json _out)
 
@@ -81,7 +81,7 @@ endfunction()
 
 function(test_custom_project_file_1)
     _doxypress_params_init()
-    _doxypress_params_parse(PROJECT_FILE DoxypressTest1.json)
+    _doxypress_inputs_parse(PROJECT_FILE DoxypressTest1.json)
     _doxypress_project_update(DoxypressTest1.json _out)
 
     TPA_get("PROJECT_FILE" _project_file)
@@ -98,7 +98,7 @@ endfunction()
 
 function(test_custom_project_file_2)
     _doxypress_params_init()
-    _doxypress_params_parse(PROJECT_FILE DoxypressTest1.json
+    _doxypress_inputs_parse(PROJECT_FILE DoxypressTest1.json
             EXAMPLE_DIRECTORIES x1 x2)
     _doxypress_project_update(DoxypressTest1.json _out)
 
@@ -113,17 +113,17 @@ function(test_input_directories_full_1)
     set("messages.quiet" false)
 
     _doxypress_params_init()
-    _doxypress_params_parse(INPUTS dir1 dir2)
+    _doxypress_inputs_parse(INPUTS dir1 dir2)
     _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     _doxypress_project_load(${_out})
-    _JSON_get("doxypress.${_DOXYPRESS_INPUT_SOURCE}" _inputs)
+    _doxypress_get("${_DOXYPRESS_INPUT_SOURCE}" _inputs)
     assert_same("${_inputs}"
             "${CMAKE_CURRENT_SOURCE_DIR}/dir1;${CMAKE_CURRENT_SOURCE_DIR}/dir2")
 
-    _JSON_get("doxypress.messages.warnings" _warnings)
+    _doxypress_get("messages.warnings" _warnings)
     assert_same(${_warnings} false)
-    _JSON_get("doxypress.messages.quiet" _quiet)
+    _doxypress_get("messages.quiet" _quiet)
     assert_same(${_quiet} false)
     TPA_clear_scope()
 endfunction()
@@ -132,15 +132,15 @@ function(test_input_directories_full_2)
     set("messages.warnings" false)
 
     _doxypress_params_init()
-    _doxypress_params_parse(INPUT_TARGET main)
+    _doxypress_inputs_parse(INPUT_TARGET main)
     _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     _doxypress_project_load(${_out})
 
-    _JSON_get("doxypress.${_DOXYPRESS_INPUT_SOURCE}" _inputs)
+    _doxypress_get("${_DOXYPRESS_INPUT_SOURCE}" _inputs)
     assert_same("${_inputs}"
             "${CMAKE_CURRENT_SOURCE_DIR}/include4;${CMAKE_CURRENT_SOURCE_DIR}/include5")
-    _JSON_get("doxypress.messages.warnings" _warnings)
+    _doxypress_get("messages.warnings" _warnings)
     assert_same(${_warnings} false)
     TPA_clear_scope()
 endfunction()
@@ -149,7 +149,7 @@ endfunction()
 # Will only perform the tests if latex is installed.
 function(test_latex_find_package)
     _doxypress_params_init()
-    _doxypress_params_parse(GENERATE_LATEX)
+    _doxypress_inputs_parse(GENERATE_LATEX)
     _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     if (NOT DEFINED LATEX_FOUND)
@@ -158,12 +158,9 @@ function(test_latex_find_package)
     TPA_clear_scope()
 endfunction()
 
-message(STATUS "Running tests...")
 test_input_flags_1()
-set(DOXYPRESS_LOG_LEVEL DEBUG)
 test_input_flags_2()
 test_input_directories_1()
-set(DOXYPRESS_LOG_LEVEL WARN)
 test_input_directories_2()
 test_input_directories_3()
 test_output_directory()
