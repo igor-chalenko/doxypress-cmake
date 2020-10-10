@@ -13,9 +13,9 @@ include(JSONParser)
 # JSON manipulation functions
 # ---------------------------
 #
-# These functions implement read/write access to the properties of `DoxyPress`
-# project file. A property is identified by its JSON path, here's a few
-# examples:
+# These functions implement read/write access to `DoxyPress` project file.
+# JSON structure is treated as a list of properties, where property is
+# identified by its JSON path, here's a few examples:
 #
 # .. code-block:: cpp
 #
@@ -32,6 +32,14 @@ include(JSONParser)
 #    JSON_get(doxypress.input.input-source _inputs)
 #    JSON_get(doxypress.messages.warnings _warnings)
 #    JSON_get(doxypress.dot.have-dot _have_dot)
+#
+# There are specialized accessor functions that encapsulate prefix addition:
+#
+# .. code-block:: cmake
+#
+#    _doxypress_get(input.input-source _inputs)
+#    _doxypress_get(messages.warnings _warnings)
+#    _doxypress_get(dot.have-dot _have_dot)
 #
 # Parsed JSON document is stored in the current :ref:`TPA scope` under the key
 # ``_DOXYPRESS_PROJECT_KEY``.
@@ -57,25 +65,19 @@ cmake_policy(SET CMP0057 NEW)
 # - ``_out_var`` the value under `_path`
 ##############################################################################
 function(_JSON_get _path _out_var)
-    TPA_get(${_path} _value)
-    if ("${_value}" MATCHES "^([0-9]+;)*([0-9]+)$")
-        if (NOT DEFINED CMAKE_MATCH_2)
-            set(__array_length 1)
-        else ()
-            set(__array_length "${CMAKE_MATCH_2}")
-            math(EXPR __array_length "${__array_length} + 1")
-        endif ()
+    _JSON_array_length(${_path} _array_length)
+    if (${_array_length} GREATER -1)
         set(_i 0)
         set(_list_value "")
         # read the array
-        while (_i LESS ${__array_length})
-            #list(APPEND _list_value ${${_path}_${_i}})
+        while (_i LESS ${_array_length})
             TPA_get(${_path}_${_i} _value)
             list(APPEND _list_value ${_value})
             math(EXPR _i "${_i}+1")
         endwhile ()
         set(${_out_var} "${_list_value}" PARENT_SCOPE)
     else ()
+        TPA_get(${_path} _value)
         set(${_out_var} "${_value}" PARENT_SCOPE)
     endif ()
 endfunction()
@@ -84,12 +86,12 @@ endfunction()
 #.rst:
 # .. cmake:command:: _JSON_set(_path _new_value)
 #
-# Sets a value of a property identified by a given JSON path. The currently
-# loaded JSON document is taken from the current :ref:`TPA scope`. If updated
-# property is a JSON leaf, the value of ``_path`` is simply updated to a new
-# value. If it is a JSON array, nested properties of that array are removed,
-# `_new_value` is treated as a list that is decomposed into individual values
-# inside the JSON array.
+# Updates a :ref:`property<property-reference-label>` identified by a given
+# JSON path. JSON source is taken from the current :ref:`TPA scope`. If
+# the path ``_path`` is a JSON leaf, the value of ``_path`` is simply set to
+# ``_new_value``. If it is a JSON array, nested properties of that array are
+# removed, ``_new_value`` is treated as a list that is then decomposed into
+# individual values inside ``_path``.
 #
 # Parameters:
 #
@@ -98,18 +100,11 @@ endfunction()
 #
 ##############################################################################
 function(_JSON_set _path _new_value)
-    TPA_get(${_path} _current_value)
-    set(_new_value ${_new_value})
     TPA_get(${_DOXYPRESS_PROJECT_KEY} _doxypress)
-    if (_current_value MATCHES "^([0-9]+;)*([0-9]+)$")
-        if (NOT DEFINED CMAKE_MATCH_2)
-            set(__array_length 1)
-        else ()
-            set(__array_length "${CMAKE_MATCH_2}")
-            math(EXPR __array_length "${__array_length} + 1")
-        endif ()
+    _JSON_array_length(${_path} _array_length)
+    if (_array_length GREATER -1)
         set(_i 0)
-        while (_i LESS ${__array_length})
+        while (_i LESS ${_array_length})
             list(REMOVE_ITEM _doxypress "${_path}_${_i}")
             math(EXPR _i "${_i} + 1")
         endwhile ()
@@ -164,7 +159,7 @@ function(_JSON_serialize _variables _out_json)
             set(_key1 "${CMAKE_MATCH_1}")
             set(_key2 "${CMAKE_MATCH_2}")
             if (_var MATCHES "(.*)_([0-9]+)")
-                if (_array_length EQUAL 0)
+                if (_array_length EQUAL 1)
                     string(APPEND _json "\t\"${_value}\"\n")
                     string(APPEND _json "\t],\n")
                 else ()
@@ -173,22 +168,18 @@ function(_JSON_serialize _variables _out_json)
                 endif ()
                 continue()
             endif ()
-            list(FIND _variables "${_var}_0" array_ind)
-            if (NOT array_ind EQUAL -1 AND "${_value}" MATCHES "^([0-9]+;)*([0-9]+)$")
+            _JSON_array_length(${_var} _array_length)
+            if (${_array_length} GREATER -1)
                 # handle array
-                set(_index2 "${CMAKE_MATCH_2}")
-                if (DEFINED _index2)
-                    set(_array_length ${_index2})
-                    if (NOT _section STREQUAL _key1)
-                        set(_section ${_key1})
-                        string(LENGTH "${_json}" _length)
-                        math(EXPR _length "${_length} - 2")
-                        string(SUBSTRING "${_json}" 0 ${_length} _json)
-                        string(APPEND _json "},\n")
-                        string(APPEND _json "\"${_key1}\": {\n")
-                    endif ()
-                    string(APPEND _json "\t\t\"${_key2}\": [\n")
+                if (NOT _section STREQUAL _key1)
+                    set(_section ${_key1})
+                    string(LENGTH "${_json}" _length)
+                    math(EXPR _length "${_length} - 2")
+                    string(SUBSTRING "${_json}" 0 ${_length} _json)
+                    string(APPEND _json "},\n")
+                    string(APPEND _json "\"${_key1}\": {\n")
                 endif ()
+                string(APPEND _json "\t\t\"${_key2}\": [\n")
             else ()
                 if (NOT _section)
                     set(_section ${_key1})
@@ -244,7 +235,7 @@ endfunction()
 #.rst:
 # .. cmake:command:: _JSON_format(_value _out_var)
 #
-# Converts a given string into a properly formatted JSON value:
+# Converts a given CMake variable into a properly formatted JSON value:
 # * booleans are converted to `true` or `false`;
 # * numbers are written "as-is";
 # * strings are written with quotes around them, if not quoted already, or
@@ -277,4 +268,34 @@ function(_JSON_format _value _out_var)
             endif ()
         endif ()
     endif ()
+endfunction()
+
+##############################################################################
+#.rst:
+# .. cmake:command:: _JSON_array_length
+#
+#  * If the JSON path ``_path`` in the currently loaded JSON contains a
+#    node, returns the number of leaves under that node.
+#  * If it contains a leaf, return ``-1``.
+#
+# Parameters:
+#
+# * ``_path`` input JSON path
+# * ``_out_var`` array length of ``_path`` node, or ``-1``
+##############################################################################
+function(_JSON_array_length _path _out_var)
+    TPA_get(${_path} _current_value)
+    TPA_get(${_DOXYPRESS_PROJECT_KEY} _doxypress)
+    if ("${_current_value}" MATCHES "^([0-9]+;)*([0-9]+)$")
+        if ("${_path}_0" IN_LIST _doxypress)
+            if (NOT DEFINED CMAKE_MATCH_2)
+                set(${_out_var} 1 PARENT_SCOPE)
+            else()
+                math(EXPR _length "${CMAKE_MATCH_2} + 1")
+                set(${_out_var} ${_length} PARENT_SCOPE)
+            endif()
+            return()
+        endif()
+    endif()
+    set(${_out_var} -1 PARENT_SCOPE)
 endfunction()

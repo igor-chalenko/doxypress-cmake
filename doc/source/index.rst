@@ -24,11 +24,6 @@ generation via Doxypress_.
    :caption: Implementation
 
    components
-   Logging
-   TPA
-   JSONFunctions
-   DoxypressTargets
-   Setters
    description
 
 .. toctree::

@@ -7,15 +7,38 @@
 
 ##############################################################################
 #.rst:
+# Project file generator
+# ----------------------
+# This module implements functions that merge property values from different
+# sources into a project file that will be used by `DoxyPress` as input.
+# These sources include:
 #
-# Doxypress parameters
-# --------------------
+# * Inputs of :ref:`doxypress_add_docs`
 #
-# Input parameters to ``doxypress_add_docs`` are defined dynamically using
-# the functions ``_doxypress_input_string``, ``_doxypress_input_option``,
-# and ``_doxypress_input_list``. This dynamic definition enables declarative
-# binding between parameters and their handlers. These declarations are then
-# interpreted by the code that is does not depend on any specific parameter.
+#   These fall into two categories. The first one is the input parameters that
+#   are not bound to any JSON paths. They are defined dynamically using
+#   the functions :cmake:command:`_doxypress_input_string`,
+#   :cmake:command:`_doxypress_input_option`, and
+#   :cmake:command:`_doxypress_input_list`. The second category is the input
+#   parameters that are bound to some JSON paths and thus may appear in
+#   the final project file. Parameters from this category are handled
+#   by :cmake:command:`_doxypress_property_add`.
+#
+# * Project file template
+#
+#   A property in a project file is identified by its JSON paths. It's then
+#   possible to bind some processing
+#   :cmake:command:`_doxypress_property_add` to that JSON path.
+#
+# .. _overrides-reference-label:
+#
+# * Overrides
+#
+#   These are defined via :cmake:command:`_doxypress_override_add`. If an
+#   override is defined for a certain property, that property in the final
+#   project file will have the value of that override, with one exception.
+#   It's not possible to have an override for a property that also has
+#   input parameter bound to it.
 ##############################################################################
 
 unset(IN_INPUT_STRING)
@@ -38,8 +61,10 @@ unset(IN_OVERWRITE)
 #                 [DEFAULT <value>])
 #
 # Attaches read/write logic to a given input option. Declarations made
-# using this function are interpreted later by ``_doxypress_inputs_parse``.
-# The following arguments are recognized:
+# using this function are interpreted later by
+# :cmake:command:`_doxypress_inputs_parse`. The following arguments are
+# recognized:
+#
 # * ``DEFAULT``
 #
 #   If the input option was not set in either ``ARGN``, setter, or updater,
@@ -191,25 +216,14 @@ function(_doxypress_input_list _name)
 endfunction()
 
 ##############################################################################
-# .rst:
+#.rst:
 # .. cmake:command:: _doxypress_inputs_parse
 #
-# .. code-block:: cmake
-#
-#    doxypress_add_docs([PROJECT_FILE] <name>
-#                       [INPUT_TARGET] <name>
-#                       [EXAMPLES] <directories>
-#                       [INPUTS] <files and directories>
-#                       [INSTALL_COMPONENT] <name>
-#                       [GENERATE_HTML]
-#                       [GENERATE_LATEX]
-#                       [GENERATE_PDF]
-#                       [GENERATE_XML]
-#                       [OUTPUT_DIRECTORY] <directory>)
-#
 # Parses the input arguments previously defined by
-# :ref:`_doxypress_input_string`, :ref:`_doxypress_input_option`, and
-# :ref:`_doxypress_input_list`.
+# :cmake:command:`_doxypress_input_string`,
+# :cmake:command:`_doxypress_input_option`, and
+# :cmake:command:`_doxypress_input_list`. Applies any bound handlers, such as
+# ``setter``, ``updater``, and ``default``, to every input argument.
 ##############################################################################
 function(_doxypress_inputs_parse)
     TPA_get("option_args" _option_args)
@@ -248,12 +262,14 @@ function(_doxypress_inputs_parse)
 endfunction()
 
 ##############################################################################
-# .rst:
+#.rst:
 # .. cmake:command:: _doxypress_inputs_update(_name _value)
 #
 # Updates value of an input parameter (not referenced by the project file),
 # based on the logic defined by previous calls to the functions
-# ``doxypress_param_*``.
+# :cmake:command:`_doxypress_input_string`,
+# :cmake:command:`_doxypress_input_option`, and
+# :cmake:command:`_doxypress_input_list`.
 #
 # Parameters:
 #
@@ -298,7 +314,7 @@ function(_doxypress_inputs_update _name _value)
 endfunction()
 
 ##############################################################################
-# .rst:
+#.rst:
 # .. cmake:command:: _doxypress_property_add
 #
 #  ..  code-block:: cmake
@@ -386,9 +402,35 @@ endfunction()
 ##############################################################################
 #.rst:
 #
+# .. cmake:command:: _doxypress_override_add
+#
+# .. code-block::
+#
+#   _doxypress_override_add(<JSON path> <value>)
+#
+# Creates an :ref:`override<overrides-reference-label>` with the given value.
+##############################################################################
+function(_doxypress_override_add _property _value)
+    TPA_set(override.${_property} "${_value}")
+    TPA_append(overrides ${_property})
+endfunction()
+
+function(_doxypress_override_find _property _out_var)
+    TPA_get(overrides _overrides)
+    if (_property IN_LIST _overrides)
+        TPA_get(override.${_property} _value)
+        set(${_out_var} "${_value}" PARENT_SCOPE)
+    else()
+        set(${_out_var} "" PARENT_SCOPE)
+    endif()
+endfunction()
+
+##############################################################################
+#.rst:
+#
 # .. cmake:command:: _doxypress_property_update
 #
-# ..code-block::
+# .. code-block::
 #
 #   _doxypress_property_update(<JSON path>)
 #
@@ -404,7 +446,6 @@ function(_doxypress_property_update _property)
     TPA_get(${_property}_DEFAULT _default)
 
     _doxypress_property_read_input("${_input_param}" _input_value)
-    _doxypress_property_override(${_property} "${_input_value}" _input_value)
     _doxypress_property_read_json(${_property} _json_value)
 
     set(_value "")
@@ -427,7 +468,7 @@ endfunction()
 #
 # .. cmake:command:: _doxypress_property_override
 #
-# ..code-block::
+# .. code-block::
 #
 #   _doxypress_property_override(<JSON path> <output variable>)
 #
@@ -445,14 +486,13 @@ endfunction()
 #
 # * ``_property`` a property to override
 ##############################################################################
-function(_doxypress_property_override _property _input_value _out_var)
+function(_doxypress_property_override _property)
     # search for an override
-    if (_input_value STREQUAL "")
-        if (DEFINED ${_property})
-            set(_message "CMake override ${_property} found:")
-            _doxypress_log(DEBUG "${_message} ${${_property}}")
-            set(${_out_var} "${${_property}}" PARENT_SCOPE)
-        endif()
+    _doxypress_override_find(${_property} _value)
+    if (NOT ${_value} STREQUAL "")
+        set(_message "CMake override ${_property} found:")
+        _doxypress_log(DEBUG "${_message} ${_value}")
+        _doxypress_set(${_property} "${_value}")
     endif()
 endfunction()
 
@@ -471,13 +511,6 @@ endfunction()
 # Helper function that handles `merge` part of the property update
 # logic.
 #
-# .. note::
-#
-# This function can only handle JSON properties that have a value other
-# than ``0``. If a property has a value of ``0``, it will be recognized
-# as an array head (incorrectly). This is not a problem in the current
-# implementation, as it only transforms string properties.
-#
 # Parameters:
 #
 # * ``_property`` a property to update, specified by its JSON path
@@ -488,12 +521,16 @@ endfunction()
 ##############################################################################
 function(_doxypress_property_merge _property _json_value _input_value _out_var)
     # if it's an array and input was non-empty, merge the two
-    TPA_get(doxypress.${_property} _json_value_raw)
-    if (NOT _input_value STREQUAL "" AND "${_json_value_raw}" MATCHES "^([0-9]+;)*([0-9]+)$")
+    #TPA_get(doxypress.${_property} _json_value_raw)
+    #TPA_get("doxypress.${_property}_0" _array_first_element)
+    _JSON_array_length(doxypress.${_property} _array_length)
+    if (NOT _input_value STREQUAL "" AND ${_array_length} GREATER -1)
         foreach (_val ${_input_value})
             list(APPEND _json_value "${_val}")
         endforeach ()
-        _doxypress_action(${_property} merge "${_json_value}")
+        if (_json_value AND _input_value)
+            _doxypress_action(${_property} merge "${_json_value}")
+        endif()
     else()
         if (NOT _input_value STREQUAL "")
             set(_json_value "${_input_value}")
@@ -509,7 +546,9 @@ function(_doxypress_property_apply_setter _property _name _out_var)
             # call setter
             _doxypress_log(DEBUG "call setter ${_name}")
             _doxypress_call(_doxypress_${_name} _new_value)
-            _doxypress_action(${_property} setter "${_new_value}")
+            if (NOT _new_value STREQUAL "")
+                _doxypress_action(${_property} setter "${_new_value}")
+            endif()
             set(${_out_var} ${_new_value} PARENT_SCOPE)
         endif()
     endif()
@@ -520,7 +559,9 @@ function(_doxypress_property_apply_updater _property _name _value _out_var)
         # call updater
         _doxypress_log(DEBUG "call updater ${_name}(${_value})")
         _doxypress_call(_doxypress_${_name} "${_value}" _new_value)
-        _doxypress_action(${_property} updater "${_new_value}")
+        if (NOT _new_value STREQUAL "")
+            _doxypress_action(${_property} updater "${_new_value}")
+        endif()
         set(${_out_var} "${_new_value}" PARENT_SCOPE)
     endif()
 endfunction()

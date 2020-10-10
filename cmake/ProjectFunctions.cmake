@@ -1,6 +1,43 @@
 ##############################################################################
 #.rst:
 #
+# .. cmake:command:: _doxypress_project_update
+#
+# .. code-block::
+#
+#   _doxypress_project_update(<project file name> <output variable>)
+#
+# Loads a given project file, applies update logic that was previously defined
+# by :cmake:command:`_doxypress_params_init`, and saves the updated file.
+# The name of the updated file is written into the output variable.
+##############################################################################
+macro(_doxypress_project_update _project_file _out_var)
+    _doxypress_project_load(${_project_file})
+
+    TPA_get("${_DOXYPRESS_JSON_PATHS_KEY}" _properties)
+    TPA_get("${_DOXYPRESS_PROJECT_KEY}" _project)
+
+    foreach (_property ${_project})
+        _doxypress_cut_prefix(${_property} _cut_property)
+        if (${_cut_property} IN_LIST _properties)
+            _doxypress_property_update(${_cut_property})
+        endif()
+        TPA_get(${_cut_property}_INPUT _input_parameter_name)
+        if (_input_parameter_name STREQUAL "")
+            _doxypress_property_override(${_cut_property})
+        endif()
+    endforeach()
+
+    # create name for the processed project file
+    _doxypress_project_generated_name(${_project_file} _file_name)
+    # save processed project file
+    _doxypress_project_save("${_file_name}")
+    set(${_out_var} "${_file_name}")
+endmacro()
+
+##############################################################################
+#.rst:
+#
 # .. cmake:command:: _doxypress_project_load
 #
 # .. code-block:: cmake
@@ -117,63 +154,30 @@ function(_doxypress_find_directory _base_dir _names _out_var)
     set(${_out_var} "${_result}" PARENT_SCOPE)
 endfunction()
 
-macro(_doxypress_check_latex)
-    TPA_get(GENERATE_LATEX _generate_latex)
-    if (_generate_latex AND NOT DEFINED LATEX_FOUND)
-        _doxypress_log(INFO "LaTex generation requested, importing LATEX...")
-        find_package(LATEX OPTIONAL_COMPONENTS MAKEINDEX PDFLATEX)
-        if (NOT LATEX_FOUND)
-            _doxypress_set("output-latex.generate-latex" false)
-            _doxypress_log(WARN "LATEX was not found; skip LaTex generation.")
-        endif()
-    endif()
-endmacro()
-
 ##############################################################################
 #.rst:
-# .. cmake:command:: _doxypress_find_inputs(_out_var)
+# .. cmake:command:: _doxypress_project_generated_name
 #
-# Collects input file names based on value of input parameters that control
-# input sources:
-# * If ``INPUTS`` is not empty, collects all files in the paths given by
-# ``INPUTS``. Files are added to the resulting list directly, and directories
-# are globbed. Puts the resulting list into ``_out_var``.
-# * If ``INPUT_TARGET`` is not empty, takes include directories from
-# the corresponding target. Every directory is then globbed to get the files.
-# * If none of the above holds, an error is raised.
+# ..  code-block:: cmake
+#
+#   _doxypress_project_generated_name(<project file name> <output variable>)
+#
+# Returns an absolute name of the output project file. Changes the input
+# file's path while leaving the file name unchanged.
 #
 # Parameters:
 #
-# * ``_out_var`` the list of files in input sources
+# - ``_project_file`` input project file
+# - ``_out_var`` output project file
 ##############################################################################
-function(_doxypress_find_inputs _out_var)
-    TPA_get(INPUTS _inputs)
-    TPA_get(INPUT_TARGET _input_target)
+function(_doxypress_project_generated_name _project_file _out_var)
+    get_filename_component(_name "${_project_file}" NAME)
+    set(${_out_var} ${CMAKE_CURRENT_BINARY_DIR}/${_name} PARENT_SCOPE)
+endfunction()
 
-    set(_all_inputs "")
-    if (_inputs)
-        foreach (_dir ${_inputs})
-            if (IS_DIRECTORY ${_dir})
-                file(GLOB_RECURSE _inputs ${_dir}/*)
-                list(APPEND _all_inputs "${_inputs}")
-            else()
-                list(APPEND _all_inputs "${_dir}")
-            endif()
-        endforeach ()
-    elseif (_input_target)
-        get_target_property(public_header_dirs
-                ${_input_target}
-                INTERFACE_INCLUDE_DIRECTORIES)
-        foreach (_dir ${public_header_dirs})
-            file(GLOB_RECURSE _inputs ${_dir}/*)
-            list(APPEND _all_inputs "${_inputs}")
-        endforeach ()
-    else ()
-        # todo better message
-        message(FATAL_ERROR [=[
-Either INPUTS or INPUT_TARGET must be specified as input argument
-for `doxypress_add_docs`]=])
-    endif ()
-
-    set(${_out_var} "${_all_inputs}" PARENT_SCOPE)
+function(_doxypress_cut_prefix _var _out_var)
+    string(FIND ${_var} "." _ind)
+    math(EXPR _ind "${_ind} + 1")
+    string(SUBSTRING ${_var} ${_ind} -1 _cut_var)
+    set(${_out_var} ${_cut_var} PARENT_SCOPE)
 endfunction()

@@ -98,8 +98,8 @@ get_filename_component(doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
 
 include(${doxypress_dir}/Logging.cmake)
 include(${doxypress_dir}/TPA.cmake)
-include(${doxypress_dir}/CMakeTargets.cmake)
-include(${doxypress_dir}/Interpreter.cmake)
+include(${doxypress_dir}/CMakeTargetGenerator.cmake)
+include(${doxypress_dir}/ProjectFileGenerator.cmake)
 include(${doxypress_dir}/ProjectFunctions.cmake)
 
 ##############################################################################
@@ -160,7 +160,7 @@ include(${doxypress_dir}/PropertyHandlers.cmake)
 #    :ref:`Algorithm description` for a detailed description of what the package
 #    does.
 #
-#    Defaults to `DoxypressAddDocs.json`, provided with the package.
+#    Defaults to ``DoxypressAddDocs.json``, provided with the package.
 #
 # .. _inputs-reference-label:
 #
@@ -175,13 +175,13 @@ include(${doxypress_dir}/PropertyHandlers.cmake)
 #    not empty, this parameter is ignored.
 #
 # **INSTALL_COMPONENT**
-#    If specified, an installation command for generated docs will be added to
+#    Specified, an installation command for generated docs will be added to
 #    the `install` target; the input parameter is used as the component name for
-#    the generated files.
+#    the generated files. Default is ``docs``.
 #
 # **OUTPUT_DIRECTORY**
 #     The base directory for all the generated documentation files.
-#     Default is `doxypress-generated`.
+#     Default is ``doxypress-generated``.
 #
 # ------------------
 # Property overrides
@@ -339,7 +339,7 @@ function(doxypress_add_docs)
     # update project file
     _doxypress_project_update("${_project_file}" _updated_project_file)
     # create target(s)
-    _doxypress_create_targets("${_project_file}" "${_updated_project_file}")
+    _doxypress_targets_create("${_project_file}" "${_updated_project_file}")
     if (DOXYPRESS_INSTALL_DOCS)
         # install generated files
         _doxypress_install_docs()
@@ -382,7 +382,10 @@ function(_doxypress_params_init_inputs)
             DEFAULT "${doxypress_dir}/DoxypressCMake.json"
     )
     _doxypress_input_string(INPUT_TARGET SETTER "set_input_target")
-    _doxypress_input_string(INSTALL_COMPONENT)
+    _doxypress_input_string(TARGET_PREFIX
+            SETTER "set_target_prefix"
+            DEFAULT "${PROJECT_NAME}")
+    _doxypress_input_string(INSTALL_COMPONENT DEFAULT docs)
     _doxypress_input_option(GENERATE_PDF DEFAULT false)
 endfunction()
 
@@ -394,18 +397,18 @@ endfunction()
 # Initializes the default set of :ref:`overrides<Property overrides>`.
 ##############################################################################
 function(_doxypress_params_init_overrides)
-    set("project.project-brief" ${PROJECT_DESCRIPTION} PARENT_SCOPE)
-    set("project.project-name" "${PROJECT_NAME}" PARENT_SCOPE)
-    set("project.project-version" ${PROJECT_VERSION} PARENT_SCOPE)
-    set("output-latex.latex-batch-mode" true PARENT_SCOPE)
-    set("output-latex.latex-hyper-pdf" true PARENT_SCOPE)
-    set("output-latex.latex-output" "latex" PARENT_SCOPE)
-    set("output-latex.latex-pdf" true PARENT_SCOPE)
-    set("output-html.html-output" "html" PARENT_SCOPE)
-    set("output-html.html-file-extension" ".html" PARENT_SCOPE)
-    set("output-xml.xml-output" "xml" PARENT_SCOPE)
-    set("input.input-recursive" true PARENT_SCOPE)
-    set("input.example-recursive" true PARENT_SCOPE)
+    _doxypress_override_add("project.project-brief" "${PROJECT_DESCRIPTION}")
+    _doxypress_override_add("project.project-name" "${PROJECT_NAME}")
+    _doxypress_override_add("project.project-version" "${PROJECT_VERSION}")
+    _doxypress_override_add("output-latex.latex-batch-mode" true)
+    _doxypress_override_add("output-latex.latex-hyper-pdf" true)
+    _doxypress_override_add("output-latex.latex-output" "latex")
+    _doxypress_override_add("output-latex.latex-pdf" true)
+    _doxypress_override_add("output-html.html-output" "html")
+    _doxypress_override_add("output-html.html-file-extension" ".html")
+    _doxypress_override_add("output-xml.xml-output" "xml")
+    _doxypress_override_add("input.input-recursive" true)
+    _doxypress_override_add("input.example-recursive" true)
 endfunction()
 
 ##############################################################################
@@ -415,7 +418,7 @@ endfunction()
 #
 # Initializes properties that are processed by the chain of handlers:
 #
-# ..code-block::
+# .. code-block::
 #
 #   `input` -> `json` -> `setter` -> `updater` -> `default`
 #
@@ -431,6 +434,7 @@ function(_doxypress_params_init_properties)
             DEFAULT false)
     _doxypress_property_add("output-latex.generate-latex"
             INPUT_OPTION GENERATE_LATEX
+            UPDATER "update_generate_latex"
             DEFAULT false)
     _doxypress_property_add("output-html.generate-html"
             INPUT_STRING GENERATE_HTML
@@ -456,34 +460,3 @@ function(_doxypress_params_init_properties)
             SETTER "set_latex_cmd_name"
             OVERWRITE)
 endfunction()
-
-##############################################################################
-#.rst:
-#
-# .. cmake:command:: _doxypress_project_update
-#
-# ..code-block::
-#
-#   _doxypress_project_update(<project file name> <output variable>)
-#
-# Loads a given project file, applies update logic that was previously defined
-# by :cmake:command:`_doxypress_params_init`, and saves the updated file.
-# The name of the updated file is written into the output variable.
-##############################################################################
-macro(_doxypress_project_update _project_file _out_var)
-    _doxypress_project_load(${_project_file})
-
-    _doxypress_check_latex()
-
-    TPA_get("${_DOXYPRESS_JSON_PATHS_KEY}" _properties)
-
-    foreach (_property ${_properties})
-        _doxypress_property_update(${_property})
-    endforeach ()
-
-    # create name for the processed project file
-    _doxypress_project_generated_name(${_project_file} _file_name)
-    # save processed project file
-    _doxypress_project_save("${_file_name}")
-    set(${_out_var} "${_file_name}")
-endmacro()
