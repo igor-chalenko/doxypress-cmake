@@ -1,21 +1,23 @@
 function(test_input_directories_full_3)
-    set("output-latex.generate-latex" false)
+    _doxypress_override_add("output-latex.generate-latex" false)
+    set(LATEX_FOUND true)
     doxypress_add_docs(
             INPUT_TARGET main
             INPUTS dir1 dir2 GENERATE_LATEX)
 
     _doxypress_project_load(${CMAKE_CURRENT_BINARY_DIR}/DoxypressCMake.json)
-    _JSON_get("doxypress.input.input-source" _inputs)
+    _JSON_get("doxypress.${_DOXYPRESS_INPUT_SOURCE}" _inputs)
     assert_same("${_inputs}"
             "${CMAKE_CURRENT_SOURCE_DIR}/dir1;${CMAKE_CURRENT_SOURCE_DIR}/dir2")
+    _doxypress_get("output-latex.generate-latex" _latex)
+    assert_same(${_latex} true)
+    unset(LATEX_FOUND)
 endfunction()
 
 function(test_logging)
     _doxypress_params_init()
-    _doxypress_params_parse(INPUT_TARGET main GENERATE_XML)
-    _doxypress_project_load(../cmake/DoxypressCMake.json)
-    _doxypress_project_update()
-    _doxypress_project_save(${CMAKE_CURRENT_BINARY_DIR}/DoxypressCMake.json)
+    _doxypress_inputs_parse(INPUT_TARGET main GENERATE_XML)
+    _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     TPA_get("histories" _histories)
     foreach(_property ${_histories})
@@ -30,5 +32,4 @@ function(test_logging)
 endfunction()
 
 test_input_directories_full_3()
-set(DOXYPRESS_INFO ON)
-# test_logging()
+test_logging()

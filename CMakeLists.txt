@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.3)
 project(DoxypressCMake VERSION 0.0.1 DESCRIPTION "Doxypress module for CMake")
 
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/externals/json-cmake")
+
 add_subdirectory(test)
-# add_subdirectory(doc)
+add_subdirectory(doc)
 
 include(cmake/InstallBasicPackageFiles.cmake)
 include(GNUInstallDirs)
@@ -28,8 +30,7 @@ endif()
 if (DEFINED CMAKE_INSTALL_LIBDIR)
     set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-    install(FILES
-            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/DoxypressCMake.cmake
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
             DESTINATION ${config_install_dir})
 else()
     message(WARNING "CMAKE_INSTALL_LIBDIR is required (install step skipped).")

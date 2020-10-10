@@ -11,20 +11,26 @@ generation via Doxypress_.
    :caption: Basics
 
    intro
-   BasicPlugin
 
 .. toctree::
    :maxdepth: 2
-   :caption: API
+   :caption: Public API
 
    FindDoxypress
-   api
+   DoxypressCMake
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Implementation
+
+   components
    description
 
 .. toctree::
    :maxdepth: 2
    :caption: Additional info
 
+   glossary
    platforms
    changelog
    license

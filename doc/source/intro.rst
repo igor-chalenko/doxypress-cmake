@@ -11,8 +11,9 @@ to import this package and then call `doxypress_add_docs`:
   find_package(DoxypressCMake)
   doxypress_add_docs(INPUT_TARGET target_in_the_need_of_docs)
 
-The above code will generate a `Doxypress`' project file, and produce output
-under `${CMAKE_CURRENT_BINARY_DIR}/doxypress-generated`.
+The above code will generate a `DoxyPress`' project file under
+``CMAKE_CURRENT_BINARY_DIR``. Documentation will be generated
+under ``CMAKE_CURRENT_BINARY_DIR``/``doxypress-generated``.
 
 .. _Doxypress: https://www.copperspice.com/docs/doxypress/index.html
 

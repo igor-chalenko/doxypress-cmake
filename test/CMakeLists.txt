@@ -1,7 +1,5 @@
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/externals/json-cmake")
-
 set(doxypress_dir ${PROJECT_SOURCE_DIR}/cmake)
-include(../cmake/DoxypressCMake.cmake)
+include(../cmake/AddDocs.cmake)
 
 # _doxypress_project_load(DoxypressTest1.json)
 function(assert_same str1 str2)
@@ -21,10 +19,11 @@ set_target_properties(main PROPERTIES EXCLUDE_FROM_ALL 1)
 target_include_directories(main PUBLIC include4 include5)
 
 if (NOT DEFINED DOXYPRESS_SKIP_TEST OR NOT DOXYPRESS_SKIP_TEST)
+    message(STATUS "Running tests...")
     include(TestTPA.cmake)
     include(TestJSON.cmake)
     include(TestCreateTargets.cmake)
     include(TestParams.cmake)
     include(TestAddDocs.cmake)
-    # include(TestFindDoxypressCMake.cmake)
+    # include(TestFindAddDocs.cmake)
 endif()
