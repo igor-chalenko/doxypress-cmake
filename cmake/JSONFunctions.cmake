@@ -13,9 +13,9 @@ include(JSONParser)
 # JSON manipulation functions
 # ---------------------------
 #
-# These functions implement read/write access to `DoxyPress` project file.
+# These functions implement read/write access to `DoxyPress` project files.
 # JSON structure is treated as a list of properties, where property is
-# identified by its JSON path, here's a few examples:
+# identified by its JSON path. Here's a few examples:
 #
 # .. code-block:: cpp
 #
@@ -52,17 +52,17 @@ cmake_policy(SET CMP0057 NEW)
 #.rst:
 # .. cmake:command:: _JSON_get(_path _out_var)
 #
-# Given a JSON path, returns a value located at that path. The input
-# variable's name is the JSON path, and its value is the value in the original
-# JSON document. If the input property is a JSON leaf, the value of the input
-# variable is formatted and written into ``_out_var``. If it is a JSON array,
-# nested properties of that array are collected into a list and that list is
-# written into ``_out_var``.
+# Given a JSON path ``_path``, returns a value located at that path in
+# the currently loaded project file. If the input property is a JSON leaf,
+# the value of ``_path`` is formatted and written into ``_out_var``. If it is
+# a JSON array, nested properties of that array are collected into a list, and
+# that list is written into ``_out_var``. Only one nested level is collected;
+# if a property in the array is itself an array, result is undefined.
 #
 # Parameters:
 #
 # - ``_path`` a JSON path (a variable created by `sbeParseJson`)
-# - ``_out_var`` the value under `_path`
+# - ``_out_var`` the value of `_path`
 ##############################################################################
 function(_JSON_get _path _out_var)
     _JSON_array_length(${_path} _array_length)

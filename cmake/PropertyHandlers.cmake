@@ -13,11 +13,11 @@
 # These functions implement property update logic:
 #
 # * relative directory names are converted into absolute ones;
-# * properties that depend on CMake are updated from the corresponding variables
+# * properties derived by `CMake` are updated from the corresponding variables
 #   and targets.
 #
 # These functions are never called directly; they are configured to participate
-# in the JSON update pipeline via ``_doxypress_property_add``.
+# in the property transformation process. todo link here
 ##############################################################################
 
 ##############################################################################
@@ -285,8 +285,8 @@ endfunction()
 #
 #   _doxypress_set_example_source(<output variable>)
 #
-# Sets the `input.example-source` configuration parameter by searching one of
-# ``example``, ``examples`` sub-directories in the current source directory.
+# Searches for the sub-directories  [``example``, ``examples``] in the current
+# source directory. Setter for ``input.example-source``.
 ##############################################################################
 function(_doxypress_set_example_source _out_var)
     _doxypress_find_directory(
@@ -297,6 +297,21 @@ function(_doxypress_set_example_source _out_var)
     set(${_out_var} "${_example_path}" PARENT_SCOPE)
 endfunction()
 
+##############################################################################
+#.rst:
+# .. cmake:command:: _doxypress_set_target_name
+#
+# .. code-block:: cmake
+#
+#   _doxypress_set_target_name(<output variable>)
+#
+# Sets the ``TARGET_NAME`` parameter when it was not given explicitly:
+#
+# * if ``INPUT_TARGET`` is not empty, sets it to ``${INPUT_TARGET}.doxypress``
+# * otherwise, sets it to ``${PROJECT_NAME}``
+#
+# Setter for ``TARGET_NAME``.
+##############################################################################
 function(_doxypress_set_target_name _out_var)
     TPA_get(INPUT_TARGET _input_target)
     if (_input_target STREQUAL "")
@@ -306,6 +321,18 @@ function(_doxypress_set_target_name _out_var)
     endif()
 endfunction()
 
+##############################################################################
+#.rst:
+# .. cmake:command:: _doxypress_update_generate_latex
+#
+# .. code-block:: cmake
+#
+#   _doxypress_update_generate_latex(<current value> <output variable>)
+#
+# If ``.tex`` generation was requested, by no LATEX was found in the local
+# environment, ``GENERATE_LATEX`` is reverted to ``false``. Since it's an
+# input parameter, it will be propagated into the project file automatically.
+##############################################################################
 macro(_doxypress_update_generate_latex _generate_latex _out_var)
     if (${_generate_latex})
         if (NOT DEFINED LATEX_FOUND)

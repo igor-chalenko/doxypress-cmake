@@ -47,11 +47,11 @@
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: _doxypress_targets_create
+# .. cmake:command:: _doxypress_add_targets
 #
 # ..  code-block:: cmake
 #
-#    _doxypress_targets_create(<project file> <processed project file>)
+#    _doxypress_add_targets(<project file> <processed project file>)
 #
 # Creates a `DoxyPress` target and an `open generated docs` target for every
 # output format that was requested.
@@ -61,25 +61,27 @@
 # * ``_project_file``  unprocessed project file name
 # * ``_updated_project_file`` processed project file name
 ##############################################################################
-function(_doxypress_targets_create _project_file _updated_project_file)
+function(_doxypress_add_targets _project_file _updated_project_file)
     _doxypress_get(general.output-dir _output_dir)
     if (NOT _output_dir)
         message(FATAL_ERROR "Output directory may not be empty.")
     endif ()
 
-    # _input_target can be empty
     TPA_get(TARGET_NAME _target_name)
 
     if (NOT TARGET "${_target_name}")
-        _doxypress_target_docs("${_target_name}" "${_output_dir}")
-        _doxypress_target_pdf("${_target_name}" "${_output_dir}")
+        _doxypress_add_target("${_project_file}"
+                "${_updated_project_file}"
+                "${_target_name}"
+                "${_output_dir}")
+        _doxypress_add_pdf_commands("${_target_name}" "${_output_dir}")
         if (DOXYPRESS_ADD_OPEN_TARGETS)
-            _doxypress_targets_open_files("${_target_name}" "${_output_dir}")
+            _doxypress_add_open_targets("${_target_name}" "${_output_dir}")
         endif ()
     endif ()
 endfunction()
 
-function(_doxypress_target_docs _doxypress_target_name _output_dir)
+function(_doxypress_add_target _project_file _updated_project_file _target_name _output_dir)
     # collect inputs for `DEPENDS` parameter
     _doxypress_list_inputs(_inputs)
     # collect outputs for the `OUTPUTS` parameter
@@ -94,18 +96,18 @@ function(_doxypress_target_docs _doxypress_target_name _output_dir)
             BYPRODUCTS ${_output_dir}
             VERBATIM)
 
-    add_custom_target(${_doxypress_target_name}
+    add_custom_target(${_target_name}
             DEPENDS ${_files}
             COMMENT "Generating docs...")
 endfunction()
 
-function(_doxypress_target_pdf _doxypress_target_name)
+function(_doxypress_add_pdf_commands _target_name)
     TPA_get(GENERATE_PDF _pdf)
     _doxypress_get(general.output-dir _output_dir)
     if (_pdf)
         file(MAKE_DIRECTORY ${_output_dir}/pdf)
         add_custom_command(TARGET
-                ${_doxypress_target_name}
+                ${_target_name}
                 POST_BUILD
                 COMMAND
                 ${CMAKE_MAKE_PROGRAM} #> ${_output_directory}/latex.log 2>&1
@@ -113,7 +115,7 @@ function(_doxypress_target_pdf _doxypress_target_name)
                 "${_output_dir}/latex"
                 COMMENT "Generating PDF..."
                 VERBATIM)
-        add_custom_command(TARGET ${_doxypress_target_name} POST_BUILD
+        add_custom_command(TARGET ${_target_name} POST_BUILD
                 COMMENT "Copying refman.pdf to its own directory..."
                 COMMAND ${CMAKE_COMMAND} -E move
                 "${_output_dir}/latex/refman.pdf"
@@ -123,11 +125,11 @@ endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: _doxypress_targets_open_files
+# .. cmake:command:: _doxypress_add_open_targets
 #
 # ..  code-block:: cmake
 #
-#    _doxypress_targets_open_files(<name prefix> <output directory>)
+#    _doxypress_add_open_targets(<name prefix> <output directory>)
 #
 # Parameters:
 #
@@ -136,7 +138,7 @@ endfunction()
 # * ``_output_dir`` a directory where documentation files will be generated
 #   by the ``DoxyPress`` target
 ##############################################################################
-function(_doxypress_targets_open_files _name_prefix _output_dir)
+function(_doxypress_add_open_targets _name_prefix _output_dir)
     _doxypress_get(output-html.generate-html _generate_html)
     _doxypress_get(output-latex.generate-latex _generate_latex)
     TPA_get(GENERATE_PDF _generate_pdf)
@@ -144,19 +146,19 @@ function(_doxypress_targets_open_files _name_prefix _output_dir)
     if (DOXYPRESS_LAUNCHER_COMMAND)
         if (_generate_html AND NOT TARGET ${_name_prefix}.open_html)
             # Create a target to open the generated HTML file.
-            _doxypress_target_open_file(
+            _doxypress_add_open_target(
                     ${_name_prefix}.open_html
                     ${_name_prefix}
                     "${_output_dir}/html/index.html")
         endif ()
         if (_generate_latex AND NOT TARGET ${_name_prefix}.open_latex)
-            _doxypress_target_open_file(
+            _doxypress_add_open_target(
                     ${_name_prefix}.open_latex
                     ${_name_prefix}
                     "${_output_dir}/latex/refman.tex")
         endif ()
         if (_generate_pdf AND NOT TARGET ${_name_prefix}.open_pdf)
-            _doxypress_target_open_file(
+            _doxypress_add_open_target(
                     ${_name_prefix}.open_pdf
                     ${_name_prefix}
                     "${_output_dir}/latex/refman.pdf")
@@ -166,11 +168,11 @@ endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: _doxypress_target_open_file
+# .. cmake:command:: _doxypress_add_open_target
 #
 # ..  code-block:: cmake
 #
-#   _doxypress_target_open_file(<target name> <parent target name> <file name>)
+#   _doxypress_add_open_target(<target name> <parent target name> <file name>)
 #
 # Creates a target that opens a given file for viewing. Synonymous
 # to `start file` on Windows or `xdg-open file` on Gnome desktops.
@@ -183,7 +185,7 @@ endfunction()
 #   serves as a dependency for the target ``_target_name``
 # * ``_file`` a file to open, such as `index.html`
 ##############################################################################
-function(_doxypress_target_open_file _target_name _parent_target_name _file)
+function(_doxypress_add_open_target _target_name _parent_target_name _file)
     _doxypress_log(INFO "Adding launch target ${_target_name} for ${_file}...")
     add_custom_target(${_target_name}
             COMMAND ${DOXYPRESS_LAUNCHER_COMMAND} "${_file}"
@@ -239,8 +241,8 @@ endfunction()
 #   _doxypress_list_outputs(<mode> <output variable>)
 #
 # Collects configured `DoxyPress` outputs. Two modes of operation are
-# supported, controlled by the ``mode`` parameter. The following values are
-# accepted:
+# supported, controlled by the ``mode`` parameter. The following ``mode`` values
+# are accepted:
 #
 # * ``FILES``
 #   In this mode, ``index.html``, ``index.xml``, ``refman.tex``, and

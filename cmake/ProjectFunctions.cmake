@@ -1,4 +1,20 @@
 ##############################################################################
+# Copyright (c) 2020 Igor Chalenko
+# Distributed under the MIT license.
+# See accompanying file LICENSE.md or copy at
+# https://opensource.org/licenses/MIT
+##############################################################################
+
+##############################################################################
+#.rst:
+# Project functions
+# -----------------
+#
+# This module contains non-public functions that are a part of the
+# :ref:`doxypress_add_docs` implementation.
+##############################################################################
+
+##############################################################################
 #.rst:
 #
 # .. cmake:command:: _doxypress_project_update
@@ -88,21 +104,64 @@ function(_doxypress_project_save _file_name)
     file(WRITE "${_file_name}" ${_json})
 endfunction()
 
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_get
+#
+# .. code-block:: cmake
+#
+#    _doxypress_get(<JSON path> <output variable>)
+#
+# Wrapper for :cmake:command:`_JSON_get` with added prefix ``doxypress.``.
+#
+# Parameters:
+#
+# * ``_property`` JSON path to read in the currently loaded JSON document
+# * ``_out_var`` value of ``_property` in the loaded JSON document
+##############################################################################
 function(_doxypress_get _property _out_var)
     _JSON_get("doxypress.${_property}" _json_value)
     set(${_out_var} "${_json_value}" PARENT_SCOPE)
 endfunction()
 
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_set
+#
+# .. code-block:: cmake
+#
+#    _doxypress_set(<JSON path> <value>)
+#
+# Wrapper for :cmake:command:`_JSON_set` with added prefix ``doxypress.``.
+#
+# Parameters:
+#
+# * ``_property`` JSON path to update in the currently loaded JSON document
+# * ``_value`` new value of ``_property`
+##############################################################################
 function(_doxypress_set _property _value)
     _JSON_set(doxypress.${_property} "${_value}")
 endfunction()
 
 ##############################################################################
-# @brief Calls a function or a macro given its name. Writes actual call code
+#.rst:
+#
+# .. cmake:command:: _doxypress_call
+#
+# .. code-block:: cmake
+#
+#    _doxypress_call(<function name> <argument #1>)
+#
+# Calls a function or a macro given its name. Writes actual call code
 # into a temporary file, which is then included.
-# @param[in] _id         name of the function or macro to call
-# @param[in] _arg1       the first argument to `_id`
-# @param[in] ARGN        arguments to pass to the callable `_id`
+#
+# Parameters:
+#
+# * ``_id``         name of the function or macro to call
+# * ``_arg1``       the first argument to the function ``_id``
+# * ``ARGN``        additional arguments to pass to ``_id``
 ##############################################################################
 macro(_doxypress_call _id _arg1)
     if (NOT COMMAND ${_id})
@@ -175,6 +234,21 @@ function(_doxypress_project_generated_name _project_file _out_var)
     set(${_out_var} ${CMAKE_CURRENT_BINARY_DIR}/${_name} PARENT_SCOPE)
 endfunction()
 
+##############################################################################
+#.rst:
+# .. cmake:command:: _doxypress_cut_prefix
+#
+# ..  code-block:: cmake
+#
+#   _doxypress_cut_prefix(<variable name> <output variable>)
+#
+# Cuts off ``part1`` in the given string of the form ``part1.part2.*``.
+#
+# Parameters:
+#
+# - ``_var`` input project file
+# - ``_out_var`` cut string
+##############################################################################
 function(_doxypress_cut_prefix _var _out_var)
     string(FIND ${_var} "." _ind)
     math(EXPR _ind "${_ind} + 1")
