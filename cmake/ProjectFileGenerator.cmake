@@ -230,6 +230,7 @@ function(_doxypress_inputs_parse)
     TPA_get("one_value_args" _one_value_args)
     TPA_get("multi_value_args" _multi_value_args)
 
+    _doxypress_log(DEBUG "options = ${_option_args}")
     cmake_parse_arguments(DOXYPRESS
             "${_option_args}"
             "${_one_value_args}"
@@ -366,6 +367,9 @@ endfunction()
 # The input arguments are parsed and stored in the current :ref:`TPA scope`.
 ##############################################################################
 function(_doxypress_property_add _property)
+    TPA_get(${_DOXYPRESS_JSON_PATHS_KEY} _properties)
+    TPA_get(properties _index)
+
     set(_options OVERWRITE)
     set(_one_value_args INPUT_OPTION INPUT_STRING DEFAULT SETTER UPDATER)
     set(_multi_value_args INPUT_LIST)
@@ -373,46 +377,33 @@ function(_doxypress_property_add _property)
     cmake_parse_arguments(IN "${_options}" "${_one_value_args}"
             "${_multi_value_args}" "${ARGN}")
 
-    if (DEFINED IN_INPUT_STRING)
+    if (DEFINED IN_INPUT_STRING AND NOT ${IN_INPUT_STRING} IN_LIST _one_value_args)
         TPA_append(one_value_args ${IN_INPUT_STRING})
         TPA_set(${_property}_INPUT ${IN_INPUT_STRING})
     endif ()
-    if (DEFINED IN_INPUT_OPTION)
+    if (DEFINED IN_INPUT_OPTION AND NOT ${IN_INPUT_OPTION} IN_LIST _option_args)
         TPA_append(option_args ${IN_INPUT_OPTION})
         TPA_set(${_property}_INPUT ${IN_INPUT_OPTION})
     endif ()
-    if (DEFINED IN_INPUT_LIST)
+    if (DEFINED IN_INPUT_LIST AND NOT ${IN_INPUT_LIST} IN_LIST _multi_value_args)
         TPA_append(multi_value_args ${IN_INPUT_LIST})
         TPA_set(${_property}_INPUT "${IN_INPUT_LIST}")
     endif ()
-    if (DEFINED IN_DEFAULT)
+    if (DEFINED IN_DEFAULT AND NOT ${_property}_DEFAULT IN_LIST _index)
         TPA_set(${_property}_DEFAULT ${IN_DEFAULT})
     endif ()
-    if (DEFINED IN_SETTER)
+    if (DEFINED IN_SETTER AND NOT ${_property}_SETTER IN_LIST _index)
         TPA_set(${_property}_SETTER ${IN_SETTER})
     endif ()
-    if (DEFINED IN_UPDATER)
+    if (DEFINED IN_UPDATER AND NOT ${_property}_UPDATER IN_LIST _index)
         TPA_set(${_property}_UPDATER ${IN_UPDATER})
     endif ()
-    TPA_set(${_property}_OVERWRITE ${IN_OVERWRITE})
+    TPA_get(${_property}_OVERWRITE _prev_overwrite)
+    if (_prev_overwrite STREQUAL "")
+        TPA_set(${_property}_OVERWRITE ${IN_OVERWRITE})
+    endif()
 
     TPA_append(${_DOXYPRESS_JSON_PATHS_KEY} "${_property}")
-endfunction()
-
-##############################################################################
-#.rst:
-#
-# .. cmake:command:: _doxypress_override_add
-#
-# .. code-block::
-#
-#   _doxypress_override_add(<JSON path> <value>)
-#
-# Creates an :ref:`override<overrides-reference-label>` with the given value.
-##############################################################################
-function(_doxypress_override_add _property _value)
-    TPA_set(override.${_property} "${_value}")
-    TPA_append(overrides ${_property})
 endfunction()
 
 function(_doxypress_override_find _property _out_var)
@@ -454,46 +445,14 @@ function(_doxypress_property_update _property)
             "${_json_value}" "${_input_value}" _value)
 
     _doxypress_property_apply_updater(${_property} "${_updater}" "${_value}" _value)
-    _doxypress_property_apply_default(${_property} "${_default}" "${_value}" _value)
+    _doxypress_property_apply_default(${_property} "${_default}"
+            "${_value}" "${_input_value}" _value)
 
     _doxypress_set(${_property} "${_value}")
     _doxypress_log(DEBUG "${_property} = ${_value}")
     if (_input_param)
         TPA_set(${_input_param} "${_value}")
     endif ()
-endfunction()
-
-##############################################################################
-#.rst:
-#
-# .. cmake:command:: _doxypress_property_override
-#
-# .. code-block::
-#
-#   _doxypress_property_override(<JSON path> <output variable>)
-#
-# Applies override logic to a given property. The override is defined for
-# the property ``_property``, if there was a call
-#
-# .. code-block:: cmake
-#
-#   set(_property value)
-#
-# previously. If a property ``_property`` was specified in the input arguments,
-# the override is not applied.
-#
-# Parameters:
-#
-# * ``_property`` a property to override
-##############################################################################
-function(_doxypress_property_override _property)
-    # search for an override
-    _doxypress_override_find(${_property} _value)
-    if (NOT ${_value} STREQUAL "")
-        set(_message "CMake override ${_property} found:")
-        _doxypress_log(DEBUG "${_message} ${_value}")
-        _doxypress_set(${_property} "${_value}")
-    endif()
 endfunction()
 
 ##############################################################################
@@ -588,11 +547,17 @@ endfunction()
 # * ``_value`` an input property
 # * ``_out_var`` the value of ``_property``
 ##############################################################################
-function(_doxypress_property_apply_default _property _default _value _out_var)
-    if (_value STREQUAL "" AND NOT _default STREQUAL "")
-        _doxypress_action(${_property} default "${_default}")
-        set(${_out_var} "${_default}" PARENT_SCOPE)
-    endif ()
+function(_doxypress_property_apply_default _property _default _value _input_value _out_var)
+    if (NOT _default STREQUAL "")
+        TPA_get(${_property}_OVERWRITE _overwrite)
+        if (NOT _input_value STREQUAL "")
+            set(_overwrite false)
+        endif()
+        if (_value STREQUAL "" OR _overwrite)
+            _doxypress_action(${_property} default "${_default}")
+            set(${_out_var} "${_default}" PARENT_SCOPE)
+        endif ()
+    endif()
 endfunction()
 
 ##############################################################################

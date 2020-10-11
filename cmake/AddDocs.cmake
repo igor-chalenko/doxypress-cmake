@@ -297,6 +297,23 @@ endfunction()
 ##############################################################################
 #.rst:
 #
+# .. cmake:command:: _doxypress_override_add
+#
+# .. code-block::
+#
+#   _doxypress_override_add(<JSON path> <value>)
+#
+# Creates an :ref:`override<overrides-reference-label>` with the given value.
+##############################################################################
+function(_doxypress_override_add _property _value)
+    # TPA_set(override.${_property} "${_value}")
+    # TPA_append(overrides ${_property})
+    _doxypress_property_add(${_property} DEFAULT "${_value}" OVERWRITE)
+endfunction()
+
+##############################################################################
+#.rst:
+#
 # .. cmake:command:: _doxypress_params_init_inputs
 #
 # Initializes input parameters that should be accepted by
