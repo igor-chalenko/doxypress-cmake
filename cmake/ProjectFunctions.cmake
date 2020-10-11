@@ -39,9 +39,6 @@ macro(_doxypress_project_update _project_file _out_var)
             _doxypress_property_update(${_cut_property})
         endif()
         TPA_get(${_cut_property}_INPUT _input_parameter_name)
-        if (_input_parameter_name STREQUAL "")
-            _doxypress_property_override(${_cut_property})
-        endif()
     endforeach()
 
     # create name for the processed project file
