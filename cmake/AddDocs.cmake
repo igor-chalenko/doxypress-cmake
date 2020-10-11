@@ -9,6 +9,9 @@
 #.rst:
 # AddDocs
 # -------
+#
+# This module contains this package's public API. It's included by
+# ``FindDoxypressCMake.cmake``.
 ##############################################################################
 
 # We must run the following at "include" time, not at function call time,
@@ -26,13 +29,13 @@ include(${doxypress_dir}/ProjectFunctions.cmake)
 ##############################################################################
 
 # a list of parsed project file's properties
-set(_DOXYPRESS_PROJECT_KEY "json.parsed")
+set(_DOXYPRESS_PROJECT_KEY "doxypress.json")
 # updatable property names
-set(_DOXYPRESS_JSON_PATHS_KEY "json.paths")
+set(_DOXYPRESS_JSON_PATHS_KEY "doxypress.updatable.properties")
 # `doxypress_add_docs` input arguments
-set(_DOXYPRESS_INPUTS "inputs")
+set(_DOXYPRESS_INPUTS_KEY "cmake.inputs")
 
-# todo remove these
+# used throughout the code
 set(_DOXYPRESS_INPUT_SOURCE "input.input-source")
 
 include(${doxypress_dir}/Logging.cmake)
@@ -45,6 +48,7 @@ include(${doxypress_dir}/PropertyHandlers.cmake)
 # ---------
 # Functions
 # ---------
+# .. cmake:command:: doxypress_add_docs
 #
 # .. code-block:: cmake
 #
@@ -68,9 +72,9 @@ include(${doxypress_dir}/PropertyHandlers.cmake)
 # * Adds the generated files to the ``install`` target, if
 #   :cmake:variable:`DOXYPRESS_INSTALL_DOCS` is enabled.
 #
-# ----------------
+# ================
 # Input parameters
-# ----------------
+# ================
 # **PROJECT_FILE**
 #    JSON project file that `DoxyPress` uses as input. Antwerp will read
 #    this file during CMake configuration phase, update it accordingly, write
@@ -106,9 +110,9 @@ include(${doxypress_dir}/PropertyHandlers.cmake)
 #     ``${INPUT_TARGET}.doxypress`` if ``INPUT_TARGET`` is supplied, or
 #     ``${PROJECT_NAME}.doxypress`` otherwise.
 #
-# ------------------
+# ==================
 # Property overrides
-# ------------------
+# ==================
 #
 # In addition to the properties handled by :cmake:command:`doxypress_add_docs`,
 # it's possible to change other properties as well by using appropriate
@@ -202,9 +206,9 @@ include(${doxypress_dir}/PropertyHandlers.cmake)
 #   This is configured separately for MS Visual Studio; other build tools
 #   use a default value.
 #
-# ---------
+# =========
 # Algorithm
-# ---------
+# =========
 #
 # * 1. The input JSON configuration is parsed into a flat list of variables as
 #   described in the documentation of `sbeParseJson` from json-cmake_;
@@ -262,7 +266,7 @@ function(doxypress_add_docs)
     # update project file
     _doxypress_project_update("${_project_file}" _updated_project_file)
     # create target(s)
-    _doxypress_targets_create("${_project_file}" "${_updated_project_file}")
+    _doxypress_add_targets("${_project_file}" "${_updated_project_file}")
     if (DOXYPRESS_INSTALL_DOCS)
         # install generated files
         _doxypress_install_docs()
@@ -372,16 +376,15 @@ function(_doxypress_params_init_properties)
             SETTER "set_example_source"
             UPDATER "update_example_source")
     _doxypress_property_add("messages.warn-format"
-            SETTER "set_warn_format"
-            OVERWRITE)
+            SETTER "set_warn_format" OVERWRITE)
     _doxypress_property_add("output-latex.makeindex-cmd-name"
-            SETTER "set_makeindex_cmd_name"
-            OVERWRITE)
+            SETTER "set_makeindex_cmd_name" OVERWRITE)
     _doxypress_property_add("output-latex.latex-cmd-name"
-            SETTER "set_latex_cmd_name"
-            OVERWRITE)
+            SETTER "set_latex_cmd_name" OVERWRITE)
 endfunction()
 
+##############################################################################
+#.rst:
 # -------
 # Options
 # -------
@@ -392,7 +395,7 @@ endfunction()
 #
 # .. code-block:: bash
 #
-#    make install
+#    make install INSTALL_COMPONENT
 #
 ##############################################################################
 option(DOXYPRESS_INSTALL_DOCS "Install generated documentation" OFF)
@@ -428,6 +431,29 @@ option(DOXYPRESS_PROMOTE_WARNINGS "Promote log warnings to CMake warnings" OFF)
 
 ##############################################################################
 #.rst:
+# ---------
+# Variables
+# ---------
+#
+# .. cmake:variable:: DOXYPRESS_LAUNCHER_COMMAND
+#
+# Platform-specific executable for file opening:
+#
+# * ``start`` on Windows
+# * ``open`` on OS/X
+# * ``xdg-open`` on Linux
+##############################################################################
+if (WIN32)
+    set(DOXYPRESS_LAUNCHER_COMMAND start)
+elseif (NOT APPLE)
+    set(DOXYPRESS_LAUNCHER_COMMAND xdg-open)
+else ()
+    # I didn't test this
+    set(DOXYPRESS_LAUNCHER_COMMAND open)
+endif ()
+
+##############################################################################
+#.rst:
 #
 # .. cmake:variable:: DOXYPRESS_LOG_LEVEL
 #
@@ -449,26 +475,3 @@ option(DOXYPRESS_PROMOTE_WARNINGS "Promote log warnings to CMake warnings" OFF)
 #    _doxypress_log(WARN text) # equivalent to message(STATUS text)
 ##############################################################################
 set(DOXYPRESS_LOG_LEVEL INFO)
-
-##############################################################################
-#.rst:
-# ---------
-# Variables
-# ---------
-#
-# .. cmake:variable:: DOXYPRESS_LAUNCHER_COMMAND
-#
-# Platform-specific executable for file opening:
-#
-# * ``start`` on Windows
-# * ``open`` on OS/X
-# * ``xdg-open`` on Linux
-##############################################################################
-if (WIN32)
-    set(DOXYPRESS_LAUNCHER_COMMAND start)
-elseif (NOT APPLE)
-    set(DOXYPRESS_LAUNCHER_COMMAND xdg-open)
-else ()
-    # I didn't test this
-    set(DOXYPRESS_LAUNCHER_COMMAND open)
-endif ()

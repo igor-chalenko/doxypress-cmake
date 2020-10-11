@@ -10,6 +10,12 @@
 # =======
 # Logging
 # =======
+#
+# This module implements basic logging with level limited by
+# :cmake:variable:`DOXYPRESS_LOG_LEVEL`. There's also a function
+# :cmake:command:`_doxypress_action`, which tracks property updates on
+# a per-property basis, so that all updates to a single property can
+# be examined.
 ##############################################################################
 
 unset(_doxypress_log_levels)
@@ -57,7 +63,6 @@ endfunction()
 # historical order. If a property has an incorrect value after processing,
 # that property's log could be consulted to quickly find approximate location
 # of an error.
-# todo better messages ?
 ##############################################################################
 function(_doxypress_action _property _action _value)
     set(_message "")

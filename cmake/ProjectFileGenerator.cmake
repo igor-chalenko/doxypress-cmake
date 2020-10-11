@@ -13,7 +13,7 @@
 # sources into a project file that will be used by `DoxyPress` as input.
 # These sources include:
 #
-# * Inputs of :ref:`doxypress_add_docs`
+# * Inputs of :cmake:command:`doxypress_add_docs`
 #
 #   These fall into two categories. The first one is the input parameters that
 #   are not bound to any JSON paths. They are defined dynamically using
@@ -250,13 +250,13 @@ function(_doxypress_inputs_parse)
     # overrides later
     foreach(_arg ${ARGN})
         if (${_arg} IN_LIST _option_args)
-            TPA_append(${_DOXYPRESS_INPUTS} ${_arg})
+            TPA_append(${_DOXYPRESS_INPUTS_KEY} ${_arg})
         endif()
         if (${_arg} IN_LIST _one_value_args)
-            TPA_append(${_DOXYPRESS_INPUTS} ${_arg})
+            TPA_append(${_DOXYPRESS_INPUTS_KEY} ${_arg})
         endif()
         if (${_arg} IN_LIST _multi_value_args)
-            TPA_append(${_DOXYPRESS_INPUTS} ${_arg})
+            TPA_append(${_DOXYPRESS_INPUTS_KEY} ${_arg})
         endif()
     endforeach()
 endfunction()
@@ -566,6 +566,28 @@ function(_doxypress_property_apply_updater _property _name _value _out_var)
     endif()
 endfunction()
 
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_property_apply_default
+#
+# .. code-block:: cmake
+#
+#   _doxypress_property_apply_default(<property>
+#                                     <default value>
+#                                     <current value>
+#                                     <output variable>)
+#
+# Sets output variable to the value of ``_default``, if ``_value`` is empty.
+# Does nothing otherwise.
+#
+# Parameters:
+#
+# * ``_property`` an input property
+# * ``_default`` a value to set
+# * ``_value`` an input property
+# * ``_out_var`` the value of ``_property``
+##############################################################################
 function(_doxypress_property_apply_default _property _default _value _out_var)
     if (_value STREQUAL "" AND NOT _default STREQUAL "")
         _doxypress_action(${_property} default "${_default}")
@@ -609,6 +631,22 @@ function(_doxypress_property_read_input _input_arg_name _out_var)
     endif()
 endfunction()
 
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_property_read_json
+#
+# .. code-block:: cmake
+#
+#   _doxypress_property_read_json(<property> <output variable>)
+#
+# Returns the value of ``_property`` in the currently loaded JSON document.
+#
+# Parameters:
+#
+# * ``_property`` an input property
+# * ``_out_var`` the value of ``_property``
+##############################################################################
 function(_doxypress_property_read_json _property _out_var)
     _doxypress_get("${_property}" _json_value)
     if (NOT _json_value STREQUAL "")
