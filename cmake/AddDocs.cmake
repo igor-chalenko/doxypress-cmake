@@ -306,8 +306,6 @@ endfunction()
 # Creates an :ref:`override<overrides-reference-label>` with the given value.
 ##############################################################################
 function(_doxypress_override_add _property _value)
-    # TPA_set(override.${_property} "${_value}")
-    # TPA_append(overrides ${_property})
     _doxypress_property_add(${_property} DEFAULT "${_value}" OVERWRITE)
 endfunction()
 
@@ -316,7 +314,7 @@ endfunction()
 #
 # .. cmake:command:: _doxypress_params_init_inputs
 #
-# Initializes input parameters that should be accepted by
+# Initializes input parameters that should be parsed by
 # :cmake:command:`doxypress_add_docs`.
 ##############################################################################
 function(_doxypress_params_init_inputs)
@@ -474,7 +472,7 @@ endif ()
 #
 # .. cmake:variable:: DOXYPRESS_LOG_LEVEL
 #
-# Controls output produced by `_doxypress_log`.
+# Controls output produced by `_doxypress_log`. Set to ``INFO`` by default.
 #
 # .. code-block:: cmake
 #

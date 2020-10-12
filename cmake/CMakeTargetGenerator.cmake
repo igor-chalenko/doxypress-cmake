@@ -62,26 +62,22 @@
 # * ``_updated_project_file`` processed project file name
 ##############################################################################
 function(_doxypress_add_targets _project_file _updated_project_file)
-    _doxypress_get(general.output-dir _output_dir)
-    if (NOT _output_dir)
-        message(FATAL_ERROR "Output directory may not be empty.")
-    endif ()
-
     TPA_get(TARGET_NAME _target_name)
-
     if (NOT TARGET "${_target_name}")
         _doxypress_add_target("${_project_file}"
                 "${_updated_project_file}"
-                "${_target_name}"
-                "${_output_dir}")
-        _doxypress_add_pdf_commands("${_target_name}" "${_output_dir}")
+                "${_target_name}")
+        _doxypress_add_pdf_commands("${_target_name}")
         if (DOXYPRESS_ADD_OPEN_TARGETS)
-            _doxypress_add_open_targets("${_target_name}" "${_output_dir}")
+            _doxypress_add_open_targets("${_target_name}" )
         endif ()
+    else()
+        _doxypress_log(WARN "The target ${_target_name} already exists.")
     endif ()
 endfunction()
 
-function(_doxypress_add_target _project_file _updated_project_file _target_name _output_dir)
+function(_doxypress_add_target _project_file _updated_project_file _target_name)
+    _doxypress_get(general.output-dir _output_dir)
     # collect inputs for `DEPENDS` parameter
     _doxypress_list_inputs(_inputs)
     # collect outputs for the `OUTPUTS` parameter
@@ -104,6 +100,7 @@ endfunction()
 function(_doxypress_add_pdf_commands _target_name)
     TPA_get(GENERATE_PDF _pdf)
     _doxypress_get(general.output-dir _output_dir)
+
     if (_pdf)
         file(MAKE_DIRECTORY ${_output_dir}/pdf)
         add_custom_command(TARGET
@@ -138,7 +135,8 @@ endfunction()
 # * ``_output_dir`` a directory where documentation files will be generated
 #   by the ``DoxyPress`` target
 ##############################################################################
-function(_doxypress_add_open_targets _name_prefix _output_dir)
+function(_doxypress_add_open_targets _name_prefix)
+    _doxypress_get(general.output-dir _output_dir)
     _doxypress_get(output-html.generate-html _generate_html)
     _doxypress_get(output-latex.generate-latex _generate_latex)
     TPA_get(GENERATE_PDF _generate_pdf)
@@ -320,18 +318,19 @@ function(_doxypress_list_inputs _out_var)
             endif ()
         endforeach ()
     elseif (_input_target)
-        get_target_property(public_header_dirs
+        get_target_property(include_directories
                 ${_input_target}
                 INTERFACE_INCLUDE_DIRECTORIES)
-        foreach (_dir ${public_header_dirs})
+        foreach (_dir ${include_directories})
             file(GLOB_RECURSE _inputs ${_dir}/*)
             list(APPEND _all_inputs "${_inputs}")
         endforeach ()
     else ()
-        # todo better message
         message(FATAL_ERROR [=[
 Either INPUTS or INPUT_TARGET must be specified as input argument
-for `doxypress_add_docs`]=])
+for `doxypress_add_docs`:
+1) INPUT_TARGET couldn't be defaulted to ${PROJECT_NAME};
+2) Input project file didn't specify any inputs either.]=])
     endif ()
 
     set(${_out_var} "${_all_inputs}" PARENT_SCOPE)
