@@ -79,11 +79,11 @@ endfunction()
 # Sets `output-latex.latex-cmd-name` to the value of `PDFLATEX_COMPILER`,
 # which was previously set by `find_package(LATEX)`.
 ##############################################################################
-function(_doxypress_update_project_file _project_file _out_var)
+function(_doxypress_update_project_file _file_name _out_var)
     set(_result "")
-    if (NOT IS_ABSOLUTE ${_project_file})
+    if (NOT IS_ABSOLUTE ${_file_name})
         get_filename_component(_result
-                ${CMAKE_CURRENT_SOURCE_DIR}/${_project_file} ABSOLUTE)
+                ${CMAKE_CURRENT_SOURCE_DIR}/${_file_name} ABSOLUTE)
         set(${_out_var} "${_result}" PARENT_SCOPE)
     endif ()
 endfunction()
@@ -156,24 +156,25 @@ endfunction()
 # ones by prepending ``CMAKE_CURRENT_SOURCE_DIR``. Does nothing
 # to absolute directory paths. Writes updated list to ``_out_var``.
 ##############################################################################
-function(_doxypress_update_input_source _directories _out_var)
+function(_doxypress_update_input_source _paths _out_var)
     set(_inputs "")
     # _doxypress_log(DEBUG "input sources before update: ${_sources}")
-    if (_directories)
-        foreach (_path ${_directories})
+    if (_paths)
+        foreach (_path ${_paths})
             if (NOT IS_ABSOLUTE ${_path})
-                get_filename_component(_path ${CMAKE_CURRENT_SOURCE_DIR}/${_path}
+                get_filename_component(_path
+                        "${CMAKE_CURRENT_SOURCE_DIR}/${_path}"
                         ABSOLUTE)
             endif ()
-            list(APPEND _inputs ${_path})
+            list(APPEND _inputs "${_path}")
         endforeach ()
     else ()
-        TPA_get("INPUT_TARGET" _input_target)
-        if (TARGET ${_input_target})
-            get_target_property(_inputs "${_input_target}"
+        TPA_get("INPUT_TARGET" _target)
+        if (TARGET ${_target})
+            get_target_property(_inputs
+                    "${_target}"
                     INTERFACE_INCLUDE_DIRECTORIES)
-            _doxypress_log(DEBUG
-                    "input sources from ${_input_target}: ${_inputs}")
+            _doxypress_log(DEBUG "inputs from ${_input_target}: ${_inputs}")
         endif ()
     endif ()
     # _doxypress_log(DEBUG "input sources after update: ${_inputs}")
@@ -254,26 +255,6 @@ function(_doxypress_set_have_dot _out_var)
     else ()
         set(${_out_var} false PARENT_SCOPE)
         _doxypress_action("dot.have-dot" "setter" false)
-    endif ()
-endfunction()
-
-##############################################################################
-#.rst:
-# .. cmake:command:: _doxypress_set_input_target
-#
-# .. code-block:: cmake
-#
-#   _doxypress_set_input_target(<output variable>)
-#
-# Tries to default the input target name. If a target ``PROJECT_NAME`` exists,
-# the output variable is set to ``PROJECT_NAME``. The output variable is cleared
-# otherwise.
-##############################################################################
-function(_doxypress_set_input_target _out_var)
-    if (TARGET ${PROJECT_NAME})
-        set(${_out_var} ${PROJECT_NAME} PARENT_SCOPE)
-    else ()
-        set(${_out_var} "" PARENT_SCOPE)
     endif ()
 endfunction()
 

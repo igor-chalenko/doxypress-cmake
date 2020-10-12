@@ -249,17 +249,17 @@ function(_doxypress_inputs_parse)
 
     # save explicitly given input arguments so that we can correctly handle
     # overrides later
-    foreach(_arg ${ARGN})
+    foreach (_arg ${ARGN})
         if (${_arg} IN_LIST _option_args)
             TPA_append(${_DOXYPRESS_INPUTS_KEY} ${_arg})
-        endif()
+        endif ()
         if (${_arg} IN_LIST _one_value_args)
             TPA_append(${_DOXYPRESS_INPUTS_KEY} ${_arg})
-        endif()
+        endif ()
         if (${_arg} IN_LIST _multi_value_args)
             TPA_append(${_DOXYPRESS_INPUTS_KEY} ${_arg})
-        endif()
-    endforeach()
+        endif ()
+    endforeach ()
 endfunction()
 
 ##############################################################################
@@ -285,10 +285,10 @@ function(_doxypress_inputs_update _name _value)
     # convert CMake booleans to JSON's
     if ("${_value}" STREQUAL "TRUE")
         set(_value true)
-    endif()
+    endif ()
     if ("${_value}" STREQUAL "FALSE")
         set(_value false)
-    endif()
+    endif ()
 
     if (_value STREQUAL "")
         if (_setter)
@@ -368,7 +368,7 @@ endfunction()
 ##############################################################################
 function(_doxypress_property_add _property)
     TPA_get(${_DOXYPRESS_JSON_PATHS_KEY} _properties)
-    TPA_get(properties _index)
+    TPA_index(_index)
 
     set(_options OVERWRITE)
     set(_one_value_args INPUT_OPTION INPUT_STRING DEFAULT SETTER UPDATER)
@@ -401,7 +401,7 @@ function(_doxypress_property_add _property)
     TPA_get(${_property}_OVERWRITE _prev_overwrite)
     if (_prev_overwrite STREQUAL "")
         TPA_set(${_property}_OVERWRITE ${IN_OVERWRITE})
-    endif()
+    endif ()
 
     TPA_append(${_DOXYPRESS_JSON_PATHS_KEY} "${_property}")
 endfunction()
@@ -411,26 +411,26 @@ function(_doxypress_override_find _property _out_var)
     if (_property IN_LIST _overrides)
         TPA_get(override.${_property} _value)
         set(${_out_var} "${_value}" PARENT_SCOPE)
-    else()
+    else ()
         set(${_out_var} "" PARENT_SCOPE)
-    endif()
+    endif ()
 endfunction()
 
 ##############################################################################
 #.rst:
 #
-# .. cmake:command:: _doxypress_property_update
+# .. cmake:command:: _doxypress_update_path
 #
 # .. code-block::
 #
-#   _doxypress_property_update(<JSON path>)
+#   _doxypress_update_path(<JSON path>)
 #
 # Applies update logic to a given property. The property is updated in the
 # loaded JSON document and in the stored input parameter, if one is defined
 # for this property. See :ref:`algorithm<Algorithm>` for a detailed description
 # of actions taken by the function.
 ##############################################################################
-function(_doxypress_property_update _property)
+function(_doxypress_update_path _property)
     TPA_get(${_property}_INPUT _input_param)
     TPA_get(${_property}_SETTER _setter)
     TPA_get(${_property}_UPDATER _updater)
@@ -444,9 +444,15 @@ function(_doxypress_property_update _property)
     _doxypress_property_merge(${_property}
             "${_json_value}" "${_input_value}" _value)
 
-    _doxypress_property_apply_updater(${_property} "${_updater}" "${_value}" _value)
-    _doxypress_property_apply_default(${_property} "${_default}"
-            "${_value}" "${_input_value}" _value)
+    _doxypress_property_apply_updater(${_property}
+            "${_updater}"
+            "${_value}"
+            _value)
+    _doxypress_property_apply_default(${_property}
+            "${_default}"
+            "${_value}"
+            "${_input_value}"
+            _value)
 
     _doxypress_set(${_property} "${_value}")
     _doxypress_log(DEBUG "${_property} = ${_value}")
@@ -489,11 +495,11 @@ function(_doxypress_property_merge _property _json_value _input_value _out_var)
         endforeach ()
         if (_json_value AND _input_value)
             _doxypress_action(${_property} merge "${_json_value}")
-        endif()
-    else()
+        endif ()
+    else ()
         if (NOT _input_value STREQUAL "")
             set(_json_value "${_input_value}")
-        endif()
+        endif ()
     endif ()
     set(${_out_var} "${_json_value}" PARENT_SCOPE)
 endfunction()
@@ -507,10 +513,10 @@ function(_doxypress_property_apply_setter _property _name _out_var)
             _doxypress_call(_doxypress_${_name} _new_value)
             if (NOT _new_value STREQUAL "")
                 _doxypress_action(${_property} setter "${_new_value}")
-            endif()
+            endif ()
             set(${_out_var} ${_new_value} PARENT_SCOPE)
-        endif()
-    endif()
+        endif ()
+    endif ()
 endfunction()
 
 function(_doxypress_property_apply_updater _property _name _value _out_var)
@@ -520,9 +526,9 @@ function(_doxypress_property_apply_updater _property _name _value _out_var)
         _doxypress_call(_doxypress_${_name} "${_value}" _new_value)
         if (NOT _new_value STREQUAL "")
             _doxypress_action(${_property} updater "${_new_value}")
-        endif()
+        endif ()
         set(${_out_var} "${_new_value}" PARENT_SCOPE)
-    endif()
+    endif ()
 endfunction()
 
 ##############################################################################
@@ -552,12 +558,12 @@ function(_doxypress_property_apply_default _property _default _value _input_valu
         TPA_get(${_property}_OVERWRITE _overwrite)
         if (NOT _input_value STREQUAL "")
             set(_overwrite false)
-        endif()
+        endif ()
         if (_value STREQUAL "" OR _overwrite)
             _doxypress_action(${_property} default "${_default}")
             set(${_out_var} "${_default}" PARENT_SCOPE)
         endif ()
-    endif()
+    endif ()
 endfunction()
 
 ##############################################################################
@@ -592,8 +598,8 @@ function(_doxypress_property_read_input _input_arg_name _out_var)
 
             _doxypress_action(${_property} input "${_input_value}")
             set(${_out_var} "${_input_value}" PARENT_SCOPE)
-        endif()
-    endif()
+        endif ()
+    endif ()
 endfunction()
 
 ##############################################################################
@@ -616,6 +622,6 @@ function(_doxypress_property_read_json _property _out_var)
     _doxypress_get("${_property}" _json_value)
     if (NOT _json_value STREQUAL "")
         _doxypress_action(${_property} source "${_json_value}")
-    endif()
+    endif ()
     set(${_out_var} "${_json_value}" PARENT_SCOPE)
 endfunction()

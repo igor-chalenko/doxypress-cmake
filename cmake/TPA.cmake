@@ -48,6 +48,8 @@
 # -------------
 ##############################################################################
 
+set(_DOXYPRESS_TPA_INDEX_KEY property.index)
+
 ##############################################################################
 #.rst:
 # .. cmake:command:: TPA_set(_property _value)
@@ -56,66 +58,57 @@
 #
 # Parameters:
 #
-# * ``_property``     a property to modify
-# * ``_value``        _property's new value
+# * ``_name`` name of a property to modify
+# * ``_value`` new value of a property ``_name``
 ##############################################################################
-function(TPA_set _property _value)
+function(TPA_set _name _value)
     _TPA_current_scope(_scope)
-    set_property(TARGET ${_scope} PROPERTY INTERFACE_${_property} "${_value}")
+    set_property(TARGET ${_scope} PROPERTY INTERFACE_${_name} "${_value}")
 
-    if (NOT ${_property} STREQUAL "properties")
-        TPA_get(properties _properties)
-        set(_flag false)
-        foreach(_existing ${_properties})
-            if (${_existing} STREQUAL ${_property})
-                set(_flag true)
-            endif()
-        endforeach()
-        if (NOT ${_flag})
-            list(APPEND _properties ${_property})
-            # set_property(TARGET ${_scope} PROPERTY properties "${_properties}")
-            TPA_set(properties "${_properties}")
+    # update index
+    if (NOT ${_name} STREQUAL ${_DOXYPRESS_TPA_INDEX_KEY})
+        TPA_index(_index)
+        if (NOT ${_name} IN_LIST _index)
+            list(APPEND _index ${_name})
+            TPA_set_index("${_index}")
         endif()
     endif()
 endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: TPA_unset(_property)
+# .. cmake:command:: TPA_unset(_name)
 #
-# Unsets the property given by ``_property``.
+# Unsets the property given by ``_name``.
 #
 # Parameters:
 #
-# * ``_property`` a property to unset
+# * ``_name`` a property to unset
 ##############################################################################
-function(TPA_unset _property)
+function(TPA_unset _name)
     _TPA_current_scope(_scope)
-    set_property(TARGET ${_scope} PROPERTY INTERFACE_${_property})
+    set_property(TARGET ${_scope} PROPERTY INTERFACE_${_name})
 
-    TPA_get(properties _properties)
-    foreach(_existing ${_properties})
-        if (${_existing} STREQUAL ${_property})
-            list(REMOVE_ITEM _properties ${_existing})
-        endif()
-    endforeach()
-    TPA_set(properties "${_properties}")
+    TPA_index(_index)
+    list(FIND _index ${_name} _ind)
+    list(REMOVE_ITEM _index ${_name})
+    TPA_set_index("${_index}")
 endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: TPA_get(_property _out_var)
+# .. cmake:command:: TPA_get(_name _out_var)
 #
 # Returns the value of a given property.
 #
 # Parameters:
 #
-# * ``_property`` the property to unset
+# * ``_name`` the property to unset
 # * ``_out_var``  the property's value if found; empty string otherwise
 ##############################################################################
-function(TPA_get _property _out_var)
+function(TPA_get _name _out_var)
     _TPA_current_scope(_scope)
-    get_target_property(_value ${_scope} INTERFACE_${_property})
+    get_target_property(_value ${_scope} INTERFACE_${_name})
     if ("${_value}" STREQUAL "_value-NOTFOUND")
         set(${_out_var} "" PARENT_SCOPE)
     else ()
@@ -125,26 +118,25 @@ endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: TPA_append(_property _value)
+# .. cmake:command:: TPA_append(_name _value)
 #
-# If the property `_property` exists, it is treated as a list, and the given
+# If the property `_name` exists, it is treated as a list, and the given
 # value is appended to it. Otherwise, it's created and set to the given value.
 #
 # Parameters:
 #
-# * ``_property``     the property to update
+# * ``_name``     the property to update
 # * ``_value``        the value to append
 ##############################################################################
-function(TPA_append _property _value)
+function(TPA_append _name _value)
     _TPA_current_scope(_scope)
 
-    TPA_get(${_property} _current_value)
+    TPA_get(${_name} _current_value)
     if ("${_current_value}" STREQUAL "")
-        TPA_set(${_property} "${_value}")
+        TPA_set(${_name} "${_value}")
     else()
-        # no need to update the index
         list(APPEND _current_value "${_value}")
-        TPA_set(${_property} "${_current_value}")
+        TPA_set(${_name} "${_current_value}")
     endif()
 endfunction()
 
@@ -156,11 +148,11 @@ endfunction()
 # Uses index variable ``properties`` to get the list of all properties.
 ##############################################################################
 function(TPA_clear_scope)
-    TPA_get(properties _properties)
-    foreach(_property ${_properties})
-        TPA_unset(${_property})
+    TPA_index(_index)
+    foreach(_name ${_index})
+        TPA_unset(${_name})
     endforeach()
-    TPA_unset(properties)
+    TPA_unset(${_DOXYPRESS_TPA_INDEX_KEY})
 endfunction()
 
 ##############################################################################
@@ -200,3 +192,23 @@ function(_TPA_scope_name _out_var)
     set(${_out_var} "${_replaced}.properties" PARENT_SCOPE)
 endfunction()
 
+##############################################################################
+#.rst:
+# .. cmake:command:: TPA_index
+#
+# Return current scope's index.
+##############################################################################
+function(TPA_index _out_var)
+    TPA_get(${_DOXYPRESS_TPA_INDEX_KEY} _index)
+    set(${_out_var} "${_index}" PARENT_SCOPE)
+endfunction()
+
+##############################################################################
+#.rst:
+# .. cmake:command:: TPA_index
+#
+# Sets current scope's index.
+##############################################################################
+function(TPA_set_index _index)
+    TPA_set(${_DOXYPRESS_TPA_INDEX_KEY} "${_index}")
+endfunction()
