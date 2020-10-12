@@ -297,15 +297,15 @@ endfunction()
 ##############################################################################
 #.rst:
 #
-# .. cmake:command:: _doxypress_override_add
+# .. cmake:command:: doxypress_override_add
 #
 # .. code-block::
 #
-#   _doxypress_override_add(<JSON path> <value>)
+#   doxypress_override_add(<JSON path> <value>)
 #
 # Creates an :ref:`override<overrides-reference-label>` with the given value.
 ##############################################################################
-function(_doxypress_override_add _property _value)
+function(doxypress_override_add _property _value)
     _doxypress_property_add(${_property} DEFAULT "${_value}" OVERWRITE)
 endfunction()
 
@@ -337,18 +337,18 @@ endfunction()
 # Initializes the default set of :ref:`overrides<Property overrides>`.
 ##############################################################################
 function(_doxypress_params_init_overrides)
-    _doxypress_override_add("project.project-brief" "${PROJECT_DESCRIPTION}")
-    _doxypress_override_add("project.project-name" "${PROJECT_NAME}")
-    _doxypress_override_add("project.project-version" "${PROJECT_VERSION}")
-    _doxypress_override_add("output-latex.latex-batch-mode" true)
-    _doxypress_override_add("output-latex.latex-hyper-pdf" true)
-    _doxypress_override_add("output-latex.latex-output" "latex")
-    _doxypress_override_add("output-latex.latex-pdf" true)
-    _doxypress_override_add("output-html.html-output" "html")
-    _doxypress_override_add("output-html.html-file-extension" ".html")
-    _doxypress_override_add("output-xml.xml-output" "xml")
-    _doxypress_override_add("input.input-recursive" true)
-    _doxypress_override_add("input.example-recursive" true)
+    doxypress_override_add("project.project-brief" "${PROJECT_DESCRIPTION}")
+    doxypress_override_add("project.project-name" "${PROJECT_NAME}")
+    doxypress_override_add("project.project-version" "${PROJECT_VERSION}")
+    doxypress_override_add("output-latex.latex-batch-mode" true)
+    doxypress_override_add("output-latex.latex-hyper-pdf" true)
+    doxypress_override_add("output-latex.latex-output" "latex")
+    doxypress_override_add("output-latex.latex-pdf" true)
+    doxypress_override_add("output-html.html-output" "html")
+    doxypress_override_add("output-html.html-file-extension" ".html")
+    doxypress_override_add("output-xml.xml-output" "xml")
+    doxypress_override_add("input.input-recursive" true)
+    doxypress_override_add("input.example-recursive" true)
 endfunction()
 
 ##############################################################################

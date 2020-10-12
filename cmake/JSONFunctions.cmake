@@ -65,6 +65,7 @@ cmake_policy(SET CMP0057 NEW)
 # - ``_out_var`` the value of `_path`
 ##############################################################################
 function(_JSON_get _path _out_var)
+    _doxypress_assert_not_empty("${_path}")
     _JSON_array_length(${_path} _array_length)
     if (${_array_length} GREATER -1)
         set(_i 0)
@@ -100,6 +101,7 @@ endfunction()
 #
 ##############################################################################
 function(_JSON_set _path _new_value)
+    _doxypress_assert_not_empty("${_path}")
     TPA_get(${_DOXYPRESS_PROJECT_KEY} _doxypress)
     _JSON_array_length(${_path} _array_length)
     if (_array_length GREATER -1)
@@ -284,6 +286,8 @@ endfunction()
 # * ``_out_var`` array length of ``_path`` node, or ``-1``
 ##############################################################################
 function(_JSON_array_length _path _out_var)
+    _doxypress_assert_not_empty("${_path}")
+
     TPA_get(${_path} _current_value)
     TPA_get(${_DOXYPRESS_PROJECT_KEY} _doxypress)
     if ("${_current_value}" MATCHES "^([0-9]+;)*([0-9]+)$")

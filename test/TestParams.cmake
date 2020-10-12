@@ -109,16 +109,15 @@ function(test_custom_project_file_2)
 endfunction()
 
 function(test_input_directories_full_1)
-    _doxypress_override_add("messages.warnings" false)
-    _doxypress_override_add("messages.quiet" false)
-    _doxypress_override_add("configuration.toc-include-headers" 2)
+    doxypress_override_add("messages.warnings" false)
+    doxypress_override_add("messages.quiet" false)
+    doxypress_override_add("configuration.toc-include-headers" 2)
 
     _doxypress_params_init()
     _doxypress_inputs_parse(INPUTS dir1 dir2)
     _doxypress_project_update(../cmake/DoxypressCMake.json _out)
     TPA_clear_scope()
 
-    # todo fix out file name - dir is not cut
     _doxypress_project_load(${_out})
     _doxypress_get("${_DOXYPRESS_INPUT_SOURCE}" _inputs)
     assert_same("${_inputs}"
@@ -134,7 +133,7 @@ function(test_input_directories_full_1)
 endfunction()
 
 function(test_input_directories_full_2)
-    _doxypress_override_add("messages.warnings" false)
+    doxypress_override_add("messages.warnings" false)
 
     _doxypress_params_init()
     _doxypress_inputs_parse(INPUT_TARGET main)

@@ -62,6 +62,9 @@
 # * ``_updated_project_file`` processed project file name
 ##############################################################################
 function(_doxypress_add_targets _project_file _updated_project_file)
+    _doxypress_assert_not_empty("${_project_file}")
+    _doxypress_assert_not_empty("${_updated_project_file}")
+
     TPA_get(TARGET_NAME _target_name)
     if (NOT TARGET "${_target_name}")
         _doxypress_add_target("${_project_file}"
@@ -80,6 +83,7 @@ function(_doxypress_add_target _project_file _updated_project_file _target_name)
     _doxypress_get(general.output-dir _output_dir)
     # collect inputs for `DEPENDS` parameter
     _doxypress_list_inputs(_inputs)
+    _doxypress_assert_not_empty("${_inputs}")
     # collect outputs for the `OUTPUTS` parameter
     _doxypress_list_outputs("${_output_dir}" _files FILES)
 
