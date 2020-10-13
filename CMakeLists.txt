@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 3.3)
 project(DoxypressCMake VERSION 0.0.1 DESCRIPTION "Doxypress module for CMake")
 
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/externals/json-cmake")
+include(cmake/InstallBasicPackageFiles.cmake)
+include(${PROJECT_SOURCE_DIR}/externals/json-cmake/JSONParser.cmake)
 
 add_subdirectory(test)
 add_subdirectory(doc)
-
-include(cmake/InstallBasicPackageFiles.cmake)
 
 if (${CMAKE_VERSION} VERSION_LESS 3.14)
     if (NOT DEFINED CMAKE_INSTALL_LIBDIR)
@@ -36,5 +35,8 @@ else()
             NO_CHECK_REQUIRED_COMPONENTS_MACRO)
 endif()
 
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
+# slash at the end remove `cmake` from the directory structure
+install(DIRECTORY "cmake/" DESTINATION ${_DESTINATION})
+
+install(FILES "externals/json-cmake/JSONParser.cmake"
         DESTINATION ${_DESTINATION})

@@ -1,0 +1,9 @@
+@PACKAGE_INIT@
+
+get_filename_component(doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
+set_and_check(DOXYPRESS_CMAKE_MODULE_DIR "${doxypress_dir}")
+list(APPEND DOXYPRESS_CMAKE_MODULE_PATH "${DOXYPRESS_CMAKE_MODULE_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${DOXYPRESS_CMAKE_MODULE_PATH}")
+include(${DOXYPRESS_CMAKE_MODULE_DIR}/FindDoxypressCMake.cmake)
+
+message(STATUS "Found DoxypressCMake")

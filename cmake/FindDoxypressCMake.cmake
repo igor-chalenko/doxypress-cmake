@@ -285,7 +285,8 @@ foreach (_comp IN LISTS Doxypress_FIND_COMPONENTS)
 endforeach ()
 unset(_comp)
 
-# include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
+include(FindPackageHandleStandardArgs)
+
 find_package_handle_standard_args(
         DoxypressCMake
         REQUIRED_VARS DOXYPRESS_EXECUTABLE
@@ -295,11 +296,21 @@ find_package_handle_standard_args(
 
 # Maintain the _FOUND variables as "YES" or "NO" for backwards
 # compatibility. This allows people to substitute them directly into
-# Doxyfile with configure_file().
+# project file with configure_file().
 if (DOXYPRESS_FOUND)
     set(DOXYPRESS_FOUND "YES")
 else ()
     set(DOXYPRESS_FOUND "NO")
 endif ()
 
-include(${doxypress_dir}/AddDocs.cmake)
+# We must run the following at "include" time, not at function call time,
+# to find the path to this module rather than the path to a calling list file
+get_filename_component(_doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
+
+#list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/externals/json-cmake")
+
+# "New" IN_LIST syntax
+cmake_policy(SET CMP0057 NEW)
+
+include(${_doxypress_dir}/AddDocs.cmake)
+include(${_doxypress_dir}/JSONParser.cmake)

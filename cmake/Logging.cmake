@@ -78,3 +78,13 @@ function(_doxypress_action _property _action _value)
     endif ()
     _doxypress_log(DEBUG "[${_action}] ${_property} -> ${_value}")
 endfunction()
+
+macro(_doxypress_assert_not_empty _string)
+    if (_string STREQUAL "")
+        _doxypress_assert_fail("Expected non-empty variable.")
+    endif()
+endmacro()
+
+function(_doxypress_assert_fail _message)
+    message(FATAL_ERROR "${_message}")
+endfunction()

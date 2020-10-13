@@ -31,14 +31,13 @@ macro(_doxypress_project_update input_project_file_name _out_var)
     _doxypress_project_load(${input_project_file_name})
 
     TPA_get("${_DOXYPRESS_JSON_PATHS_KEY}" _updatable_paths)
-    TPA_get("${_DOXYPRESS_PROJECT_KEY}" _project)
 
     foreach (_path ${_updatable_paths})
         _doxypress_update_path(${_path})
     endforeach()
 
     # create name for the processed project file
-    _doxypress_generate_output_project_file_name(
+    _doxypress_output_project_file_name(
             ${input_project_file_name}
             _output_project_file_name)
 
@@ -61,11 +60,11 @@ endmacro()
 #
 # Parameters:
 #
-# * ``_file_name`` a project file to load
+# * ``_project_file_name`` a project file to load
 ##############################################################################
-function(_doxypress_project_load _file_name)
-    _doxypress_log(INFO "Loading project template ${_file_name}...")
-    file(READ "${_file_name}" _contents)
+function(_doxypress_project_load _project_file_name)
+    _doxypress_log(INFO "Loading project template ${_project_file_name}...")
+    file(READ "${_project_file_name}" _contents)
     sbeParseJson(doxypress _contents)
     foreach (_property ${doxypress})
         TPA_set(${_property} "${${_property}}")
@@ -92,12 +91,13 @@ endfunction()
 #
 # * ``_file_name`` output file name
 ##############################################################################
-function(_doxypress_project_save _file_name)
+function(_doxypress_project_save _project_file_name)
+    _doxypress_assert_not_empty("${_project_file_name}")
     TPA_get(${_DOXYPRESS_PROJECT_KEY} _variables)
 
     _JSON_serialize("${_variables}" _json)
-    _doxypress_log(INFO "Saving processed project file ${_file_name}...")
-    file(WRITE "${_file_name}" ${_json})
+    _doxypress_log(INFO "Saving project file ${_project_file_name}...")
+    file(WRITE "${_project_file_name}" ${_json})
 endfunction()
 
 ##############################################################################
@@ -200,11 +200,11 @@ endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: _doxypress_generate_output_project_file_name
+# .. cmake:command:: _doxypress_output_project_file_name
 #
 # ..  code-block:: cmake
 #
-#   _doxypress_generate_output_project_file_name(<input project file name>
+#   _doxypress_output_project_file_name(<input project file name>
 #                                                <output variable>)
 #
 # Returns an absolute name of the output project file. Changes the input
@@ -212,10 +212,11 @@ endfunction()
 #
 # Parameters:
 #
-# - ``_project_file`` input project file
-# - ``_out_var`` output project file
+# - ``_project_file_name`` input project file name
+# - ``_out_var`` output project file name
 ##############################################################################
-function(_doxypress_generate_output_project_file_name _project_file _out_var)
-    get_filename_component(_name "${_project_file}" NAME)
+function(_doxypress_output_project_file_name _project_file_name _out_var)
+    _doxypress_assert_not_empty("${_project_file_name}")
+    get_filename_component(_name "${_project_file_name}" NAME)
     set(${_out_var} ${CMAKE_CURRENT_BINARY_DIR}/${_name} PARENT_SCOPE)
 endfunction()

@@ -249,8 +249,6 @@ endfunction()
 function(_doxypress_set_have_dot _out_var)
     if (TARGET Doxypress::dot)
         set(${_out_var} true PARENT_SCOPE)
-        # todo
-        #set(DOXYGEN_DOT_MULTI_TARGETS true)
         _doxypress_action("dot.have-dot" "setter" true)
     else ()
         set(${_out_var} false PARENT_SCOPE)
