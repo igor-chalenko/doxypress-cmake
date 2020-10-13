@@ -1,4 +1,4 @@
-set(doxypress_dir ${PROJECT_SOURCE_DIR}/cmake)
+set(_doxypress_dir ${PROJECT_SOURCE_DIR}/cmake)
 include(../cmake/AddDocs.cmake)
 
 # _doxypress_project_load(DoxypressTest1.json)

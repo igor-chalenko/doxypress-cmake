@@ -1,6 +1,4 @@
 function(test_input_flags_1)
-    include(../cmake/FindDoxypressCMake.cmake)
-
     _doxypress_params_init()
     _doxypress_inputs_parse(GENERATE_XML GENERATE_LATEX GENERATE_HTML false)
 
@@ -15,8 +13,6 @@ function(test_input_flags_1)
 endfunction()
 
 function(test_input_flags_2)
-    include(../cmake/FindDoxypressCMake.cmake)
-
     _doxypress_params_init()
     _doxypress_inputs_parse(GENERATE_LATEX)
     _doxypress_project_update(../cmake/DoxypressCMake.json _out)

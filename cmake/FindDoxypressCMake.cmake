@@ -303,4 +303,14 @@ else ()
     set(DOXYPRESS_FOUND "NO")
 endif ()
 
-include(${doxypress_dir}/AddDocs.cmake)
+# We must run the following at "include" time, not at function call time,
+# to find the path to this module rather than the path to a calling list file
+get_filename_component(_doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
+
+#list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/externals/json-cmake")
+
+# "New" IN_LIST syntax
+cmake_policy(SET CMP0057 NEW)
+
+include(${_doxypress_dir}/AddDocs.cmake)
+include(${_doxypress_dir}/JSONParser.cmake)

@@ -5,8 +5,6 @@
 # https://opensource.org/licenses/MIT
 ##############################################################################
 
-include(JSONParser)
-
 ##############################################################################
 #.rst:
 #
@@ -44,9 +42,6 @@ include(JSONParser)
 # Parsed JSON document is stored in the current :ref:`TPA scope` under the key
 # ``_DOXYPRESS_PROJECT_KEY``.
 ##############################################################################
-
-# "New" IN_LIST syntax
-cmake_policy(SET CMP0057 NEW)
 
 ##############################################################################
 #.rst:

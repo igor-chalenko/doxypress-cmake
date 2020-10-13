@@ -14,15 +14,13 @@
 # ``FindDoxypressCMake.cmake``.
 ##############################################################################
 
-# We must run the following at "include" time, not at function call time,
-# to find the path to this module rather than the path to a calling list file
-get_filename_component(doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
-
-include(${doxypress_dir}/Logging.cmake)
-include(${doxypress_dir}/TPA.cmake)
-include(${doxypress_dir}/CMakeTargetGenerator.cmake)
-include(${doxypress_dir}/ProjectFileGenerator.cmake)
-include(${doxypress_dir}/ProjectFunctions.cmake)
+include(${_doxypress_dir}/Logging.cmake)
+include(${_doxypress_dir}/TPA.cmake)
+include(${_doxypress_dir}/JSONFunctions.cmake)
+include(${_doxypress_dir}/CMakeTargetGenerator.cmake)
+include(${_doxypress_dir}/ProjectFileGenerator.cmake)
+include(${_doxypress_dir}/ProjectFunctions.cmake)
+include(${_doxypress_dir}/PropertyHandlers.cmake)
 
 ##############################################################################
 # TPA usage protocol
@@ -37,11 +35,6 @@ set(_DOXYPRESS_INPUTS_KEY "cmake.inputs")
 
 # used throughout the code
 set(_DOXYPRESS_INPUT_SOURCE "input.input-source")
-
-include(${doxypress_dir}/Logging.cmake)
-include(${doxypress_dir}/TPA.cmake)
-include(${doxypress_dir}/JSONFunctions.cmake)
-include(${doxypress_dir}/PropertyHandlers.cmake)
 
 ##############################################################################
 #.rst:
@@ -321,7 +314,7 @@ function(_doxypress_params_init_inputs)
     _doxypress_input_string(
             PROJECT_FILE
             UPDATER "update_project_file"
-            DEFAULT "${doxypress_dir}/DoxypressCMake.json"
+            DEFAULT "${_doxypress_dir}/DoxypressCMake.json"
     )
     _doxypress_input_string(INPUT_TARGET SETTER "set_input_target")
     _doxypress_input_string(TARGET_NAME SETTER "set_target_name")
