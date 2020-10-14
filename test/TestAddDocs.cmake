@@ -1,5 +1,5 @@
 function(test_input_directories_full_3)
-    doxypress_override_add("output-latex.generate-latex" false)
+    doxypress_add_override("output-latex.generate-latex" false)
     set(LATEX_FOUND true)
     doxypress_add_docs(
             INPUT_TARGET main

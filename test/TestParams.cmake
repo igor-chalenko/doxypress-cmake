@@ -60,7 +60,7 @@ function(test_input_directories_3)
 
     TPA_get(INPUTS _inputs)
     assert_same("${_inputs}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/include4;${CMAKE_CURRENT_SOURCE_DIR}/include5")
+            "${CMAKE_CURRENT_SOURCE_DIR}/include;${CMAKE_CURRENT_SOURCE_DIR}/include5")
     TPA_clear_scope()
 endfunction()
 
@@ -105,9 +105,9 @@ function(test_custom_project_file_2)
 endfunction()
 
 function(test_input_directories_full_1)
-    doxypress_override_add("messages.warnings" false)
-    doxypress_override_add("messages.quiet" false)
-    doxypress_override_add("configuration.toc-include-headers" 2)
+    doxypress_add_override("messages.warnings" false)
+    doxypress_add_override("messages.quiet" false)
+    doxypress_add_override("configuration.toc-include-headers" 2)
 
     _doxypress_params_init()
     _doxypress_inputs_parse(INPUTS dir1 dir2)
@@ -129,7 +129,7 @@ function(test_input_directories_full_1)
 endfunction()
 
 function(test_input_directories_full_2)
-    doxypress_override_add("messages.warnings" false)
+    doxypress_add_override("messages.warnings" false)
 
     _doxypress_params_init()
     _doxypress_inputs_parse(INPUT_TARGET main)
@@ -139,7 +139,7 @@ function(test_input_directories_full_2)
 
     _doxypress_get("${_DOXYPRESS_INPUT_SOURCE}" _inputs)
     assert_same("${_inputs}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/include4;${CMAKE_CURRENT_SOURCE_DIR}/include5")
+            "${CMAKE_CURRENT_SOURCE_DIR}/include;${CMAKE_CURRENT_SOURCE_DIR}/include5")
     _doxypress_get("messages.warnings" _warnings)
     assert_same(${_warnings} false)
     TPA_clear_scope()
@@ -154,7 +154,7 @@ function(test_latex_find_package)
 
     TPA_get(LATEX_FOUND _latex_found)
     if (_latex_found STREQUAL "")
-        assert_same("LATEX_FOUND not set" "")
+        _doxypress_assert_fail("LATEX_FOUND not set")
     endif()
     TPA_clear_scope()
 endfunction()

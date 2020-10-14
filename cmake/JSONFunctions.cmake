@@ -45,19 +45,21 @@
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: _JSON_get(_path _out_var)
+# .. cmake:command:: _JSON_get
+#
+# .. code-block:: cmake
+#
+#    _JSON_get(_path _out_var)
 #
 # Given a JSON path ``_path``, returns a value located at that path in
-# the currently loaded project file. If the input property is a JSON leaf,
-# the value of ``_path`` is formatted and written into ``_out_var``. If it is
-# a JSON array, nested properties of that array are collected into a list, and
-# that list is written into ``_out_var``. Only one nested level is collected;
-# if a property in the array is itself an array, result is undefined.
+# the currently loaded project file:
 #
-# Parameters:
-#
-# - ``_path`` a JSON path (a variable created by `sbeParseJson`)
-# - ``_out_var`` the value of `_path`
+# * If the input property is a JSON leaf, the value of ``_path``  is simply
+#   written into ``_out_var``;
+# * If it is a JSON array, nested properties of that array are collected into
+#   a list, and that list is written into ``_out_var``. Only one nested level
+#   is collected; if a property in the array is itself an array, the result is
+#   undefined.
 ##############################################################################
 function(_JSON_get _path _out_var)
     _doxypress_assert_not_empty("${_path}")
@@ -80,20 +82,20 @@ endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: _JSON_set(_path _new_value)
+# .. cmake:command:: _JSON_set
 #
-# Updates a :ref:`property<property-reference-label>` identified by a given
-# JSON path. JSON source is taken from the current :ref:`TPA scope`. If
-# the path ``_path`` is a JSON leaf, the value of ``_path`` is simply set to
-# ``_new_value``. If it is a JSON array, nested properties of that array are
-# removed, ``_new_value`` is treated as a list that is then decomposed into
-# individual values inside ``_path``.
+# .. code-block:: cmake
 #
-# Parameters:
+#    _JSON_set(_path _new_value)
 #
-# * ``_path`` a JSON path (a variable created by `sbeParseJson`)
-# * ``_new_value`` a new value of ``_path`` in the currently loaded JSON
+# Updates a :ref:`property<property-reference-label>` identified by the JSON
+# path ``_path``. JSON source is taken from the current :ref:`TPA scope`.
 #
+# * If the path ``_path`` is a JSON leaf, the value of ``_path`` is simply
+#   set to ``_new_value``;
+# * If it is a JSON array, nested properties of that array are removed,
+#   ``_new_value`` is treated as a list that is then decomposed into
+#   individual array values inside ``_path``.
 ##############################################################################
 function(_JSON_set _path _new_value)
     _doxypress_assert_not_empty("${_path}")
@@ -113,7 +115,6 @@ function(_JSON_set _path _new_value)
         math(EXPR _ind "${_ind}+1")
         while (_i LESS ${_length})
             list(GET _new_value ${_i} _next_value)
-            # _JSON_format("${_next_value}" _next_value)
             _doxypress_log(DEBUG "set ${_path}_${_i} to ${_next_value}...")
             TPA_set(${_path}_${_i} ${_next_value})
             list(APPEND _index_value ${_i})
@@ -131,17 +132,16 @@ endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: _JSON_serialize(_variables _out_json)
+# .. cmake:command:: _JSON_serialize
 #
-# Forms a JSON string from a flat list of variables, previously
-# created by ``sbeParseJson``. Handles format of `DoxyPress` configuration
-# files, not arbitrary JSON.
+# .. code-block:: cmake
 #
-# Parameters:
+#    _JSON_serialize(_variables _out_json)
 #
-# * ``_variables`` a list of variables that that was obtained by invoking
-#   ``sbeParseJson``
-# * ``_out_json``  output JSON string
+# Forms a JSON document from a flat list of variables in ``_variables``,
+# previously created by ``sbeParseJson``. Handles format of `DoxyPress`
+# project files, not arbitrary JSON. The resulting JSON is written into
+# the variable, designated by ``_out_json`` in the parent scope.
 ##############################################################################
 function(_JSON_serialize _variables _out_json)
     set(_json "{\n")
@@ -230,20 +230,20 @@ endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: _JSON_format(_value _out_var)
+# .. cmake:command:: _JSON_format
 #
-# Converts a given CMake variable into a properly formatted JSON value:
+# .. code-block:: cmake
+#
+#    _JSON_format(_value _out_var)
+#
+# Converts a given variable ``_value`` into a properly formatted JSON value:
+#
 # * booleans are converted to `true` or `false`;
 # * numbers are written "as-is";
 # * strings are written with quotes around them, if not quoted already, or
-# "as-is" otherwise.
+#   "as-is" otherwise.
 #
-# Converted value is written into the output variable ``_out_var``.
-#
-# Parameters:
-#
-# * ``_value`` input value
-# * ``_out_var`` JSON-formatted input value
+# The converted value is written into the output variable ``_out_var``.
 ##############################################################################
 function(_JSON_format _value _out_var)
     set(_true_values true TRUE ON on)
@@ -271,14 +271,15 @@ endfunction()
 #.rst:
 # .. cmake:command:: _JSON_array_length
 #
+# .. code-block:: cmake
+#
+#    _JSON_array_length(_path _out_var)
+#
+# There are two possibilities:
+#
 #  * If the JSON path ``_path`` in the currently loaded JSON contains a
-#    node, returns the number of leaves under that node.
-#  * If it contains a leaf, return ``-1``.
-#
-# Parameters:
-#
-# * ``_path`` input JSON path
-# * ``_out_var`` array length of ``_path`` node, or ``-1``
+#    node, puts the number of leaves under that node into ``_out_var``.
+#  * If it contains a leaf, puts ``-1`` into ``_out_var``.
 ##############################################################################
 function(_JSON_array_length _path _out_var)
     _doxypress_assert_not_empty("${_path}")

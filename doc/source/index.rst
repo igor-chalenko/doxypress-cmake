@@ -13,7 +13,7 @@ generation via Doxypress_.
    intro
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Public API
 
    FindDoxypress

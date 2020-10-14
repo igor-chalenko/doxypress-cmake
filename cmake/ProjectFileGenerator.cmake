@@ -13,7 +13,7 @@
 # sources into a project file that will be used by `DoxyPress` as input.
 # These sources include:
 #
-# * Inputs of :cmake:command:`doxypress_add_docs`
+# * Inputs of :ref:`doxypress_add_docs`
 #
 #   These fall into two categories. The first one is the input parameters that
 #   are not bound to any JSON paths. They are defined dynamically using
@@ -30,11 +30,9 @@
 #   possible to bind some processing
 #   :cmake:command:`_doxypress_property_add` to that JSON path.
 #
-# .. _overrides-reference-label:
-#
 # * Overrides
 #
-#   These are defined via :cmake:command:`doxypress_override_add`. If an
+#   These are defined via :cmake:command:`doxypress_add_override`. If an
 #   override is defined for a certain property, that property in the final
 #   project file will have the value of that override, with one exception.
 #   It's not possible to have an override for a property that also has
@@ -55,12 +53,12 @@ unset(IN_OVERWRITE)
 #
 #  ..  code-block:: cmake
 #
-#    _doxypress_input_option(<property>
+#    _doxypress_input_option(_name
 #                 [SETTER <function name>]
 #                 [UPDATER <function name>]
 #                 [DEFAULT <value>])
 #
-# Attaches read/write logic to a given input option. Declarations made
+# Attaches read/write logic to a given input option ``_name``. Declarations made
 # using this function are interpreted later by
 # :cmake:command:`_doxypress_inputs_parse`. The following arguments are
 # recognized:
@@ -112,12 +110,12 @@ endfunction()
 #
 #  ..  code-block:: cmake
 #
-#    _doxypress_input_string(<property>
+#    _doxypress_input_string(_name
 #                 [SETTER <function name>]
 #                 [UPDATER <function name>]
 #                 [DEFAULT <value>])
 #
-# Attaches read/write logic to a given input single-value parameter.
+# Attaches read/write logic to a given input single-value parameter ``_name``.
 # Declarations made using this function are interpreted later by
 # ``_doxypress_inputs_parse``. The following arguments are recognized:
 # * ``DEFAULT``
@@ -166,14 +164,16 @@ endfunction()
 #
 #  ..  code-block:: cmake
 #
-#    _doxypress_input_list(<property>
+#    _doxypress_input_list(_name
 #                 [SETTER <function name>]
 #                 [UPDATER <function name>]
 #                 [DEFAULT <value>])
 #
-# Attaches read/write logic to a given input multi-value parameter. Declarations
-# made using this function are interpreted later by ``_doxypress_inputs_parse``.
-# The following arguments are recognized:
+# Attaches read/write logic to a given input multi-value parameter ``_name``.
+# Declarations made using this function are interpreted later by
+# :cmake:command:``_doxypress_inputs_parse``. The following arguments are
+# recognized:
+#
 # * ``DEFAULT``
 #
 #   If the input multi-value parameter was not set in either ``ARGN``, setter,
@@ -219,6 +219,10 @@ endfunction()
 #.rst:
 # .. cmake:command:: _doxypress_inputs_parse
 #
+#  ..  code-block:: cmake
+#
+#    _doxypress_inputs_parse()
+#
 # Parses the input arguments previously defined by
 # :cmake:command:`_doxypress_input_string`,
 # :cmake:command:`_doxypress_input_option`, and
@@ -238,13 +242,13 @@ function(_doxypress_inputs_parse)
             "${ARGN}")
 
     foreach (_option ${_option_args})
-        _doxypress_inputs_update(${_option} "${DOXYPRESS_${_option}}")
+        _doxypress_update_input_parameter(${_option} "${DOXYPRESS_${_option}}")
     endforeach ()
     foreach (_arg ${_one_value_args})
-        _doxypress_inputs_update(${_arg} "${DOXYPRESS_${_arg}}")
+        _doxypress_update_input_parameter(${_arg} "${DOXYPRESS_${_arg}}")
     endforeach ()
     foreach (_list ${_multi_value_args})
-        _doxypress_inputs_update(${_list} "${DOXYPRESS_${_list}}")
+        _doxypress_update_input_parameter(${_list} "${DOXYPRESS_${_list}}")
     endforeach ()
 
     # save explicitly given input arguments so that we can correctly handle
@@ -264,20 +268,19 @@ endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: _doxypress_inputs_update(_name _value)
+# .. cmake:command:: _doxypress_update_input_parameter
 #
-# Updates value of an input parameter (not referenced by the project file),
-# based on the logic defined by previous calls to the functions
-# :cmake:command:`_doxypress_input_string`,
+#  ..  code-block:: cmake
+#
+#    _doxypress_update_input_parameter(_name _value)
+#
+# Updates value of an input parameter ``_name`` based on the logic defined
+# by previous calls to the functions :cmake:command:`_doxypress_input_string`,
 # :cmake:command:`_doxypress_input_option`, and
-# :cmake:command:`_doxypress_input_list`.
-#
-# Parameters:
-#
-# * ``_name``  parameter's name
-# * ``_value`` parameter's value after applying setter, updater, and defaults
+# :cmake:command:`_doxypress_input_list`. ``_value`` is the initial value of
+# this parameter, given to :ref:`doxypress_add_docs`.
 ##############################################################################
-function(_doxypress_inputs_update _name _value)
+function(_doxypress_update_input_parameter _name _value)
     TPA_get("${_name}_UPDATER" _updater)
     TPA_get("${_name}_SETTER" _setter)
     TPA_get("${_name}_DEFAULT" _default)
@@ -330,9 +333,9 @@ endfunction()
 #                 [USE_PRODUCT_NAME]
 #                 [OVERWRITE])
 #
-# Attaches read/write logic to a given JSON path. Declarations made
-# using this function are interpreted later by ``_doxypress_parse``.
-# The following arguments are recognized:
+# Attaches read/write logic to a given property identified by its JSON path
+# ``_path``. Declarations made using this function are interpreted later by
+# :cmake:command:`_doxypress_parse`. The following arguments are recognized:
 #
 # * ``INPUT_OPTION``, ``INPUT_STRING``, ``INPUT_LIST``
 #
@@ -371,7 +374,7 @@ endfunction()
 #    the same property. In this case, property's handlers will be merged by
 #    adding the new ones and keeping the existing ones.
 ##############################################################################
-function(_doxypress_property_add _property)
+function(_doxypress_property_add _path)
     TPA_get(${_DOXYPRESS_JSON_PATHS_KEY} _properties)
     TPA_index(_index)
 
@@ -384,31 +387,31 @@ function(_doxypress_property_add _property)
 
     if (DEFINED IN_INPUT_STRING)
         TPA_append(one_value_args ${IN_INPUT_STRING})
-        TPA_set(${_property}_INPUT ${IN_INPUT_STRING})
+        TPA_set(${_path}_INPUT ${IN_INPUT_STRING})
     endif ()
     if (DEFINED IN_INPUT_OPTION)
         TPA_append(option_args ${IN_INPUT_OPTION})
-        TPA_set(${_property}_INPUT ${IN_INPUT_OPTION})
+        TPA_set(${_path}_INPUT ${IN_INPUT_OPTION})
     endif ()
     if (DEFINED IN_INPUT_LIST)
         TPA_append(multi_value_args ${IN_INPUT_LIST})
-        TPA_set(${_property}_INPUT "${IN_INPUT_LIST}")
+        TPA_set(${_path}_INPUT "${IN_INPUT_LIST}")
     endif ()
-    if (DEFINED IN_DEFAULT AND NOT ${_property}_DEFAULT IN_LIST _index)
-        TPA_set(${_property}_DEFAULT ${IN_DEFAULT})
+    if (DEFINED IN_DEFAULT AND NOT ${_path}_DEFAULT IN_LIST _index)
+        TPA_set(${_path}_DEFAULT ${IN_DEFAULT})
     endif ()
     if (DEFINED IN_SETTER)
-        TPA_set(${_property}_SETTER ${IN_SETTER})
+        TPA_set(${_path}_SETTER ${IN_SETTER})
     endif ()
     if (DEFINED IN_UPDATER)
-        TPA_set(${_property}_UPDATER ${IN_UPDATER})
+        TPA_set(${_path}_UPDATER ${IN_UPDATER})
     endif ()
-    TPA_get(${_property}_OVERWRITE _prev_overwrite)
+    TPA_get(${_path}_OVERWRITE _prev_overwrite)
     if (_prev_overwrite STREQUAL "")
-        TPA_set(${_property}_OVERWRITE ${IN_OVERWRITE})
+        TPA_set(${_path}_OVERWRITE ${IN_OVERWRITE})
     endif ()
 
-    TPA_append(${_DOXYPRESS_JSON_PATHS_KEY} "${_property}")
+    TPA_append(${_DOXYPRESS_JSON_PATHS_KEY} "${_path}")
 endfunction()
 
 ##############################################################################
@@ -418,39 +421,40 @@ endfunction()
 #
 # .. code-block::
 #
-#   _doxypress_update_path(<JSON path>)
+#   _doxypress_update_path(_path)
 #
-# Applies update logic to a given property. The property is updated in the
-# loaded JSON document and in the stored input parameter, if one is defined
-# for this property. See :ref:`algorithm<Algorithm>` for a detailed description
-# of actions taken by the function.
+# Applies update logic to a given property identified by its JSON path
+# ``_path``. The property is updated in the loaded JSON document; if an input
+# parameter is bound to this path, the corresponding input argument is updated
+# as well. See :ref:`algorithm<algorithm-reference-label>` for a detailed
+# description of actions taken by the function.
 ##############################################################################
-function(_doxypress_update_path _property)
-    TPA_get(${_property}_INPUT _input_param)
-    TPA_get(${_property}_SETTER _setter)
-    TPA_get(${_property}_UPDATER _updater)
-    TPA_get(${_property}_DEFAULT _default)
+function(_doxypress_update_path _path)
+    TPA_get(${_path}_INPUT _input_param)
+    TPA_get(${_path}_SETTER _setter)
+    TPA_get(${_path}_UPDATER _updater)
+    TPA_get(${_path}_DEFAULT _default)
 
     _doxypress_property_read_input("${_input_param}" _input_value)
-    _doxypress_property_read_json(${_property} _json_value)
+    _doxypress_property_read_json(${_path} _json_value)
 
     set(_value "")
-    _doxypress_property_apply_setter(${_property} "${_setter}" _value)
-    _doxypress_property_merge(${_property}
+    _doxypress_property_apply_setter(${_path} "${_setter}" _value)
+    _doxypress_property_merge(${_path}
             "${_json_value}" "${_input_value}" _value)
 
-    _doxypress_property_apply_updater(${_property}
+    _doxypress_property_apply_updater(${_path}
             "${_updater}"
             "${_value}"
             _value)
-    _doxypress_property_apply_default(${_property}
+    _doxypress_property_apply_default(${_path}
             "${_default}"
             "${_value}"
             "${_input_value}"
             _value)
 
-    _doxypress_set(${_property} "${_value}")
-    _doxypress_log(DEBUG "${_property} = ${_value}")
+    _doxypress_set(${_path} "${_value}")
+    #_doxypress_log(DEBUG "${_path} = ${_value}")
     if (_input_param)
         TPA_set(${_input_param} "${_value}")
     endif ()
@@ -463,33 +467,30 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_property_merge(<JSON path>
-#                            <value>
-#                            <input argument>
-#                            <output variable>)
+#   _doxypress_property_merge(_path _json_value _input_value _out_var)
 #
 # Helper function that handles `merge` part of the property update
 # logic.
 #
 # Parameters:
 #
-# * ``_property`` a property to update, specified by its JSON path
+# * ``_path`` a property to update, specified by its JSON path
 # * ``_value`` the property's current value, read from JSON; could be empty
 # * ``_input_value`` the value of ``_property`` from a corresponding input
 #   parameter
 # * ``_out_var`` the output variable
 ##############################################################################
-function(_doxypress_property_merge _property _json_value _input_value _out_var)
+function(_doxypress_property_merge _path _json_value _input_value _out_var)
     # if it's an array and input was non-empty, merge the two
     #TPA_get(doxypress.${_property} _json_value_raw)
     #TPA_get("doxypress.${_property}_0" _array_first_element)
-    _JSON_array_length(doxypress.${_property} _array_length)
+    _JSON_array_length(doxypress.${_path} _array_length)
     if (NOT _input_value STREQUAL "" AND ${_array_length} GREATER -1)
         foreach (_val ${_input_value})
             list(APPEND _json_value "${_val}")
         endforeach ()
         if (_json_value AND _input_value)
-            _doxypress_action(${_property} merge "${_json_value}")
+            _doxypress_action(${_path} merge "${_json_value}")
         endif ()
     else ()
         if (NOT _input_value STREQUAL "")
@@ -499,21 +500,55 @@ function(_doxypress_property_merge _property _json_value _input_value _out_var)
     set(${_out_var} "${_json_value}" PARENT_SCOPE)
 endfunction()
 
-function(_doxypress_property_apply_setter _property _name _out_var)
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_property_apply_setter
+#
+# .. code-block:: cmake
+#
+#   _doxypress_property_apply_setter(_path _name _out_var)
+#
+# Helper function that applies setter to a property identified by ``_path``.
+#
+# Parameters:
+#
+# * ``_path`` a property to update, identified by its JSON path
+# * ``_name`` the name of a setter function to call
+# * ``_out_var`` the output variable
+##############################################################################
+function(_doxypress_property_apply_setter _path _name _out_var)
     if (_name)
-        TPA_get(${_property}_OVERWRITE _overwrite)
+        TPA_get(${_path}_OVERWRITE _overwrite)
         if (_json_value STREQUAL "" AND _input_value STREQUAL "" OR _overwrite)
             # call setter
             _doxypress_log(DEBUG "call setter ${_name}")
             _doxypress_call(_doxypress_${_name} _new_value)
             if (NOT _new_value STREQUAL "")
-                _doxypress_action(${_property} setter "${_new_value}")
+                _doxypress_action(${_path} setter "${_new_value}")
             endif ()
             set(${_out_var} ${_new_value} PARENT_SCOPE)
         endif ()
     endif ()
 endfunction()
 
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_property_apply_updater
+#
+# .. code-block:: cmake
+#
+#   _doxypress_property_apply_updater(_path _name _out_var)
+#
+# Helper function that applies updater to a property identified by ``_path``.
+#
+# Parameters:
+#
+# * ``_path`` a property to update, identified by its JSON path
+# * ``_name`` the name of an updater function to call
+# * ``_out_var`` the output variable
+##############################################################################
 function(_doxypress_property_apply_updater _property _name _value _out_var)
     if (_name)
         # call updater
@@ -533,10 +568,11 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_property_apply_default(<property>
-#                                     <default value>
-#                                     <current value>
-#                                     <output variable>)
+#   _doxypress_property_apply_default(_property
+#                                     _default
+#                                     _value
+#                                     _input_value
+#                                     _out_var)
 #
 # Sets output variable to the value of ``_default``, if ``_value`` is empty.
 # Does nothing otherwise.
@@ -545,8 +581,9 @@ endfunction()
 #
 # * ``_property`` an input property
 # * ``_default`` a value to set
-# * ``_value`` an input property
-# * ``_out_var`` the value of ``_property``
+# * ``_value`` the current value of the property ``_property``
+# * ``_input_value`` an input value of the corresponding input parameter
+# * ``_out_var`` the output variable
 ##############################################################################
 function(_doxypress_property_apply_default _property
         _default _value _input_value _out_var)
@@ -569,16 +606,11 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_property_read_input(<property> <argument name> <output variable>)
+#   _doxypress_property_read_input(_input_arg_name _out_var)
 #
 # Finds the input argument ``_input_arg_name`` in the current TPA scope,
 # converts `CMake`'s boolean values to ``true``/``false`` format, and writes
-# the result into the output variable.
-#
-# Parameters:
-#
-# * ``_input_arg_name`` an input parameter to read
-# * ``_out_var`` the output variable
+# the result into the output variable ``_out_var``.
 ##############################################################################
 function(_doxypress_property_read_input _input_arg_name _out_var)
     if (_input_arg_name)
@@ -592,7 +624,7 @@ function(_doxypress_property_read_input _input_arg_name _out_var)
                 set(_input_value false)
             endif ()
 
-            _doxypress_action(${_property} input "${_input_value}")
+            _doxypress_action(${_path} input "${_input_value}")
             set(${_out_var} "${_input_value}" PARENT_SCOPE)
         endif ()
     endif ()
@@ -605,7 +637,7 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_property_read_json(<property> <output variable>)
+#   _doxypress_property_read_json(_property _out_var)
 #
 # Returns the value of ``_property`` in the currently loaded JSON document.
 #
