@@ -14,9 +14,9 @@ function(assert_list_contains list1 el)
     endif ()
 endfunction()
 
-add_executable(main main.cc)
+add_executable(main src/main.cc)
 set_target_properties(main PROPERTIES EXCLUDE_FROM_ALL 1)
-target_include_directories(main PUBLIC include4 include5)
+target_include_directories(main PUBLIC include include5)
 
 if (NOT DEFINED DOXYPRESS_SKIP_TEST OR NOT DOXYPRESS_SKIP_TEST)
     message(STATUS "Running tests...")

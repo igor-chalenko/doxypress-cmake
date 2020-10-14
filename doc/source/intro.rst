@@ -4,7 +4,7 @@ What is it
 
 This is a CMake package that makes it easy to set up API documentation
 generation via Doxypress_. At the bare minimum, all one needs to do is
-to import this package and then call `doxypress_add_docs`:
+to import this package and then call :cmake:command:`doxypress_add_docs`:
 
 .. code-block:: cmake
 
@@ -86,4 +86,4 @@ Usage
         OUTPUT_DIRECTORY)
   endif()
 
-Refer to the :ref:`Public functions and variables` section for details.
+Refer to the :ref:`doxypress_add_docs` section for details.

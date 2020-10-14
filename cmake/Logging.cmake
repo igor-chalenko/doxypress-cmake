@@ -30,12 +30,12 @@ list(APPEND _doxypress_log_levels WARN)
 #
 # .. code-block:: cmake
 #
-#    _doxypress_log(<level> <message>)
+#    _doxypress_log(_level _message)
 #
 # Prints a given message if the corresponding log level is on (set by
 # :cmake:variable:`DOXYPRESS_LOG_LEVEL`). Does nothing otherwise.
 ##############################################################################
-function(_doxypress_log _level _text)
+function(_doxypress_log _level _message)
     list(FIND _doxypress_log_levels ${_level} _ind)
     if (_ind EQUAL -1)
         set(_ind 2)
@@ -46,9 +46,9 @@ function(_doxypress_log _level _text)
     endif()
     if (${_ind} GREATER_EQUAL ${_ind2})
         if (${_level} STREQUAL WARN AND DOXYPRESS_PROMOTE_WARNINGS)
-            message(WARNING "${_text}")
+            message(WARNING "${_message}")
         else()
-            message(STATUS "[${_level}] ${_text}")
+            message(STATUS "[${_level}] ${_message}")
         endif()
     endif ()
 endfunction()
@@ -56,13 +56,20 @@ endfunction()
 ##############################################################################
 #.rst:
 #
-# .. cmake:command:: _doxypress_action(<property> <action> <value>)
+# .. cmake:command:: _doxypress_action
 #
-# Adds a record into the action log of a given property. Action log is helpful
-# during debugging phase: it stores all updates to a given property in
-# historical order. If a property has an incorrect value after processing,
-# that property's log could be consulted to quickly find approximate location
-# of an error.
+# .. code-block:: cmake
+#
+#    _doxypress_action(_property _action _value>)
+#
+# Adds a record into the action log of a property ``_property``. ``action``
+# describes what happened to the property, and ``_value`` contains a new
+# value of it.
+#
+# Action log is helpful during debugging phase: it stores all updates to a given
+# property in historical order. If a property has an incorrect value after
+# processing, that property's log could be consulted to quickly find approximate
+# location of an error.
 ##############################################################################
 function(_doxypress_action _property _action _value)
     set(_message "")
@@ -79,12 +86,33 @@ function(_doxypress_action _property _action _value)
     _doxypress_log(DEBUG "[${_action}] ${_property} -> ${_value}")
 endfunction()
 
-macro(_doxypress_assert_not_empty _string)
-    if (_string STREQUAL "")
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_assert_not_empty
+#
+# .. code-block:: cmake
+#
+#    _doxypress_assert_not_empty(_value)
+#
+# If the value given by ``_value`` is empty, fails with a fatal error.
+# Does nothing otherwise.
+macro(_doxypress_assert_not_empty _value)
+    if ("${_value}" STREQUAL "")
         _doxypress_assert_fail("Expected non-empty variable.")
     endif()
 endmacro()
 
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_assert_fail
+#
+# .. code-block:: cmake
+#
+#    # equivalent to message(FATAL_ERROR "${_message}")
+#    _doxypress_assert_fail(_message)
+#
 function(_doxypress_assert_fail _message)
     message(FATAL_ERROR "${_message}")
 endfunction()

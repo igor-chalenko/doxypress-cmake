@@ -17,15 +17,19 @@
 #   and targets.
 #
 # These functions are never called directly; they are configured to participate
-# in the property transformation process. todo link here
+# in the property :ref:`transformation<Project file generator>` process.
 ##############################################################################
 
 ##############################################################################
 #.rst:
 # .. cmake:command:: _doxypress_set_dia_path
 #
-# Sets the ``dot.dia-path`` configuration property. Uses results of the
-# ``find_package(Doxypress)`` call.
+# ..  code-block:: cmake
+#
+#    _doxypress_set_dia_path(_out_var)
+#
+# Sets the ``dot.dia-path`` configuration property. Puts the result into
+# ``_out_var``.
 ##############################################################################
 function(_doxypress_set_dia_path _out_var)
     if (TARGET Doxypress::dia)
@@ -38,8 +42,13 @@ endfunction()
 #.rst:
 # .. cmake:command:: _doxypress_set_latex_cmd_name
 #
+# ..  code-block:: cmake
+#
+#    _doxypress_set_latex_cmd_name(_out_var)
+#
 # Sets the property ``output-latex.latex-cmd-name`` to the value of
 # ``PDFLATEX_COMPILER``, previously configured by ``find_package(LATEX)``.
+# Puts the result into ``_out_var``.
 ##############################################################################
 function(_doxypress_set_latex_cmd_name _out_var)
     if (NOT "${PDFLATEX_COMPILER}" STREQUAL PDFLATEX_COMPILER-NOTFOUND)
@@ -57,12 +66,13 @@ endfunction()
 #.rst:
 # .. cmake:command:: _doxypress_set_makeindex_cmd_name
 #
-# .. code-block:: cmake
+# ..  code-block:: cmake
 #
-#   _doxypress_set_makeindex_cmd_name(<output variable>)
+#    _doxypress_set_makeindex_cmd_name(_out_var)
 #
-## @brief Sets ``output-latex.makeindex-cmd-name`` to the value of
-## `MAKEINDEX_COMPILER` set by `find_package(LATEX)`.
+# Sets ``output-latex.makeindex-cmd-name`` to the value of
+# `MAKEINDEX_COMPILER` set by `find_package(LATEX)`. Puts the result into
+# ``_out_var``.
 ##############################################################################
 function(_doxypress_set_makeindex_cmd_name _out_var)
     if (NOT "${MAKEINDEX_COMPILER}" STREQUAL "MAKEINDEX_COMPILER-NOTFOUND")
@@ -76,8 +86,12 @@ endfunction()
 #.rst:
 # .. cmake:command:: _doxypress_update_project_file
 #
-# Sets `output-latex.latex-cmd-name` to the value of `PDFLATEX_COMPILER`,
-# which was previously set by `find_package(LATEX)`.
+# .. code-block:: cmake
+#
+#   _doxypress_update_project_file(_file_name _out_var)
+#
+# Transforms a relative file name ``_file_name`` into an absolute one, if
+# needed, and puts the result into ``_out_var``. Does nothing otherwise.
 ##############################################################################
 function(_doxypress_update_project_file _file_name _out_var)
     set(_result "")
@@ -90,14 +104,14 @@ endfunction()
 
 ##############################################################################
 #.rst:
-# .. cmake:command:: _doxypress_set_dia_path
+# .. cmake:command:: _doxypress_set_input_target
 #
 # .. code-block:: cmake
 #
-#   _doxypress_set_input_target(<output variable>)
+#   _doxypress_set_input_target(_out_var)
 #
-# Sets the output variable to ``PROJECT_NAME`` if a target with that name
-# exists. Clears the output variable otherwise.
+# Sets the output variable ``_out_var`` to ``${PROJECT_NAME}`` if a target with
+# that name exists. Clears the output variable otherwise.
 ##############################################################################
 function(_doxypress_set_input_target _out_var)
     if (TARGET ${PROJECT_NAME})
@@ -113,10 +127,10 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_set_warn_format(<output variable>)
+#   _doxypress_set_warn_format(_out_var)
 #
 # Sets the value of the configuration property ``messages.warn-format``
-# depending on the current build tool.
+# depending on the current build tool. Puts the result into ``_out_var``.
 ##############################################################################
 function(_doxypress_set_warn_format _out_var)
     if ("${CMAKE_BUILD_TOOL}" MATCHES "(msdev|devenv)")
@@ -132,10 +146,10 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_set_dot_path(<output variable>)
+#   _doxypress_set_dot_path(_out_var)
 #
 # Sets the ``dot.dot-path`` configuration property. Uses result of the call
-# ``find_package(Doxypress)``.
+# ``find_package(Doxypress)``. Puts the result into ``_out_var``.
 ##############################################################################
 function(_doxypress_set_dot_path _out_var)
     if (TARGET Doxypress::dot)
@@ -152,7 +166,7 @@ endfunction()
 #
 #   _doxypress_update_input_source(<directories> <output variable>)
 #
-# Walks through directory paths ``_sources`` and updates relative
+# Walks through directory paths ``_paths`` and updates relative
 # ones by prepending ``CMAKE_CURRENT_SOURCE_DIR``. Does nothing
 # to absolute directory paths. Writes updated list to ``_out_var``.
 ##############################################################################
@@ -188,7 +202,7 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_update_example_source(<directories> <output variable>)
+#   _doxypress_update_example_source(_directories _out_var)
 #
 # Walks through directory paths ``_directories`` and updates relative
 # ones by prepending ``CMAKE_CURRENT_SOURCE_DIR``. Does nothing
@@ -215,13 +229,13 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_update_output_dir(<directory> <output variable>)
+#   _doxypress_update_output_dir(_directory _out_var)
 #
-# Updates a given output directory:
+# Updates a given output directory ``_directory``:
 #
 # * a relative directory path is converted into an absolute one by prepending
-#   ``CMAKE_CURRENT_BINARY_DIR``;
-# * an absolute path stays unchanged.
+#   *CMAKE_CURRENT_BINARY_DIR*;
+# * an absolute path stays unchanged. Puts the result into ``_out_var``.
 ##############################################################################
 function(_doxypress_update_output_dir _directory _out_var)
     if (_directory)
@@ -241,10 +255,11 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_set_have_dot(<output variable>)
+#   _doxypress_set_have_dot(_out_var)
 #
 # Sets ``dot.have-dot`` configuration flag depending on `Graphviz` ``dot``
 # presence. Uses the results of the ``find_package(DoxypressCMake)`` call.
+# Puts the result into ``_out_var``.
 ##############################################################################
 function(_doxypress_set_have_dot _out_var)
     if (TARGET Doxypress::dot)
@@ -262,10 +277,11 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_set_example_source(<output variable>)
+#   _doxypress_set_example_source(_out_var)
 #
-# Searches for the sub-directories  [``example``, ``examples``] in the current
-# source directory. Setter for ``input.example-source``.
+# Setter for the property ``input.example-source``. Searches for
+# the sub-directories  [``example``, ``examples``] in the current source
+# directory, and collects found ones. Puts the result into ``_out_var``.
 ##############################################################################
 function(_doxypress_set_example_source _out_var)
     _doxypress_find_directory(
@@ -282,14 +298,14 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_set_target_name(<output variable>)
+#   _doxypress_set_target_name(_out_var)
 #
 # Sets the ``TARGET_NAME`` parameter when it was not given explicitly:
 #
-# * if ``INPUT_TARGET`` is not empty, sets it to ``${INPUT_TARGET}.doxypress``
+# * if ``INPUT_TARGET`` is not empty, sets it to ``${INPUT_TARGET}.doxypress``;
 # * otherwise, sets it to ``${PROJECT_NAME}``
 #
-# Setter for ``TARGET_NAME``.
+# Puts the result into ``_out_var``.
 ##############################################################################
 function(_doxypress_set_target_name _out_var)
     TPA_get(INPUT_TARGET _input_target)
@@ -306,11 +322,11 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_update_generate_latex(<current value> <output variable>)
+#   _doxypress_update_generate_latex(_generate_latex _out_var)
 #
-# If ``.tex`` generation was requested, by no LATEX was found in the local
-# environment, ``GENERATE_LATEX`` is reverted to ``false``. Since it's an
-# input parameter, it will be propagated into the project file automatically.
+# If ``.tex`` generation was requested (``_generate_latex`` is ``true``), but
+# no LATEX was found in the local environment, ``_out_var`` is set to ``false``.
+# Otherwise, it's set to ``true``.
 ##############################################################################
 macro(_doxypress_update_generate_latex _generate_latex _out_var)
     if (${_generate_latex})

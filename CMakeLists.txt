@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.3)
-project(DoxypressCMake VERSION 0.0.1 DESCRIPTION "Doxypress module for CMake")
+project(DoxypressCMake VERSION 0.1 DESCRIPTION "Doxypress module for CMake")
 
 include(cmake/InstallBasicPackageFiles.cmake)
 include(${PROJECT_SOURCE_DIR}/externals/json-cmake/JSONParser.cmake)

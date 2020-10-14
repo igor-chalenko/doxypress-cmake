@@ -1,6 +1,6 @@
 .. _v0.1:
 
-Pre-Release 0.1 (Oct 5, 2020)
+Pre-Release 0.1 (Oct 15, 2020)
 -------------------------------
 
-- First pre-release for internal use.
+- First release for internal use.

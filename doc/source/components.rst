@@ -18,6 +18,7 @@ Components
 
 .. toctree::
    ProjectFileGenerator
+   ProjectFunctions
    CMakeTargetGenerator
    JSONFunctions
    PropertyHandlers

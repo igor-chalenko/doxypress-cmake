@@ -30,7 +30,7 @@
 #
 #      ${DOXYPRESS_LAUNCHER_COMMAND} ${OUTPUT_DIRECTORY}/latex/refman.tex
 #
-#   This target is created if LaTex  generation was enabled.
+#   This target is created if LaTex generation was enabled.
 #
 #   * ``${TARGET_NAME}.pdf``:
 #
@@ -43,6 +43,10 @@
 # In addition to the above, ``doxypress-cmake`` uses
 # :cmake:command:`_doxypress_install_docs` to add documentation files to the
 # ``install`` target.
+#
+# See also:
+#
+# * :cmake:variable:`DOXYPRESS_LAUNCHER_COMMAND`
 ##############################################################################
 
 ##############################################################################
@@ -79,6 +83,25 @@ function(_doxypress_add_targets _project_file _updated_project_file)
     endif ()
 endfunction()
 
+##############################################################################
+#.rst:
+# .. cmake:command:: _doxypress_add_target
+#
+# ..  code-block:: cmake
+#
+#    _doxypress_add_target(<project file name>
+#                          <processed project file name>
+#                          <target name>)
+#
+# Creates a `DoxyPress` target ``_target_name`` and an `open generated docs`
+# target for every output format that was requested.
+#
+# Parameters:
+#
+# * ``_project_file``  unprocessed project file name
+# * ``_updated_project_file`` processed project file name
+# * ``_target_name`` the name of the target to create
+##############################################################################
 function(_doxypress_add_target _project_file _updated_project_file _target_name)
     _doxypress_get(general.output-dir _output_dir)
     # collect inputs for `DEPENDS` parameter
@@ -101,6 +124,21 @@ function(_doxypress_add_target _project_file _updated_project_file _target_name)
             COMMENT "Generating docs...")
 endfunction()
 
+##############################################################################
+#.rst:
+# .. cmake:command:: _doxypress_add_pdf_commands
+#
+# ..  code-block:: cmake
+#
+#    _doxypress_add_pdf_commands(<target name>)
+#
+# Adds PDF generation commands to a previously created `DoxyPress` target
+# ``_target_name``.
+#
+# Parameters:
+#
+# * ``_target_name`` the name of the target to add commands to
+##############################################################################
 function(_doxypress_add_pdf_commands _target_name)
     TPA_get(GENERATE_PDF _pdf)
     _doxypress_get(general.output-dir _output_dir)
@@ -294,7 +332,7 @@ endfunction()
 #.rst:
 # .. cmake:command:: _doxypress_list_inputs(_out_var)
 #
-# Collects input file names based on value of input parameters that control
+# Collects input file names based on the value of input parameters that control
 # input sources:
 # * If ``INPUTS`` is not empty, collects all files in the paths given by
 # ``INPUTS``. Files are added to the resulting list directly, and directories
@@ -322,11 +360,11 @@ function(_doxypress_list_inputs _out_var)
             endif ()
         endforeach ()
     elseif (_input_target)
-        get_target_property(include_directories
+        get_target_property(_include_directories
                 ${_input_target}
                 INTERFACE_INCLUDE_DIRECTORIES)
-        foreach (_dir ${include_directories})
-            file(GLOB_RECURSE _inputs ${_dir}/*)
+        foreach (_dir ${_include_directories})
+            file(GLOB_RECURSE _inputs "${_dir}/*")
             list(APPEND _all_inputs "${_inputs}")
         endforeach ()
     else ()

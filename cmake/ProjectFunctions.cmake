@@ -17,18 +17,141 @@
 ##############################################################################
 #.rst:
 #
+# .. cmake:command:: _doxypress_params_init
+#
+# .. code-block:: cmake
+#
+#    _doxypress_params_init()
+#
+# Initializes parsing context. Changes made by this function in the current
+# scope can be reverted by :cmake:command:`TPA_clear_scope`.
+##############################################################################
+function(_doxypress_params_init)
+    # define acceptable input parameters
+    _doxypress_params_init_inputs()
+    # define properties that are processed by the chain of handlers
+    # `input` -> `json` -> `setter` -> `updater` -> `default`
+    _doxypress_params_init_properties()
+    # define properties that are set to a constant value
+    _doxypress_params_init_overrides()
+endfunction()
+
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_params_init_inputs
+#
+# .. code-block:: cmake
+#
+#    _doxypress_params_init_inputs()
+#
+# Initializes input parameters that should be parsed by
+# :ref:`doxypress_add_docs`.
+##############################################################################
+function(_doxypress_params_init_inputs)
+    _doxypress_input_string(
+            PROJECT_FILE
+            UPDATER "update_project_file"
+            DEFAULT "${_doxypress_dir}/DoxypressCMake.json"
+    )
+    _doxypress_input_string(INPUT_TARGET SETTER "set_input_target")
+    _doxypress_input_string(TARGET_NAME SETTER "set_target_name")
+    _doxypress_input_string(INSTALL_COMPONENT DEFAULT docs)
+    _doxypress_input_option(GENERATE_PDF DEFAULT false)
+endfunction()
+
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_params_init_overrides
+#
+# .. code-block:: cmake
+#
+#    _doxypress_params_init_overrides()
+#
+# Initializes the default set of :ref:`overrides<overrides-reference-label>`.
+##############################################################################
+function(_doxypress_params_init_overrides)
+    doxypress_add_override("project.project-brief" "${PROJECT_DESCRIPTION}")
+    doxypress_add_override("project.project-name" "${PROJECT_NAME}")
+    doxypress_add_override("project.project-version" "${PROJECT_VERSION}")
+    doxypress_add_override("output-latex.latex-batch-mode" true)
+    doxypress_add_override("output-latex.latex-hyper-pdf" true)
+    doxypress_add_override("output-latex.latex-output" "latex")
+    doxypress_add_override("output-latex.latex-pdf" true)
+    doxypress_add_override("output-html.html-output" "html")
+    doxypress_add_override("output-html.html-file-extension" ".html")
+    doxypress_add_override("output-xml.xml-output" "xml")
+    doxypress_add_override("input.input-recursive" true)
+    doxypress_add_override("input.example-recursive" true)
+endfunction()
+
+##############################################################################
+#.rst:
+#
+# .. cmake:command:: _doxypress_params_init_inputs
+#
+# .. code-block:: cmake
+#
+#    _doxypress_params_init_overrides()
+#
+# Initializes properties that are processed by the chain of handlers:
+#
+# .. code-block::
+#
+#   `input` -> `json` -> `setter` -> `updater` -> `default`
+##############################################################################
+function(_doxypress_params_init_properties)
+    _doxypress_property_add("messages.quiet" DEFAULT true)
+    _doxypress_property_add("messages.warnings" DEFAULT true)
+    _doxypress_property_add("dot.have-dot" SETTER "set_have_dot" OVERWRITE)
+    _doxypress_property_add("dot.dot-path" SETTER "set_dot_path" OVERWRITE)
+    _doxypress_property_add("dot.dia-path" SETTER "set_dia_path" OVERWRITE)
+    _doxypress_property_add("output-xml.generate-xml"
+            INPUT_OPTION GENERATE_XML
+            DEFAULT false)
+    _doxypress_property_add("output-latex.generate-latex"
+            INPUT_OPTION GENERATE_LATEX
+            UPDATER "update_generate_latex"
+            DEFAULT false)
+    _doxypress_property_add("output-html.generate-html"
+            INPUT_STRING GENERATE_HTML
+            DEFAULT true)
+    _doxypress_property_add("general.output-dir"
+            INPUT_STRING OUTPUT_DIRECTORY
+            UPDATER "update_output_dir"
+            DEFAULT "${CMAKE_CURRENT_BINARY_DIR}/doxypress-generated")
+    _doxypress_property_add(${_DOXYPRESS_INPUT_SOURCE}
+            INPUT_LIST INPUTS
+            UPDATER "update_input_source")
+    _doxypress_property_add("input.example-source"
+            INPUT_LIST EXAMPLE_DIRECTORIES
+            SETTER "set_example_source"
+            UPDATER "update_example_source")
+    _doxypress_property_add("messages.warn-format"
+            SETTER "set_warn_format" OVERWRITE)
+    _doxypress_property_add("output-latex.makeindex-cmd-name"
+            SETTER "set_makeindex_cmd_name" OVERWRITE)
+    _doxypress_property_add("output-latex.latex-cmd-name"
+            SETTER "set_latex_cmd_name" OVERWRITE)
+endfunction()
+
+##############################################################################
+#.rst:
+#
 # .. cmake:command:: _doxypress_project_update
 #
 # .. code-block::
 #
-#   _doxypress_project_update(<project file name> <output variable>)
+#   _doxypress_project_update(_input_project_file_name _out_var)
 #
-# Loads a given project file, applies update logic that was previously defined
-# by :cmake:command:`_doxypress_params_init`, and saves the updated file.
-# The name of the updated file is written into the output variable.
+# Loads a given project file ``_input_project_file_name``, applies update logic
+# that was previously defined by :cmake:command:`_doxypress_params_init`
+# and saves the updated file. The name of the updated file is written into
+# the output variable ``_out_var``.
 ##############################################################################
-macro(_doxypress_project_update input_project_file_name _out_var)
-    _doxypress_project_load(${input_project_file_name})
+macro(_doxypress_project_update _input_project_file_name _out_var)
+    _doxypress_project_load(${_input_project_file_name})
 
     TPA_get("${_DOXYPRESS_JSON_PATHS_KEY}" _updatable_paths)
 
@@ -38,7 +161,7 @@ macro(_doxypress_project_update input_project_file_name _out_var)
 
     # create name for the processed project file
     _doxypress_output_project_file_name(
-            ${input_project_file_name}
+            ${_input_project_file_name}
             _output_project_file_name)
 
     # save processed project file
@@ -53,14 +176,11 @@ endmacro()
 #
 # .. code-block:: cmake
 #
-#    _doxypress_project_load(<project file name>
+#    _doxypress_project_load(_project_file_name)
 #
-# Loads a given project file into the current TPA scope. Name of every resulting
-# property is prefixed with ``doxypress.`` in order to avoid name clashes.
-#
-# Parameters:
-#
-# * ``_project_file_name`` a project file to load
+# Loads a given project file ``_project_file_name`` into the current
+# :ref:`TPA scope`. The name of every resulting property is prefixed with
+# ``doxypress.``.
 ##############################################################################
 function(_doxypress_project_load _project_file_name)
     _doxypress_log(INFO "Loading project template ${_project_file_name}...")
@@ -81,15 +201,11 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#    _doxypress_project_save(<project file name>)
+#    _doxypress_project_save(_project_file_name)
 #
-# Saves a parsed JSON document into a given file. The JSON tree is taken
-# from the current TPA scope. Any existing file with the same name will be
-# overwritten.
-#
-# Parameters:
-#
-# * ``_file_name`` output file name
+# Saves a parsed JSON document into a given file ``_project_file_name``.
+# The JSON tree is taken from the current TPA scope. Any existing file with
+# the same name is overwritten.
 ##############################################################################
 function(_doxypress_project_save _project_file_name)
     _doxypress_assert_not_empty("${_project_file_name}")
@@ -107,17 +223,12 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#    _doxypress_get(<JSON path> <output variable>)
+#    # same as _JSON_get("doxypress.${_path}" _out_var)
+#    _doxypress_get(_path _out_var)
 #
-# Wrapper for :cmake:command:`_JSON_get` with added prefix ``doxypress.``.
-#
-# Parameters:
-#
-# * ``_property`` JSON path to read in the currently loaded JSON document
-# * ``_out_var`` value of ``_property` in the loaded JSON document
 ##############################################################################
-function(_doxypress_get _property _out_var)
-    _JSON_get("doxypress.${_property}" _json_value)
+function(_doxypress_get _path _out_var)
+    _JSON_get("doxypress.${_path}" _json_value)
     set(${_out_var} "${_json_value}" PARENT_SCOPE)
 endfunction()
 
@@ -128,14 +239,8 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#    _doxypress_set(<JSON path> <value>)
-#
-# Wrapper for :cmake:command:`_JSON_set` with added prefix ``doxypress.``.
-#
-# Parameters:
-#
-# * ``_property`` JSON path to update in the currently loaded JSON document
-# * ``_value`` new value of ``_property`
+#    # same as _JSON_set("doxypress.${_path}" _value)
+#    _doxypress_set(_path _value)
 ##############################################################################
 function(_doxypress_set _property _value)
     _JSON_set(doxypress.${_property} "${_value}")
@@ -148,16 +253,10 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#    _doxypress_call(<function name> <argument #1>)
+#    _doxypress_call(_id _arg1)
 #
-# Calls a function or a macro given its name. Writes actual call code
-# into a temporary file, which is then included.
-#
-# Parameters:
-#
-# * ``_id``         name of the function or macro to call
-# * ``_arg1``       the first argument to the function ``_id``
-# * ``ARGN``        additional arguments to pass to ``_id``
+# Calls a function or a macro given its name ``_id``. Writes actual call code
+# into a temporary file, which is then included. ``ARGN`` is also passed.
 ##############################################################################
 macro(_doxypress_call _id _arg1)
     if (NOT COMMAND ${_id})
@@ -176,16 +275,11 @@ endmacro()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_find_directory(<base directory> <names> <output variable>)
+#   _doxypress_find_directory(_base_dir _names _out_var)
 #
-# Searches for a directory with a name from the given list. Sets the output
-# variable to contain absolute path of every found directory.
-#
-# Parameters:
-#
-# * ``_base_dir`` a directory to search
-# * ``_names`` directories to find under ``_base_dir``
-# * ``_out_var`` the output variable
+# Searches for a directory with a name from ``_names``, starting from
+# ``_base_dir``. Sets the output variable ``_out_var`` to contain absolute
+# path of every found directory.
 ##############################################################################
 function(_doxypress_find_directory _base_dir _names _out_var)
     set(_result "")
@@ -204,16 +298,11 @@ endfunction()
 #
 # ..  code-block:: cmake
 #
-#   _doxypress_output_project_file_name(<input project file name>
-#                                                <output variable>)
+#   _doxypress_output_project_file_name(_project_file_name _out_var)
 #
-# Returns an absolute name of the output project file. Changes the input
-# file's path while leaving the file name unchanged.
-#
-# Parameters:
-#
-# - ``_project_file_name`` input project file name
-# - ``_out_var`` output project file name
+# Generates an output project file's name, given the input name.
+# Replaces th path to input project file ``_project_file_name`` by
+# *CMAKE_CURRENT_BINARY_DIR* while leaving the file name unchanged.
 ##############################################################################
 function(_doxypress_output_project_file_name _project_file_name _out_var)
     _doxypress_assert_not_empty("${_project_file_name}")
