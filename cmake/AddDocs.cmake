@@ -119,7 +119,7 @@ set(_DOXYPRESS_INPUT_SOURCE "input.input-source")
 #   The current scope is cleared after each call to :ref:`doxypress_add_docs`.
 #   Therefore, if you call this function
 #   more than once in the same directory, you need to specify overrides every
-#   time. Similarly, it's not possible to specify ``global`` overrides for all
+#   time. Similarly, it's not possible to specify global overrides for all
 #   the sub-projects in a project. If needed, a function could be implemented
 #   to wrap a call to :ref:`doxypress_add_docs` together with related
 #   overrides.
@@ -203,7 +203,7 @@ set(_DOXYPRESS_INPUT_SOURCE "input.input-source")
 # *********
 #
 # * 1. The input JSON configuration is parsed into a flat list of variables as
-#   described in the documentation of `sbeParseJson` from json-cmake_;
+#   described in the documentation for ``sbeParseJson`` from json-cmake_.
 # * 2. Some of these variables get a new value. The set of JSON properties
 #   to update is defined by :cmake:command:`_doxypress_params_init_properties`.
 #   Each property is assigned a set of handlers, described in the documentation
@@ -215,11 +215,11 @@ set(_DOXYPRESS_INPUT_SOURCE "input.input-source")
 #   * ``SETTER`` is invoked if the current property value is empty;
 #   * ``UPDATER`` is invoked if the current property value is NOT empty;
 #   * the current value is set to the value of ``DEFAULT`` if the current
-#     property value is still empty).
-# * 3. The list of variables is re-assembled back into a new JSON document,
-#   which is then written to a file that becomes the final Doxypress
-#   configuration. Property overrides are applied during the serialization
-#   phase.
+#     property value is still empty.
+# * 3. Property overrides are applied.
+# * 4. The list of variables is re-assembled back into a new JSON document,
+#   which is then written to a file that becomes the final DoxyPress
+#   configuration.
 #
 # There are four sources of property values that may contribute to the final,
 # processed project file:

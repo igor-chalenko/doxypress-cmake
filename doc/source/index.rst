@@ -32,6 +32,7 @@ generation via Doxypress_.
 
    glossary
    platforms
+   faq
    changelog
    license
 
