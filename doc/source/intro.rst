@@ -11,9 +11,9 @@ to import this package and then call :cmake:command:`doxypress_add_docs`:
   find_package(DoxypressCMake)
   doxypress_add_docs(INPUT_TARGET target_in_the_need_of_docs)
 
-The above code will generate a `DoxyPress`' project file under
-``CMAKE_CURRENT_BINARY_DIR``. Documentation will be generated
-under ``CMAKE_CURRENT_BINARY_DIR``/``doxypress-generated``.
+The above code will generate a project file under
+``${CMAKE_CURRENT_BINARY_DIR}``. Documentation will be generated
+under ``${CMAKE_CURRENT_BINARY_DIR}``/``doxypress-generated``.
 
 .. _Doxypress: https://www.copperspice.com/docs/doxypress/index.html
 
@@ -41,7 +41,7 @@ Installation
 
 .. code-block:: bash
 
-   git clone git@github.com:igor-chalenko/doxypress-cmake.git
+   git clone --recurse-submodules git@github.com:igor-chalenko/doxypress-cmake.git
    cd doxypress-cmake
    mkdir build && cd build
    # this will run the tests and create install commands
@@ -74,16 +74,17 @@ Usage
   find_package(doxypress-cmake)
   if(TARGET Doxypress::doxypress)
     doxypress_add_docs(
-        PROJECT_FILE
-        INPUT_TARGET
-        EXAMPLES
-        INPUTS
-        INSTALL_COMPONENT
-        GENERATE_HTML
-        GENERATE_LATEX
-        GENERATE_PDF
-        GENERATE_XML
-        OUTPUT_DIRECTORY)
+        INPUTS            # empty
+        INPUT_TARGET      # empty
+        EXAMPLES          # empty
+        INSTALL_COMPONENT # docs
+        GENERATE_HTML # true
+        GENERATE_LATEX # false
+        GENERATE_PDF # false
+        GENERATE_XML # false
+        OUTPUT_DIRECTORY # ${CMAKE_CURRENT_BINARY_DIR}
+        PROJECT_FILE # DoxypressAddDocs.json
+        TARGET_NAME)
   endif()
 
 Refer to the :ref:`doxypress_add_docs` section for details.
