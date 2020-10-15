@@ -444,7 +444,6 @@ class CMakeDomain(Domain):
         targetid = '%s:%s' % (typ, target)
         obj = self.data['objects'].get(targetid)
         if obj is None:
-            # TODO: warn somehow?
             return None
         return make_refnode(builder, fromdocname, obj[0], targetid,
                             contnode, target)
