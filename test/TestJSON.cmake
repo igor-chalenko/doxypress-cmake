@@ -1,4 +1,4 @@
-function(test__JSON_format)
+function(test_JSON_format)
     _JSON_format(ON _var1)
     _JSON_format(true _var2)
     _JSON_format(on _var3)
@@ -26,7 +26,7 @@ function(test__JSON_format)
     assert_same(${_var4} "\"four\"")
 endfunction()
 
-function(test__JSON_get)
+function(test_JSON_get)
     _doxypress_project_load(DoxypressTest1.json)
 
     _JSON_get("doxypress.source.suffix-exclude-navtree" _property)
@@ -38,6 +38,17 @@ function(test__JSON_get)
 
     _JSON_get("doxypress.source.inline-source" _property)
     assert_same("${_property}" false)
+    TPA_clear_scope()
+endfunction()
+
+function(test_JSON_array_length)
+    _doxypress_project_load(DoxypressTest1.json)
+
+    _JSON_array_length(input.input-source _length)
+    assert_same("${_length}" 2)
+
+    _JSON_get("doxypress.source.inline-source" _length)
+    assert_same("${_length}" -1)
     TPA_clear_scope()
 endfunction()
 
@@ -66,7 +77,7 @@ function(test_JSON_serialize)
     TPA_clear_scope()
 endfunction()
 
-function(test__JSON_set)
+function(test_JSON_set)
     _doxypress_project_load(DoxypressTest1.json)
     set(_new_value x1 x2 x3)
     _JSON_set("doxypress.source.suffix-exclude-navtree" "${_new_value}")
@@ -83,7 +94,7 @@ function(test__JSON_set)
     TPA_clear_scope()
 endfunction()
 
-# test__JSON_format()
-# test__JSON_get()
-# test__JSON_set()
+# test_JSON_format()
+# test_JSON_get()
+# test_JSON_set()
 test_JSON_serialize()

@@ -228,18 +228,17 @@ macro(_Doxypress_find_mscgen)
         # The Doxyfile wants the path to the utility, not the entire path
         # including file name
         get_filename_component(DOXYPRESS_MSCGEN_PATH
-                "${DOXYPRESS_MSCGEN_EXECUTABLE}"
-                DIRECTORY)
+                "${DOXYPRESS_MSCGEN_EXECUTABLE}" DIRECTORY)
         if (WIN32)
-            file(TO_NATIVE_PATH "${DOXYPRESS_MSCGEN_PATH}" DOXYPRESS_MSCGEN_PATH)
+            file(TO_NATIVE_PATH
+                    "${DOXYPRESS_MSCGEN_PATH}" DOXYPRESS_MSCGEN_PATH)
         endif ()
 
         # Create an imported target for component
         if (NOT TARGET Doxypress::mscgen)
             add_executable(Doxypress::mscgen IMPORTED GLOBAL)
             set_target_properties(Doxypress::mscgen PROPERTIES
-                    IMPORTED_LOCATION "${DOXYPRESS_MSCGEN_EXECUTABLE}"
-                    )
+                    IMPORTED_LOCATION "${DOXYPRESS_MSCGEN_EXECUTABLE}")
         endif ()
     endif ()
 
@@ -251,7 +250,6 @@ if (NOT Doxypress_FIND_COMPONENTS)
     # Search at least for `DoxyPress` executable
     set(Doxypress_FIND_COMPONENTS doxypress)
     # Preserve backward compatibility:
-    # search for `dot` also if `DOXYPRESS_SKIP_DOT` is not explicitly disable this.
     if (NOT DOXYPRESS_SKIP_DOT)
         list(APPEND Doxypress_FIND_COMPONENTS dot)
     endif ()

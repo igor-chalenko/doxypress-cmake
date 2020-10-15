@@ -435,7 +435,7 @@ function(_doxypress_update_path _path)
     TPA_get(${_path}_UPDATER _updater)
     TPA_get(${_path}_DEFAULT _default)
 
-    _doxypress_property_read_input("${_input_param}" _input_value)
+    _doxypress_property_read_input(${_path} "${_input_param}" _input_value)
     _doxypress_property_read_json(${_path} _json_value)
 
     set(_value "")
@@ -606,13 +606,13 @@ endfunction()
 #
 # .. code-block:: cmake
 #
-#   _doxypress_property_read_input(_input_arg_name _out_var)
+#   _doxypress_property_read_input(_path _input_arg_name _out_var)
 #
 # Finds the input argument ``_input_arg_name`` in the current TPA scope,
 # converts `CMake`'s boolean values to ``true``/``false`` format, and writes
 # the result into the output variable ``_out_var``.
 ##############################################################################
-function(_doxypress_property_read_input _input_arg_name _out_var)
+function(_doxypress_property_read_input _path _input_arg_name _out_var)
     if (_input_arg_name)
         TPA_get(${_input_arg_name} _input_value)
 
