@@ -62,8 +62,6 @@
 import os
 import re
 
-from html import escape
-from sphinxcontrib.qthelp import QtHelpBuilder
 from typing import List, Tuple, Dict
 
 from docutils.nodes import Element
@@ -89,24 +87,6 @@ CMakeLexer.tokens["args"].append(('(\\$<)(.+?)(>)',
 
 # Monkey patch for sphinx generating invalid content for qcollectiongenerator
 # https://bitbucket.org/birkenfeld/sphinx/issue/1435/qthelp-builder-should-htmlescape-keywords
-
-old_build_keywords = QtHelpBuilder.build_keywords
-
-
-def new_build_keywords(self, title, refs, subitems):
-    old_items = old_build_keywords(self, title, refs, subitems)
-    new_items = []
-    for item in old_items:
-        before, rest = item.split("ref=\"", 1)
-        ref, after = rest.split("\"")
-        if "<" in ref and ">" in ref:
-            new_items.append(before + "ref=\"" + escape(ref) + "\"" + after)
-        else:
-            new_items.append(item)
-    return new_items
-
-
-QtHelpBuilder.build_keywords = new_build_keywords
 
 
 class CMakeModule(Directive):
