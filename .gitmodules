@@ -1,3 +1,0 @@
-[submodule "externals/json-cmake"]
-	path = externals/json-cmake
-	url = git@github.com:sbellus/json-cmake.git

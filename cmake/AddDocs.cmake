@@ -377,4 +377,4 @@ endif ()
 #    _doxypress_log(INFO text) # does nothing
 #    _doxypress_log(WARN text) # equivalent to message([STATUS|WARNING] text)
 ##############################################################################
-set(DOXYPRESS_LOG_LEVEL INFO)
+set(DOXYPRESS_LOG_LEVEL WARN)
