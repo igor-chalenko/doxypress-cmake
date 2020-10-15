@@ -96,10 +96,7 @@ endfunction()
 #    _doxypress_params_init_overrides()
 #
 # Initializes properties that are processed by the chain of handlers:
-#
-# .. code-block::
-#
-#   `input` -> `json` -> `setter` -> `updater` -> `default`
+#   ``input`` -> ``json`` -> ``setter`` -> ``updater` -> ``default`
 ##############################################################################
 function(_doxypress_params_init_properties)
     _doxypress_property_add("messages.quiet" DEFAULT true)
@@ -141,7 +138,7 @@ endfunction()
 #
 # .. cmake:command:: _doxypress_project_update
 #
-# .. code-block::
+# .. code-block:: cmake
 #
 #   _doxypress_project_update(_input_project_file_name _out_var)
 #

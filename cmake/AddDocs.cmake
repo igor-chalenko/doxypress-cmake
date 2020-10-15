@@ -184,9 +184,9 @@ set(_DOXYPRESS_INPUT_SOURCE "input.input-source")
 #   If `.tex` generation was requested, but LaTex installation was not found
 #   after the call to
 #
-#   .. code-block::
+#   .. code-block:: cmake
 #
-#     find_package(LATEX),
+#     find_package(LATEX)
 #
 #   then the `.tex` generation is disabled and the properties
 #   ``output-latex.latex-cmd-name`` and ``output-latex.make-index-cmd-name`` are
@@ -276,7 +276,7 @@ endfunction()
 # doxypress_add_override
 # ======================
 #
-# .. code-block::
+# .. code-block:: cmake
 #
 #   doxypress_add_override(_path _value)
 #

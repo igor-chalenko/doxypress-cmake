@@ -419,7 +419,7 @@ endfunction()
 #
 # .. cmake:command:: _doxypress_update_path
 #
-# .. code-block::
+# .. code-block:: cmake
 #
 #   _doxypress_update_path(_path)
 #
