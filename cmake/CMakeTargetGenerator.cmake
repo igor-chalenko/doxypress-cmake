@@ -371,7 +371,7 @@ function(_doxypress_list_inputs _out_var)
         message(FATAL_ERROR [=[
 Either INPUTS or INPUT_TARGET must be specified as input argument
 for `doxypress_add_docs`:
-1) INPUT_TARGET couldn't be defaulted to ${PROJECT_NAME};
+1) INPUT_TARGET couldn't be defaulted to ${CMAKE_PROJECT_NAME};
 2) Input project file didn't specify any inputs either.]=])
     endif ()
 

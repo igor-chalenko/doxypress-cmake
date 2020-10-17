@@ -93,7 +93,7 @@ set(_DOXYPRESS_INPUT_SOURCE "input.input-source")
 # **TARGET_NAME**
 #     The name of the `DoxyPress` target. The default is
 #     ``${INPUT_TARGET}.doxypress`` if ``INPUT_TARGET`` is supplied, or
-#     ``${PROJECT_NAME}.doxypress`` otherwise.
+#     ``${CMAKE_PROJECT_NAME}.doxypress`` otherwise.
 #
 # .. _overrides-reference-label:
 #
@@ -135,7 +135,7 @@ set(_DOXYPRESS_INPUT_SOURCE "input.input-source")
 #    The author sees little value in customizing these since the base output
 #    directory is customizable.
 #
-# * ``project.project-name`` = ``${PROJECT_NAME}``
+# * ``project.project-name`` = ``${CMAKE_PROJECT_NAME}``
 # * ``project.project-version`` = ``${PROJECT_VERSION}``
 # * ``project.project-brief`` = ``${PROJECT_DESCRIPTION}``
 #

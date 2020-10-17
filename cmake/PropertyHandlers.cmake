@@ -110,12 +110,12 @@ endfunction()
 #
 #   _doxypress_set_input_target(_out_var)
 #
-# Sets the output variable ``_out_var`` to ``${PROJECT_NAME}`` if a target with
-# that name exists. Clears the output variable otherwise.
+# Sets the output variable ``_out_var`` to ``${CMAKE_PROJECT_NAME}`` if a target
+# with that name exists. Clears the output variable otherwise.
 ##############################################################################
 function(_doxypress_set_input_target _out_var)
-    if (TARGET ${PROJECT_NAME})
-        set(${_out_var} ${PROJECT_NAME} PARENT_SCOPE)
+    if (TARGET ${CMAKE_PROJECT_NAME})
+        set(${_out_var} ${CMAKE_PROJECT_NAME} PARENT_SCOPE)
     else ()
         set(${_out_var} "" PARENT_SCOPE)
     endif ()
@@ -299,14 +299,14 @@ endfunction()
 # Sets the ``TARGET_NAME`` parameter when it was not given explicitly:
 #
 # * if ``INPUT_TARGET`` is not empty, sets it to ``${INPUT_TARGET}.doxypress``;
-# * otherwise, sets it to ``${PROJECT_NAME}``
+# * otherwise, sets it to ``${CMAKE_PROJECT_NAME}``
 #
 # Puts the result into ``_out_var``.
 ##############################################################################
 function(_doxypress_set_target_name _out_var)
     TPA_get(INPUT_TARGET _input_target)
     if (_input_target STREQUAL "")
-        set(${_out_var} "${PROJECT_NAME}.doxypress" PARENT_SCOPE)
+        set(${_out_var} "${CMAKE_PROJECT_NAME}.doxypress" PARENT_SCOPE)
     else()
         set(${_out_var} "${_input_target}.doxypress" PARENT_SCOPE)
     endif()

@@ -73,7 +73,7 @@ endfunction()
 ##############################################################################
 function(_doxypress_params_init_overrides)
     doxypress_add_override("project.project-brief" "${PROJECT_DESCRIPTION}")
-    doxypress_add_override("project.project-name" "${PROJECT_NAME}")
+    doxypress_add_override("project.project-name" "${CMAKE_PROJECT_NAME}")
     doxypress_add_override("project.project-version" "${PROJECT_VERSION}")
     doxypress_add_override("output-latex.latex-batch-mode" true)
     doxypress_add_override("output-latex.latex-hyper-pdf" true)
