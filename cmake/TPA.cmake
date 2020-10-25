@@ -48,7 +48,7 @@
 # -------------
 ##############################################################################
 
-set(_DOXYPRESS_TPA_INDEX_KEY property.index)
+set(_DOXYPRESS_TPA_INDEX_KEY property.index CACHE STRING "index of properties")
 
 ##############################################################################
 #.rst:
