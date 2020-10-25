@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.3)
 project(DoxypressCMake VERSION 0.1 DESCRIPTION "Doxypress module for CMake")
 
-include(${PROJECT_SOURCE_DIR}/cmake/JSONParser.cmake)
-set(_doxypress_dir ${PROJECT_SOURCE_DIR}/cmake)
-include(${PROJECT_SOURCE_DIR}/cmake/AddDocs.cmake)
+get_filename_component(_doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
+set(_doxypress_dir "${_doxypress_dir}/cmake")
+include(${_doxypress_dir}/AddDocs.cmake)
 
 if (PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
-    include(${PROJECT_SOURCE_DIR}/cmake/InstallBasicPackageFiles.cmake)
+    include(cmake/InstallBasicPackageFiles.cmake)
 
     add_subdirectory(test)
     add_subdirectory(doc)

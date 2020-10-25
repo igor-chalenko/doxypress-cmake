@@ -18,10 +18,8 @@
 # be examined.
 ##############################################################################
 
-unset(_doxypress_log_levels)
-list(APPEND _doxypress_log_levels DEBUG)
-list(APPEND _doxypress_log_levels INFO)
-list(APPEND _doxypress_log_levels WARN)
+set(_doxypress_log_levels "DEBUG;INFO;WARN" CACHE STRING "DoxyPress Log levels")
+mark_as_advanced(_doxypress_log_levels)
 
 ##############################################################################
 #.rst:

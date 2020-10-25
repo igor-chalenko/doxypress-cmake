@@ -78,10 +78,6 @@
 
 include(FindPackageHandleStandardArgs)
 
-# We must run the following at "include" time, not at function call time,
-# to find the path to this module rather than the path to a calling list file
-get_filename_component(doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
-
 macro(_Doxypress_find_doxypress)
     find_program(
             DOXYPRESS_EXECUTABLE
@@ -311,4 +307,4 @@ get_filename_component(_doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
 cmake_policy(SET CMP0057 NEW)
 
 include(${_doxypress_dir}/AddDocs.cmake)
-include(${_doxypress_dir}/JSONParser.cmake)
+
