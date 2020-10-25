@@ -7,6 +7,7 @@
 
 include(${_doxypress_dir}/Logging.cmake)
 include(${_doxypress_dir}/TPA.cmake)
+include(${_doxypress_dir}/JSONParser.cmake)
 include(${_doxypress_dir}/JSONFunctions.cmake)
 include(${_doxypress_dir}/CMakeTargetGenerator.cmake)
 include(${_doxypress_dir}/ProjectFileGenerator.cmake)
@@ -18,14 +19,19 @@ include(${_doxypress_dir}/PropertyHandlers.cmake)
 ##############################################################################
 
 # a list of parsed project file's properties
-set(_DOXYPRESS_PROJECT_KEY "doxypress.json")
+set(_DOXYPRESS_PROJECT_KEY "doxypress.json" CACHE STRING "doxypress.json")
 # updatable property names
-set(_DOXYPRESS_JSON_PATHS_KEY "doxypress.updatable.properties")
+set(_DOXYPRESS_JSON_PATHS_KEY "doxypress.updatable.properties"
+        CACHE STRING "doxypress.json.paths")
 # `doxypress_add_docs` input arguments
-set(_DOXYPRESS_INPUTS_KEY "cmake.inputs")
+set(_DOXYPRESS_INPUTS_KEY "cmake.inputs" CACHE STRING "cmake.inputs")
 
 # used throughout the code
-set(_DOXYPRESS_INPUT_SOURCE "input.input-source")
+set(_DOXYPRESS_INPUT_SOURCE "input.input-source"
+        CACHE STRING "doxypress.input.source")
+
+mark_as_advanced(_DOXYPRESS_PROJECT_KEY _DOXYPRESS_JSON_PATHS_KEY
+        _DOXYPRESS_INPUTS_KEY _DOXYPRESS_INPUT_SOURCE)
 
 ##############################################################################
 #.rst:
@@ -377,4 +383,6 @@ endif ()
 #    _doxypress_log(INFO text) # does nothing
 #    _doxypress_log(WARN text) # equivalent to message([STATUS|WARNING] text)
 ##############################################################################
-set(DOXYPRESS_LOG_LEVEL WARN)
+set(DOXYPRESS_LOG_LEVEL WARN CACHE STRING "doxypress.log.level")
+
+mark_as_advanced(DOXYPRESS_LOG_LEVEL)
