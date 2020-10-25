@@ -300,6 +300,7 @@ endif ()
 # We must run the following at "include" time, not at function call time,
 # to find the path to this module rather than the path to a calling list file
 get_filename_component(_doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
+set_property(GLOBAL PROPERTY _doxypress_dir "${_doxypress_dir}")
 
 #list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/externals/json-cmake")
 

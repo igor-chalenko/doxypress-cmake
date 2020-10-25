@@ -49,6 +49,7 @@ endfunction()
 # :ref:`doxypress_add_docs`.
 ##############################################################################
 function(_doxypress_params_init_inputs)
+    get_property(_doxypress_dir GLOBAL PROPERTY _doxypress_dir)
     _doxypress_input_string(
             PROJECT_FILE
             UPDATER "update_project_file"

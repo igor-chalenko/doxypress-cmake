@@ -3,6 +3,7 @@ project(DoxypressCMake VERSION 0.1 DESCRIPTION "Doxypress module for CMake")
 
 get_filename_component(_doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
 set(_doxypress_dir "${_doxypress_dir}/cmake")
+set_property(GLOBAL PROPERTY _doxypress_dir "${_doxypress_dir}")
 include(${_doxypress_dir}/AddDocs.cmake)
 
 if (PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
