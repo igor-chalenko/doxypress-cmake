@@ -297,7 +297,6 @@ if (DOXYPRESS_FOUND)
 else ()
     set(DOXYPRESS_FOUND "NO")
 endif ()
-message(STATUS "!!!! DOXYPRESS_FOUND = ${DOXYPRESS_FOUND}")
 
 # We must run the following at "include" time, not at function call time,
 # to find the path to this module rather than the path to a calling list file
