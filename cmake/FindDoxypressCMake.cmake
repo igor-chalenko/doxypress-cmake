@@ -77,10 +77,8 @@
 ##############################################################################
 
 include(FindPackageHandleStandardArgs)
-message(STATUS "!!!!!!!!!!!!!!!!!!!!!!!!!!!!11")
 
 macro(_Doxypress_find_doxypress)
-    message(STATUS "!!!! _Doxypress_find_doxypress")
     find_program(
             DOXYPRESS_EXECUTABLE
             NAMES doxypress
@@ -95,6 +93,7 @@ macro(_Doxypress_find_doxypress)
     mark_as_advanced(DOXYPRESS_EXECUTABLE)
 
     if (DOXYPRESS_EXECUTABLE)
+        set(DOXYPRESS_FOUND YES)
         execute_process(
                 COMMAND "${DOXYPRESS_EXECUTABLE}" --version
                 OUTPUT_VARIABLE DOXYPRESS_VERSION
@@ -112,13 +111,10 @@ macro(_Doxypress_find_doxypress)
 
         # Create an imported target for Doxygen
         if (NOT TARGET Doxypress::doxypress)
-            message(STATUS "!!!! Create Doxypress::doxypress")
             add_executable(Doxypress::doxypress IMPORTED GLOBAL)
             set_target_properties(Doxypress::doxypress PROPERTIES
                     IMPORTED_LOCATION "${DOXYPRESS_EXECUTABLE}"
                     )
-        else()
-            message(STATUS "!!!! Do Not create Doxypress::doxypress")
         endif ()
     endif ()
 endmacro()
@@ -261,7 +257,6 @@ endif ()
 #
 # Find all requested components of Doxygen...
 #
-message(STATUS "!!!! before _Doxypress_find_doxypress")
 foreach (_comp IN LISTS Doxypress_FIND_COMPONENTS)
     if (_comp STREQUAL "doxypress")
         _Doxypress_find_doxypress()
