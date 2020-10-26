@@ -33,4 +33,4 @@ endfunction()
 
 set(DOXYPRESS_LOG_LEVEL DEBUG)
 test_input_directories_full_3()
-test_logging()
+#test_logging()
