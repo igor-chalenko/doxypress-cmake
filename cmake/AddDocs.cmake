@@ -5,6 +5,8 @@
 # https://opensource.org/licenses/MIT
 ##############################################################################
 
+get_filename_component(_doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
+
 include(${_doxypress_dir}/Logging.cmake)
 include(${_doxypress_dir}/TPA.cmake)
 include(${_doxypress_dir}/JSONParser.cmake)
@@ -383,6 +385,4 @@ endif ()
 #    _doxypress_log(INFO text) # does nothing
 #    _doxypress_log(WARN text) # equivalent to message([STATUS|WARNING] text)
 ##############################################################################
-set(DOXYPRESS_LOG_LEVEL WARN CACHE STRING "doxypress.log.level")
-
-mark_as_advanced(DOXYPRESS_LOG_LEVEL)
+set(DOXYPRESS_LOG_LEVEL WARN CACHE STRING "DoxypressCMake logging level")

@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.3)
 project(DoxypressCMake VERSION 0.1 DESCRIPTION "Doxypress module for CMake")
 
-get_filename_component(_doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
-set(_doxypress_dir "${_doxypress_dir}/cmake")
-set_property(GLOBAL PROPERTY _doxypress_dir "${_doxypress_dir}")
-include(${_doxypress_dir}/AddDocs.cmake)
+macro(c_include _file)
+    get_filename_component(_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
+    set_property(GLOBAL PROPERTY _doxypress_dir "${_dir}/cmake")
+    include(${_dir}/${_file})
+endmacro()
+
+#set(_doxypress_dir "${_doxypress_dir}/cmake")
+c_include(cmake/AddDocs.cmake)
 
 if (PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
     include(cmake/InstallBasicPackageFiles.cmake)
@@ -40,6 +44,6 @@ if (PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
                 NO_CHECK_REQUIRED_COMPONENTS_MACRO)
     endif()
 
-    # slash at the end remove `cmake` from the directory structure
+    # slash at the end removes `cmake` from the directory structure
     install(DIRECTORY "cmake/" DESTINATION ${_DESTINATION})
 endif()

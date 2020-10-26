@@ -55,6 +55,7 @@ endif()
 ##############################################################################
 
 set(_DOXYPRESS_TPA_INDEX_KEY property.index CACHE STRING "index of properties")
+mark_as_advanced(_DOXYPRESS_TPA_INDEX_KEY)
 
 ##############################################################################
 #.rst:

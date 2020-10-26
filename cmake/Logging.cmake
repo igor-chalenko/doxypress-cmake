@@ -18,9 +18,6 @@
 # be examined.
 ##############################################################################
 
-set(_doxypress_log_levels "DEBUG;INFO;WARN" CACHE STRING "DoxyPress Log levels")
-mark_as_advanced(_doxypress_log_levels)
-
 ##############################################################################
 #.rst:
 #
@@ -34,11 +31,13 @@ mark_as_advanced(_doxypress_log_levels)
 # :cmake:variable:`DOXYPRESS_LOG_LEVEL`). Does nothing otherwise.
 ##############################################################################
 function(_doxypress_log _level _message)
-    list(FIND _doxypress_log_levels ${_level} _ind)
+    set(_log_levels "DEBUG;INFO;WARN")
+
+    list(FIND _log_levels ${_level} _ind)
     if (_ind EQUAL -1)
         set(_ind 2)
     endif()
-    list(FIND _doxypress_log_levels ${DOXYPRESS_LOG_LEVEL} _ind2)
+    list(FIND _log_levels ${DOXYPRESS_LOG_LEVEL} _ind2)
     if (_ind2 EQUAL -1)
         set(_ind2 1)
     endif()
