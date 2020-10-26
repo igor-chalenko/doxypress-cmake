@@ -77,6 +77,7 @@
 ##############################################################################
 
 include(FindPackageHandleStandardArgs)
+message(STATUS "!!!!!!!!!!!!!!!!!!!!!!!!!!!!11")
 
 macro(_Doxypress_find_doxypress)
     message(STATUS "!!!! _Doxypress_find_doxypress")
