@@ -79,6 +79,7 @@
 include(FindPackageHandleStandardArgs)
 
 macro(_Doxypress_find_doxypress)
+    message(STATUS "!!!! _Doxypress_find_doxypress")
     find_program(
             DOXYPRESS_EXECUTABLE
             NAMES doxypress
@@ -110,10 +111,13 @@ macro(_Doxypress_find_doxypress)
 
         # Create an imported target for Doxygen
         if (NOT TARGET Doxypress::doxypress)
+            message(STATUS "!!!! Create Doxypress::doxypress")
             add_executable(Doxypress::doxypress IMPORTED GLOBAL)
             set_target_properties(Doxypress::doxypress PROPERTIES
                     IMPORTED_LOCATION "${DOXYPRESS_EXECUTABLE}"
                     )
+        else()
+            message(STATUS "!!!! Do Not create Doxypress::doxypress")
         endif ()
     endif ()
 endmacro()
@@ -256,6 +260,7 @@ endif ()
 #
 # Find all requested components of Doxygen...
 #
+message(STATUS "!!!! before _Doxypress_find_doxypress")
 foreach (_comp IN LISTS Doxypress_FIND_COMPONENTS)
     if (_comp STREQUAL "doxypress")
         _Doxypress_find_doxypress()
@@ -296,6 +301,7 @@ if (DOXYPRESS_FOUND)
 else ()
     set(DOXYPRESS_FOUND "NO")
 endif ()
+message(STATUS "!!!! DOXYPRESS_FOUND = ${DOXYPRESS_FOUND}")
 
 # We must run the following at "include" time, not at function call time,
 # to find the path to this module rather than the path to a calling list file
