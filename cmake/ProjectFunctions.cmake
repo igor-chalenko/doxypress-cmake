@@ -97,7 +97,7 @@ endfunction()
 #    _doxypress_params_init_overrides()
 #
 # Initializes properties that are processed by the chain of handlers:
-#   ``input`` -> ``json`` -> ``setter`` -> ``updater` -> ``default`
+#   ``input`` -> ``json`` -> ``setter`` -> ``updater`` -> ``default``
 ##############################################################################
 function(_doxypress_params_init_properties)
     _doxypress_property_add("messages.quiet" DEFAULT true)

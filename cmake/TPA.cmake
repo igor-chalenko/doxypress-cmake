@@ -42,11 +42,8 @@ endif()
 # prefixed with ``INTERFACE_`` to obtain the actual property name in that
 # `INTERFACE` target. Each TPA scope maintains the index of properties
 # it contains; this makes it easy to clear up a scope entirely and re-use it
-# afterward. There could be as many different TPA scopes as there are different
-# values of the ``CMAKE_CURRENT_SOURCE_DIR`` variable. Therefore, it's safe
-# to run parallel builds as long as there is only one CMake process working
-# on a given directory.
-
+# afterward. There can be only one TPA scope in a project, as its name uses
+# the value of  ``CMAKE_PROJECT_NAME`` as prefix.
 ##############################################################################
 #.rst:
 # -------------
