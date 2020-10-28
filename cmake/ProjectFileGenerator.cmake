@@ -37,6 +37,7 @@
 #   project file will have the value of that override, with one exception.
 #   It's not possible to have an override for a property that also has
 #   input parameter bound to it.
+#
 ##############################################################################
 
 unset(IN_INPUT_STRING)
@@ -335,7 +336,8 @@ endfunction()
 #
 # Attaches read/write logic to a given property identified by its JSON path
 # ``_path``. Declarations made using this function are interpreted later by
-# :cmake:command:`_doxypress_parse`. The following arguments are recognized:
+# :cmake:command:`_doxypress_update_path`. The following arguments are
+# recognized:
 #
 # * ``INPUT_OPTION``, ``INPUT_STRING``, ``INPUT_LIST``
 #
