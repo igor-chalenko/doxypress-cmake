@@ -97,7 +97,7 @@ function(_doxypress_update_project_file _file_name _out_var)
     set(_result "")
     if (NOT IS_ABSOLUTE ${_file_name})
         get_filename_component(_result
-                ${CMAKE_CURRENT_SOURCE_DIR}/${_file_name} ABSOLUTE)
+                "${_file_name}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
         set(${_out_var} "${_result}" PARENT_SCOPE)
     endif ()
 endfunction()
@@ -175,10 +175,10 @@ function(_doxypress_update_input_source _paths _out_var)
     # _doxypress_log(DEBUG "input sources before update: ${_sources}")
     if (_paths)
         foreach (_path ${_paths})
-            if (NOT IS_ABSOLUTE ${_path})
+            if (NOT IS_ABSOLUTE "${_path}")
                 get_filename_component(_path
-                        "${CMAKE_CURRENT_SOURCE_DIR}/${_path}"
-                        ABSOLUTE)
+                        "${_path}" ABSOLUTE
+                        BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
             endif ()
             list(APPEND _inputs "${_path}")
         endforeach ()
@@ -213,8 +213,8 @@ function(_doxypress_update_example_source _directories _out_var)
         foreach (_dir ${_directories})
             if (NOT IS_ABSOLUTE "${_dir}")
                 get_filename_component(_dir
-                        "${CMAKE_CURRENT_SOURCE_DIR}/${_dir}"
-                        ABSOLUTE)
+                        "${_dir}" ABSOLUTE
+                        BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
             endif ()
             list(APPEND _result "${_dir}")
         endforeach ()
@@ -239,9 +239,9 @@ endfunction()
 function(_doxypress_update_output_dir _directory _out_var)
     if (_directory)
         if (NOT IS_ABSOLUTE "${_directory}")
-            get_filename_component(_dir
-                    "${CMAKE_CURRENT_BINARY_DIR}/${_directory}"
-                    ABSOLUTE)
+            get_filename_component(_dir "${_directory}"
+                    ABSOLUTE
+                    BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
             set(${_out_var} "${_dir}" PARENT_SCOPE)
         endif ()
     endif ()

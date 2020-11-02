@@ -27,5 +27,4 @@ function(test_create_targets)
     endif()
 endfunction()
 
-set(DOXYPRESS_LOG_LEVEL DEBUG)
 test_create_targets()

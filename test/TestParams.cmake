@@ -30,12 +30,12 @@ endfunction()
 # give input directories as input and read them back
 function(test_input_directories_1)
     _doxypress_params_init()
-    _doxypress_inputs_parse(INPUTS dir1 dir2)
+    _doxypress_inputs_parse(INPUTS dir1/dir3 dir2)
     _doxypress_project_update(../cmake/DoxypressCMake.json _out)
 
     TPA_get("INPUTS" _inputs)
     assert_same("${_inputs}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/dir1;${CMAKE_CURRENT_SOURCE_DIR}/dir2")
+            "${CMAKE_CURRENT_SOURCE_DIR}/dir1/dir3;${CMAKE_CURRENT_SOURCE_DIR}/dir2")
     TPA_clear_scope()
 endfunction()
 
