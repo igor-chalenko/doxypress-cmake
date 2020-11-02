@@ -39,7 +39,21 @@ Files
    It's taken from the project [YCM](https://github.com/robotology/ycm), 
    which is 
    [copyrighted](https://github.com/robotology/ycm/blob/master/Copyright.txt)
-   by Istituto Italiano di Tecnologia (IIT). Follow the 
+   by Istituto Italiano di Tecnologia (IIT):
+
+    ```
+    Copyright 2014 Istituto Italiano di Tecnologia (IIT)
+      Authors: Daniele E. Domenichelli <daniele.domenichelli@iit.it>
+
+    Distributed under the OSI-approved BSD License (the "License");
+    see accompanying file Copyright.txt for details.
+
+    This software is distributed WITHOUT ANY WARRANTY; without even the
+    implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the License for more information.
+    ```
+
+Follow the 
    [link](https://github.com/robotology/ycm/blob/master/modules/InstallBasicPackageFiles.cmake)
    to view the original source. It's not a part of the installation package.
      
