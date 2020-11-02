@@ -156,9 +156,11 @@ function(_doxypress_add_pdf_commands _target_name)
                 VERBATIM)
         add_custom_command(TARGET ${_target_name} POST_BUILD
                 COMMENT "Copying refman.pdf to its own directory..."
-                COMMAND ${CMAKE_COMMAND} -E move
+                COMMAND ${CMAKE_COMMAND} -E copy
                 "${_output_dir}/latex/refman.pdf"
                 "${_output_dir}/pdf/refman.pdf")
+        add_custom_command(TARGET ${_target_name} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E rm "${_output_dir}/latex/refman.pdf")
     endif ()
 endfunction()
 
@@ -251,7 +253,7 @@ endfunction()
 # These
 ##############################################################################
 function(_doxypress_install_docs)
-    _doxypress_get(general.output-dir _output_directory)
+    _doxypress_get(general.output-dir _output_dir)
     TPA_get(INSTALL_COMPONENT _component)
 
     if (NOT DEFINED CMAKE_INSTALL_DOCDIR)

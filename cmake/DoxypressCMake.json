@@ -348,7 +348,7 @@
 		"latex-stylesheets": [
 			""
 		],
-		"latex-timestamp": true,
+		"latex-timestamp": false,
 		"make-index-cmd-name": "makeindex"
 	},
 	"output-man": {
