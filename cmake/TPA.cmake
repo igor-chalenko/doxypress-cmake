@@ -195,14 +195,12 @@ endfunction()
 #
 #    _TPA_scope_name(_out_var)
 #
-# Implements a scope naming scheme. The current directory's name is transformed
-# to satisfy requirements for valid target names and then used as a prefix
-# for the resulting name. This name is then written into ``_out_var``.
+# Implements a scope naming scheme.
 #
 # This function should not be used anywhere except in `_TPA_current_scope`.
 ##############################################################################
 function(_TPA_scope_name _out_var)
-    string(REPLACE " " "." _replaced "${CMAKE_PROJECT_NAME}")
+    string(REPLACE " " "." _replaced "${CMAKE_SOURCE_DIR}")
     string(REPLACE "/" "." _replaced "${_replaced}")
     string(REPLACE "\\" "." _replaced "${_replaced}")
     set(${_out_var} "${_replaced}.properties" PARENT_SCOPE)
