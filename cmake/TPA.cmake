@@ -172,10 +172,10 @@ endfunction()
 #
 # Defines what the current scope is. Upon the first invocation in the current
 # `CMake` source directory, creates an `INTERFACE` target with a name derived
-# from the value of ``${CMAKE_CURRENT_SOURCE_DIR}``. Afterward,
-# this name is written into the output variable ``_out_var`` in the parent
-# scope. This function is used by other `TPA` functions to obtain the current
-# TPA scope; it's not meant to be used outside the module.
+# from the value of ``${CMAKE_SOURCE_DIR}``. Afterward, this name is written
+# into the output variable ``_out_var`` in the parent scope. This function is
+# used by other `TPA` functions to obtain the current TPA scope; it's not
+# meant to be used outside the module.
 ##############################################################################
 function(_TPA_current_scope _out_var)
     _TPA_scope_name(_scope_name)
@@ -200,7 +200,7 @@ endfunction()
 # This function should not be used anywhere except in `_TPA_current_scope`.
 ##############################################################################
 function(_TPA_scope_name _out_var)
-    string(REPLACE " " "." _replaced "${CMAKE_SOURCE_DIR}")
+    string(REPLACE " " "." _replaced "${CMAKE_SOURCE_DIR}_${_random_id}")
     string(REPLACE "/" "." _replaced "${_replaced}")
     string(REPLACE "\\" "." _replaced "${_replaced}")
     set(${_out_var} "${_replaced}.properties" PARENT_SCOPE)

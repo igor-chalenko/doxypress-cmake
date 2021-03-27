@@ -258,6 +258,7 @@ mark_as_advanced(_DOXYPRESS_PROJECT_KEY _DOXYPRESS_JSON_PATHS_KEY
 # .. _json-cmake: https://github.com/sbellus/json-cmake
 ##############################################################################
 function(doxypress_add_docs)
+    string(RANDOM _random_id)
     # initialize parameter/property descriptions
     _doxypress_params_init()
     # parse input arguments
