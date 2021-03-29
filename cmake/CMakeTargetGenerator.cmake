@@ -203,7 +203,7 @@ function(_doxypress_add_open_targets _name_prefix)
             _doxypress_add_open_target(
                     ${_name_prefix}.open_pdf
                     ${_name_prefix}
-                    "${_output_dir}/latex/refman.pdf")
+                    "${_output_dir}/pdf/refman.pdf")
         endif ()
     endif ()
 endfunction()
