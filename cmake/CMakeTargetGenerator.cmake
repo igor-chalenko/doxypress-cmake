@@ -350,6 +350,7 @@ endfunction()
 function(_doxypress_list_inputs _out_var)
     TPA_get(INPUTS _inputs)
     TPA_get(INPUT_TARGET _input_target)
+    message(STATUS "!!! _input_target = ${_input_target}")
 
     set(_all_inputs "")
     if (_inputs)
