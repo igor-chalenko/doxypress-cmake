@@ -407,5 +407,6 @@ for `doxypress_add_docs`:
 2) Input project file didn't specify any inputs either.]=])
     endif ()
 
+    message(STATUS "_all_inputs = ${_all_inputs}")
     set(${_out_var} "${_all_inputs}" PARENT_SCOPE)
 endfunction()
