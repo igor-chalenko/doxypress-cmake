@@ -306,6 +306,5 @@ set_property(GLOBAL PROPERTY _doxypress_dir "${_doxypress_dir}")
 # "New" IN_LIST syntax
 cmake_policy(SET CMP0057 NEW)
 
-message(STATUS "!!! including ${_doxypress_dir}/AddDocs.cmake")
 include(${_doxypress_dir}/AddDocs.cmake)
 
