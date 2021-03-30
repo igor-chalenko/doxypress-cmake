@@ -303,8 +303,6 @@ endif ()
 get_filename_component(_doxypress_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
 set_property(GLOBAL PROPERTY _doxypress_dir "${_doxypress_dir}")
 
-#list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/externals/json-cmake")
-
 # "New" IN_LIST syntax
 cmake_policy(SET CMP0057 NEW)
 
