@@ -19,7 +19,7 @@ function(test_logging)
     add_executable(main2 src/main.cc)
     set_target_properties(main2 PROPERTIES EXCLUDE_FROM_ALL 1)
     target_include_directories(main2 PUBLIC
-            "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/test/include>$<INSTALL_INTERFACE:include>")
+            "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/test/include>")
 
     #_doxypress_params_init()
     #_doxypress_inputs_parse(INPUT_TARGET main GENERATE_XML GENERATE_PDF)
