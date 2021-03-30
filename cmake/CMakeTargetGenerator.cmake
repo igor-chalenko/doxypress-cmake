@@ -366,6 +366,7 @@ function(_doxypress_list_inputs _out_var)
         get_target_property(_include_directories
                 ${_input_target}
                 INTERFACE_INCLUDE_DIRECTORIES)
+        message(STATUS "!!! include dirs = ${_include_directories}")
         foreach (_dir ${_include_directories})
             message(STATUS "!!! scanning ${_dir}...")
             string(FIND ${_dir} "$<BUILD_INTERFACE:" _ind)
